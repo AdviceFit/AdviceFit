@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/parv/Desktop/AdviceFit/frontend/src/app/%28auth%29/layout.tsx"],"sourcesContent":["const AuthLayout = ({ children }: { children: React.ReactNode }) => {\r\n    return (\r\n        <main className=\"wrapper grid grid-cols-2\">\r\n            <div className=\"w-full bg-gray-900\"/>\r\n            <div>\r\n                {children}\r\n            </div>\r\n        </main>\r\n    )\r\n}\r\n\r\nexport default AuthLayout\r\n"],"names":[],"mappings":";;;;;AAAA,MAAM,aAAa,CAAC,EAAE,QAAQ,EAAiC;IAC3D,qBACI,8OAAC;QAAK,WAAU;;0BACZ,8OAAC;gBAAI,WAAU;;;;;;0BACf,8OAAC;0BACI;;;;;;;;;;;;AAIjB;uCAEe"}},
+    {"offset": {"line": 38, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
