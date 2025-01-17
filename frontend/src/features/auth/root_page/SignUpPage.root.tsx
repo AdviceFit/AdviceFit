@@ -35,6 +35,7 @@ import {
   Textarea
 } from "@/components/ui/textarea"
 import LocationSelector from "@/components/ui/location-input"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   gym_name: z.string().min(2).max(50),
@@ -50,6 +51,7 @@ const formSchema = z.object({
 });
 
 const SignUpPage = () => {
+    const router = useRouter();
   const [countryName, setCountryName] = useState<string>('');
   const [stateName, setStateName] = useState<string>('');
 
@@ -98,6 +100,8 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
 
     const data = await response.json();
     toast.success('Signup successful!');
+    router.push("/sign-in");
+
 
   } catch (error) {
     console.error('Form submission error', error);

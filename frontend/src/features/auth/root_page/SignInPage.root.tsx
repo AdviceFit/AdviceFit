@@ -1,10 +1,8 @@
 "use client";
-import { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRouter } from 'next/navigation';
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -25,6 +24,7 @@ const formSchema = z.object({
 });
 
 export default function MyForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -48,6 +48,7 @@ export default function MyForm() {
       console.log(data); // Log the response data
 
       toast.success("Login successful!"); // Show success message
+      router.push("/dashboard");
 
     } catch (error) {
       console.error("Form submission error", error);
