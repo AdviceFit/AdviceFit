@@ -1,23 +1,11 @@
-"use client"
-import {
-  useState
-} from "react"
-import {
-  toast
-} from "sonner"
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {
-  cn
-} from "@/lib/utils"
-import {
-  Button
-} from "@/components/ui/button"
+"use client";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -26,34 +14,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import {
-  Input
-} from "@/components/ui/input"
-import {
-  PasswordInput
-} from "@/components/ui/password-input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
+// Define the schema for validation
 const formSchema = z.object({
-  email: z.string(),
-  password: z.string()
+  email: z.string().email("Invalid email format"), // Validate email format
+  password: z.string().min(6, "Password must be at least 6 characters long"), // Minimum length for password
 });
 
 export default function MyForm() {
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+  });
 
-  })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  // Update onSubmit function to handle API call
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      const response = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values), // Send email and password as JSON
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log(data); // Log the response data
+
+      toast.success("Login successful!"); // Show success message
+
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -63,7 +58,6 @@ export default function MyForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
-
         <FormField
           control={form.control}
           name="email"
@@ -103,9 +97,8 @@ export default function MyForm() {
           )}
         />
 
-
         <Button type="submit">Submit</Button>
       </form>
     </Form>
-  )
+  );
 }
