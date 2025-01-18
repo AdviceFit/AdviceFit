@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const memberRoutes = require('./routes/memberRoutes');
+const visitorRoutes = require('./routes/visitorRoutes')
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 // User Routes
 app.use('/api/users', userRoutes);
 app.use('/members', memberRoutes);
+app.use('/visitors', visitorRoutes);
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');
