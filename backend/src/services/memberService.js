@@ -16,6 +16,11 @@ exports.createMember = async (memberData) => {
     return await member.save();
 };
 
+exports.findMembersByUser = async (userId) => {
+    console.log("🚀 ~ exports.findMembersByUser= ~ userId:", userId)
+    return await Member.find({ createdBy: userId, isDeleted: false });
+};
+
 // Update a member by ID
 exports.updateMember = async (id, updateData) => {
     return await Member.findByIdAndUpdate(id, updateData, { new: true });
