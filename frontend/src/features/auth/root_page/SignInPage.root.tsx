@@ -46,7 +46,11 @@ export default function MyForm() {
 
       const data = await response.json();
       console.log(data); // Log the response data
-
+      if (data.token) {
+        console.log(data.token);
+        
+        localStorage.setItem("authToken", data.token);
+      }
       toast.success("Login successful!"); // Show success message
       router.push("/dashboard");
 
