@@ -78,7 +78,7 @@ const MemberRoute: React.FC = () => {
       toast.success("Member Deleted Successfully!"); // Show success message
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      toast.success("Failed to Delete the Member!"); // Show success message
+      toast.error("Failed to Delete the Member!"); // Show success message
     }
   };
 
