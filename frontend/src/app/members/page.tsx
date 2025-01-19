@@ -4,7 +4,21 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/ui/header";
 import Sidebar from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Member {
   _id: string;
@@ -26,8 +40,10 @@ const MemberRoute: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
+  const router = useRouter();
   useEffect(() => {
     const fetchMembers = async () => {
       try {
@@ -46,6 +62,7 @@ const MemberRoute: React.FC = () => {
         }
         const data = await response.json();
         setMembers(data.members);
+        setTotalPages(data.totalPages || 1);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -75,10 +92,8 @@ const MemberRoute: React.FC = () => {
 
       // Remove deleted member from state
       setMembers((prevMembers) => prevMembers.filter((member) => member._id !== id));
-      toast.success("Member Deleted Successfully!"); // Show success message
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      toast.error("Failed to Delete the Member!"); // Show success message
     }
   };
 
@@ -98,74 +113,99 @@ const MemberRoute: React.FC = () => {
           {!loading && !error && members.length === 0 && (
             <p className="text-center text-lg">No members found.</p>
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {!loading &&
-              !error &&
-              members.map((member) => (
-                <div
-                  key={member._id}
-                  className="member-card border border-gray-300 rounded-lg shadow-md p-4 bg-white hover:bg-gray-50 transition duration-200 ease-in-out"
-                >
-                  <h2 className="text-xl font-semibold mb-2">{member.name}</h2>
-                  <p>
-                    <strong>Mobile:</strong> {member.mobile}
-                  </p>
-                  <p>
-                    <strong>Gym Member Code:</strong> {member.gym_member_code}
-                  </p>
-                  <p>
-                    <strong>Joining Date:</strong>{" "}
-                    {new Date(member.joining_date).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {member.email}
-                  </p>
-                  <p>
-                    <strong>Center:</strong> {member.center}
-                  </p>
-                  <p>
-                    <strong>Gender:</strong> {member.gender}
-                  </p>
-                  <p>
-                    <strong>Source:</strong> {member.source}
-                  </p>
-                  <p>
-                    <strong>Occupation:</strong> {member.occupation}
-                  </p>
-                  <p>
-                    <strong>Date of Birth:</strong>{" "}
-                    {new Date(member.dob).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Health Conditions:</strong> {member.health_conditions}
-                  </p>
-                  <p>
-                    <strong>Marital Status:</strong> {member.marital_status}
-                  </p>
-                  <div className="flex gap-4 mt-4">
-                    <button
-                      onClick={() => router.push("members/add-member")}
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                    >
-                      Add Member
-                    </button>
-                    <button
-                      onClick={() => handleUpdate(member._id)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Update
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(member._id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
+          <div className="flex flex-col ">
+            <div className=" w-10/12 absolute " >
+              <Button
+                onClick={() => router.push("members/add-member")}
+                className="float-right"
+              >
+                Add Member
+              </Button>
+            </div>
+            <div className="flex flex-col mt-12 w-10/12 absolute">
+              <div className="py-2">
+                <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Mobile</TableHead>
+                        <TableHead>Member Code</TableHead>
+                        <TableHead>Gym Name - Center</TableHead>
+                        <TableHead>Joining Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {members.map((member) => (
+                        <TableRow key={member._id}>
+                          <TableCell>{member.name}</TableCell>
+                          <TableCell>{member.mobile}</TableCell>
+                          <TableCell>{member.gym_member_code || "N/A"}</TableCell>
+                          <TableCell>{member.center}</TableCell>
+                          <TableCell>
+                            {new Date(member.joining_date).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>•••
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleUpdate(member._id)}>
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(member._id)}
+                                  className="text-red-500"
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center justify-between mt-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                >
+                  Previous
+                </Button>
+                <div className="hidden md:flex items-center gap-x-3">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      key={i}
+                      variant='default'
+                      size="sm"
+                      onClick={() => setCurrentPage(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+
           </div>
+
         </div>
       </div>
     </div>

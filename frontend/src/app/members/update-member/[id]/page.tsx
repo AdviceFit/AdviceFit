@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import CreateMember from "../../add-member/page";
 
 const UpdateMember = () => {
-  const id = useParams();
+  const { id: memberId } = useParams();
   const [memberData, setMemberData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      fetch(`http://localhost:5000/members/${id.slug}`, {
+    if (memberId) {
+      fetch(`http://localhost:5000/members/${memberId}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
@@ -25,10 +25,10 @@ const UpdateMember = () => {
           setLoading(false);
         });
     }
-  }, [id]);
+  }, [memberId]);
 
   if (loading) return <div>Loading...</div>;
-//@ts-ignore
+  //@ts-ignore
   return <CreateMember mode="edit" initialData={memberData} />;
 };
 

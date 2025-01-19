@@ -1,10 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 // Define the interface
 interface NewMember {
-    _id?:string
+    _id?: string
     name: string;
     mobile: number;
     gym_member_code?: string;
@@ -21,12 +24,16 @@ interface NewMember {
 }
 const CreateMember: React.FC<{
     mode: "add" | "edit"; // Mode to determine form behavior
-    initialData?: NewMember ; // Optional data for editing
+    initialData?: NewMember; // Optional data for editing
 }> = ({ mode, initialData }) => {
+      const router = useRouter();
     const currentDate = new Date().toISOString().slice(0, 10);
-// const memberId=initialData ? initialData._id :''
+    // const memberId=initialData ? initialData._id :''
+    // Normalize dates to YYYY-MM-DD
+    const normalizeDate = (date?: string) =>
+        date ? new Date(date).toISOString().slice(0, 10) : "";
+
     const [formData, setFormData] = useState<NewMember>({
-        // _id:memberId,
         name: "",
         mobile: 0,
         gym_member_code: "",
@@ -40,9 +47,21 @@ const CreateMember: React.FC<{
         health_conditions: "",
         marital_status: "",
         member_id_proof: "",
-        ...initialData, // Populate with initial data if editing
+        ...initialData,
+        ...(initialData?.joining_date && { joining_date: normalizeDate(initialData.joining_date) }),
+        ...(initialData?.dob && { dob: normalizeDate(initialData.dob) }),
     });
 
+    useEffect(() => {
+        if (initialData) {
+            setFormData((prev) => ({
+                ...prev,
+                ...initialData,
+                joining_date: normalizeDate(initialData.joining_date),
+                dob: normalizeDate(initialData.dob),
+            }));
+        }
+    }, [initialData]);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -87,7 +106,7 @@ const CreateMember: React.FC<{
 
             const endpoint =
                 mode === "edit"
-                //@ts-ignore
+                    //@ts-ignore
                     ? `http://localhost:5000/members/${initialData?._id}` // Use ID for editing
                     : "http://localhost:5000/members";
 
@@ -105,11 +124,9 @@ const CreateMember: React.FC<{
             if (!response.ok) {
                 throw new Error(`Failed to ${mode === "edit" ? "update" : "add"} member`);
             }
-
-            const data = await response.json();
-            console.log(`${mode === "edit" ? "Updated" : "Added"} successfully:`, data);
-            alert(`${mode === "edit" ? "Member updated" : "Member added"} successfully!`);
-
+            await response.json();
+            toast.success("Member Added Successfully!"); 
+            router.push(`/members`);
             // Reset form if adding
             if (mode === "add") {
                 setFormData({
@@ -145,8 +162,8 @@ const CreateMember: React.FC<{
 
     return (
         <form onSubmit={handleSubmit} className="mb-4 p-4 border rounded shadow-sm">
-      <h2 className="text-lg font-semibold">{mode === "edit" ? "Update Member" : "Add New Member"}</h2>
-      <div className="grid grid-cols-2 gap-4">
+            <h2 className="text-lg font-semibold">{mode === "edit" ? "Update Member" : "Add New Member"}</h2>
+            <div className="grid grid-cols-2 gap-4">
                 {/* Name */}
                 <div>
                     <label className="block font-medium">
@@ -404,12 +421,12 @@ const CreateMember: React.FC<{
                 </div>
             </div>
 
-            <button
+            <Button
                 type="submit"
-                className="mt-6 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="mt-6"
             >
                 SAVE
-            </button>
+            </Button>
         </form>
     );
 };
