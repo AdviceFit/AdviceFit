@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/ui/header";
 import Sidebar from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Member {
   _id: string;
@@ -74,8 +75,10 @@ const MemberRoute: React.FC = () => {
 
       // Remove deleted member from state
       setMembers((prevMembers) => prevMembers.filter((member) => member._id !== id));
+      toast.success("Member Deleted Successfully!"); // Show success message
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+      toast.success("Failed to Delete the Member!"); // Show success message
     }
   };
 

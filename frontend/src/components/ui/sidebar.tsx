@@ -8,10 +8,10 @@ const Sidebar: React.FC = () => {
           <Link href="/dashboard">Dashboard</Link>
         </li>
         <li className="mb-2">
-          <Link href="/settings">Visitors</Link>
+          <Link href="/members">Members</Link>
         </li>
         <li className="mb-2">
-          <Link href="/members">Members</Link>
+          <Link href="/visitors">Visitors</Link>
         </li>
         <li className="mb-2">
           <Link href="/profile">Attendance</Link>

@@ -11,6 +11,11 @@ exports.findAllVisitors = async () => {
     return await Visitor.find();
 };
 
+// Get all visitors by User
+exports.findVisitorsByUser = async (userId) => {
+    return await Visitor.find({ createdBy: userId, isDeleted: false });
+};
+
 // Get a visitor by ID
 exports.findVisitorById = async (id) => {
     return await Visitor.findById(id);
@@ -23,5 +28,5 @@ exports.updateVisitor = async (id, updateData) => {
 
 // Delete a visitor by ID
 exports.deleteVisitor = async (id) => {
-    return await Visitor.findByIdAndDelete(id);
+    return await Visitor.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 };
