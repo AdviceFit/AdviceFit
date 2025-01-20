@@ -14,7 +14,7 @@ const Sidebar: React.FC = () => {
           <Link href="/visitors">Visitors</Link>
         </li>
         <li className="mb-2">
-          <Link href="/profile">Attendance</Link>
+          <Link href="/attendances">Attendance</Link>
         </li>
         <li className="mb-2">
           <Link href="/profile">Session</Link>
@@ -30,6 +30,9 @@ const Sidebar: React.FC = () => {
         </li>
         <li className="mb-2">
           <Link href="/profile">Setup</Link>
+        </li>     
+           <li className="mb-2">
+          <Link href="/centers">Center</Link>
         </li>
       </ul>
     </aside>

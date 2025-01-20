@@ -18,51 +18,60 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-interface Member {
+interface Center {
   _id: string;
   name: string;
-  mobile: number;
-  gym_member_code: string;
-  joining_date: string;
-  email: string;
-  center: string;
-  gender: string;
-  source: string;
-  occupation: string;
-  dob: string;
-  health_conditions: string;
-  marital_status: string;
+  centerCode: string;
+  centerEmail: string;
+  mobileNo: string;
+  workPhone?: string;
+  gstNumber?: string;
+  agency?: string;
+  biometricSerialNumber?: string;
+  address: {
+    addressLine1: string;
+    addressLine2: string;
+    state: string;
+    city: string;
+    pincode: string;
+  };
+  aboutUs?: string;
+  termsAndConditions?: string;
+  createdBy: string;
 }
 
-const MemberRoute: React.FC = () => {
-  const [members, setMembers] = useState<Member[]>([]);
+const CenterPage: React.FC = () => {
+  const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const router = useRouter();
+
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchCenters = async () => {
       try {
         const token = localStorage.getItem("authToken");
         if (!token) {
           throw new Error("Authentication token is missing");
         }
-        const response = await fetch("http://localhost:5000/members", {
+        const response = await fetch("http://localhost:5000/center/user", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
-        }); if (!response.ok) {
+        });
+
+        if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
-        setMembers(data.members);
+        setCenters(data.data); // Assuming the API returns centers in `data.data`
         setTotalPages(data.totalPages || 1);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -71,39 +80,38 @@ const MemberRoute: React.FC = () => {
       }
     };
 
-    fetchMembers();
+    fetchCenters();
   }, []);
 
-  // Handle delete member
+  // Handle delete center
   const handleDelete = async (id: string) => {
     try {
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch(`http://localhost:5000/members/${id}`, {
+      const response = await fetch(`http://localhost:5000/centers/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete member");
+        throw new Error("Failed to delete center");
       }
 
-      // Remove deleted member from state
-      setMembers((prevMembers) => prevMembers.filter((member) => member._id !== id));
-      toast.success("Member Deleted Successfully!"); // Show success message
+      // Remove deleted center from state
+      setCenters((prevCenters) => prevCenters.filter((center) => center._id !== id));
+      toast.success("Center Deleted Successfully!");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      toast.error("Failed to Delete the Member!"); // Show success message
-
+      toast.error("Failed to Delete the Center!");
     }
   };
 
-  // Handle update member (Dummy example for now)
+  // Handle update center
   const handleUpdate = async (id: string) => {
-    router.push(`/members/update-member/${id}`);
+    router.push(`/centers/update-center/${id}`);
   };
 
   return (
@@ -111,19 +119,19 @@ const MemberRoute: React.FC = () => {
       <Header />
       <div className="flex flex-grow">
         <Sidebar />
-        <div className="members-list p-6 overflow-y-auto">
+        <div className="centers-list p-6 overflow-y-auto">
           {loading && <p className="text-center text-lg">Loading...</p>}
           {error && <p className="text-red-500 text-center">{error}</p>}
-          {!loading && !error && members.length === 0 && (
-            <p className="text-center text-lg">No members found.</p>
+          {!loading && !error && centers.length === 0 && (
+            <p className="text-center text-lg">No centers found.</p>
           )}
-          <div className="flex flex-col ">
-            <div className=" w-10/12 absolute " >
+          <div className="flex flex-col">
+            <div className="w-10/12 absolute">
               <Button
-                onClick={() => router.push("members/add-member")}
+                onClick={() => router.push("/centers/add-center")}
                 className="float-right"
               >
-                Add Member
+                Add Center
               </Button>
             </div>
             <div className="flex flex-col mt-12 w-10/12 absolute">
@@ -133,23 +141,23 @@ const MemberRoute: React.FC = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Name</TableHead>
+                        <TableHead>Center Code</TableHead>
+                        <TableHead>Email</TableHead>
                         <TableHead>Mobile</TableHead>
-                        <TableHead>Member Code</TableHead>
-                        <TableHead>Gym Name - Center</TableHead>
-                        <TableHead>Joining Date</TableHead>
+                        <TableHead>Biometric Serial Number</TableHead>
+                        <TableHead>City</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {members.map((member) => (
-                        <TableRow key={member._id}>
-                          <TableCell>{member.name}</TableCell>
-                          <TableCell>{member.mobile}</TableCell>
-                          <TableCell>{member.gym_member_code || "N/A"}</TableCell>
-                          <TableCell>{member.center}</TableCell>
-                          <TableCell>
-                            {new Date(member.joining_date).toLocaleDateString()}
-                          </TableCell>
+                      {centers.map((center) => (
+                        <TableRow key={center._id}>
+                          <TableCell>{center.name}</TableCell>
+                          <TableCell>{center.centerCode}</TableCell>
+                          <TableCell>{center.centerEmail}</TableCell>
+                          <TableCell>{center.biometricSerialNumber}</TableCell>
+                          <TableCell>{center.mobileNo}</TableCell>
+                          <TableCell>{center.address.city}</TableCell>
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -158,11 +166,11 @@ const MemberRoute: React.FC = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleUpdate(member._id)}>
+                                <DropdownMenuItem onClick={() => handleUpdate(center._id)}>
                                   Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  onClick={() => handleDelete(member._id)}
+                                  onClick={() => handleDelete(center._id)}
                                   className="text-red-500"
                                 >
                                   Delete
@@ -189,7 +197,7 @@ const MemberRoute: React.FC = () => {
                   {[...Array(totalPages)].map((_, i) => (
                     <Button
                       key={i}
-                      variant='default'
+                      variant="default"
                       size="sm"
                       onClick={() => setCurrentPage(i + 1)}
                     >
@@ -207,13 +215,11 @@ const MemberRoute: React.FC = () => {
                 </Button>
               </div>
             </div>
-
           </div>
-
         </div>
       </div>
     </div>
   );
 };
 
-export default MemberRoute;
+export default CenterPage;
