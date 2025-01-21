@@ -34,6 +34,9 @@ const Sidebar: React.FC = () => {
            <li className="mb-2">
           <Link href="/centers">Center</Link>
         </li>
+        <li className="mb-2">
+          <Link href="/packages">Package</Link>
+        </li>
       </ul>
     </aside>
   );
