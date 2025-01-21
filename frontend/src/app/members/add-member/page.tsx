@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 // Define the interface
-interface Address {
+export interface Address {
     addressLine1?: string;
     addressLine2?: string;
     state?: string;
@@ -34,7 +34,7 @@ interface NewMember {
 
 const CreateMember: React.FC<{
     mode: "add" | "edit"; // Mode to determine form behavior
-    initialData?: NewMember; // Optional data for editing
+    initialData: NewMember; // Optional data for editing
 }> = ({ mode, initialData }) => {
     const router = useRouter();
     const currentDate = new Date().toISOString().slice(0, 10);
@@ -44,31 +44,10 @@ const CreateMember: React.FC<{
         date ? new Date(date).toISOString().slice(0, 10) : "";
 
     const [formData, setFormData] = useState<NewMember>({
-        name: "",
-        mobile: 0,
-        gym_member_code: "",
-        joining_date: currentDate,
-        email: "",
-        center: "",
-        gender: "",
-        source: "",
-        occupation: "",
-        dob: "",
-        health_conditions: "",
-        marital_status: "",
-        member_id_proof: "",
-        address: {
-            addressLine1: "",
-            addressLine2: "",
-            state: "",
-            city: "",
-            pincode: "",
-        },
         ...initialData,
-        ...(initialData?.joining_date && { joining_date: normalizeDate(initialData.joining_date) }),
-        ...(initialData?.dob && { dob: normalizeDate(initialData.dob) }),
+        joining_date: initialData?.joining_date ? normalizeDate(initialData.joining_date) : currentDate,
+        dob: initialData?.dob ? normalizeDate(initialData.dob) : "",
     });
-
 
     useEffect(() => {
         if (initialData) {
@@ -86,7 +65,7 @@ const CreateMember: React.FC<{
         const { name, value } = e.target;
         if (name.includes("address.")) {
             const [_, key] = name.split(".");
-            
+
             setFormData((prev) => ({
                 ...prev,
                 address: { ...prev.address, [key]: value },
@@ -98,7 +77,7 @@ const CreateMember: React.FC<{
             }));
         }
     };
-    
+
 
     const memberSchema = z.object({
         // _id: z.string().optional(), 
@@ -465,8 +444,8 @@ const CreateMember: React.FC<{
                         <option value="None">None</option>
                     </select>
                 </div>
-              
-            </div >            
+
+            </div >
             <div className="mt-5">
                 <label className="block font-medium">
                     Address Line 1
@@ -535,7 +514,8 @@ const CreateMember: React.FC<{
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
                 />
-            </div>            <Button
+            </div>
+            <Button
                 type="submit"
                 className="mt-6"
             >

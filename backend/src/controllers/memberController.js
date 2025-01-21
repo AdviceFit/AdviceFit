@@ -30,7 +30,7 @@ exports.getAllMembers = async (req, res) => {
 exports.getMembersByUser = async (req, res) => {
     try {
         const userId = req.user._id; // Get the logged-in user's ID from req.user
-        console.log("Fetching members for user:", userId);
+        // console.log("Fetching members for user:", userId);
 
         // Fetch members associated with this user
         const members = await MemberService.findMembersByUser(userId);

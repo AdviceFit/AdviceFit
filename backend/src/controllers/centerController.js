@@ -58,7 +58,7 @@ exports.deleteCenter = async (req, res) => {
 exports.getCentersByUser = async (req, res) => {
     try {
         const centers = await centerService.getCentersByUser(req.user._id); // Use the logged-in user's ID
-        console.log("🚀 ~ exports.getCentersByUser= ~ centers:", centers)
+        // console.log("🚀 ~ exports.getCentersByUser= ~ centers:", centers)
         res.status(200).json({ success: true, data: centers });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });

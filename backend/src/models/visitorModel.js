@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const addressSchema = require('./addressModel');
 
 const visitorSchema = new mongoose.Schema(
     {
@@ -71,6 +72,10 @@ const visitorSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: ['Talking', 'Walking', 'Any']
+        },
+        address: {
+            type: addressSchema,
+            required: false,
         },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,

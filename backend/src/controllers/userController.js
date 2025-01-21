@@ -22,7 +22,7 @@ exports.signup = async (req, res) => {
             password: hashedPassword,
             ...rest,
         });
-        console.log("🚀 ~ exports.signup= ~ newUser:", newUser)
+        // console.log("🚀 ~ exports.signup= ~ newUser:", newUser)
 
         res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {

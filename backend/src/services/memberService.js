@@ -17,7 +17,7 @@ exports.createMember = async (memberData) => {
 };
 
 exports.findMembersByUser = async (userId) => {
-    console.log("🚀 ~ exports.findMembersByUser= ~ userId:", userId)
+    // console.log("🚀 ~ exports.findMembersByUser= ~ userId:", userId)
     return await Member.find({ createdBy: userId, isDeleted: false });
 };
 

@@ -1,16 +1,16 @@
 'use client'
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import CreateMember from "../../add-member/page";
+import CreateVisitor from "../../add-visitor/page";
 
 const UpdateMember = () => {
-  const { id: memberId } = useParams();
-  const [memberData, setMemberData] = useState(null);
+  const { id: visitorId } = useParams();
+  const [visitorData, setvisitorData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (memberId) {
-      fetch(`http://localhost:5000/members/${memberId}`, {
+    if (visitorId) {
+      fetch(`http://localhost:5000/visitors/${visitorId}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
@@ -18,18 +18,18 @@ const UpdateMember = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          setMemberData(data.member);
+          setvisitorData(data.visitor);
           setLoading(false);
         })
         .catch((err) => {
           setLoading(false);
         });
     }
-  }, [memberId]);
+  }, [visitorId]);
 
   if (loading) return <div>Loading...</div>;
-  if (!memberData) return <div>Members not found</div>;
-  return <CreateMember mode="edit" initialData={memberData} />;
+  if (!visitorData) return <div>Visitor not found</div>;
+  return <CreateVisitor mode="edit" initialData={visitorData} />;
 };
 
 export default UpdateMember;
