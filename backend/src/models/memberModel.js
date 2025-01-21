@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const addressSchema = require('./addressModel');
 
 const memberSchema = new mongoose.Schema(
     {
@@ -70,6 +71,10 @@ const memberSchema = new mongoose.Schema(
             type: String,
             required: false,
             default: 'None',
+        },
+        address: {
+            type: addressSchema,
+            required: false,
         },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,

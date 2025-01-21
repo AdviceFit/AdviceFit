@@ -6,8 +6,16 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 // Define the interface
+interface Address {
+    addressLine1?: string;
+    addressLine2?: string;
+    state?: string;
+    city?: string;
+    pincode?: string;
+}
+
 interface NewMember {
-    _id?: string
+    _id?: string;
     name: string;
     mobile: number;
     gym_member_code?: string;
@@ -21,12 +29,14 @@ interface NewMember {
     health_conditions?: string;
     marital_status: string;
     member_id_proof?: string;
+    address?: Address;
 }
+
 const CreateMember: React.FC<{
     mode: "add" | "edit"; // Mode to determine form behavior
     initialData?: NewMember; // Optional data for editing
 }> = ({ mode, initialData }) => {
-      const router = useRouter();
+    const router = useRouter();
     const currentDate = new Date().toISOString().slice(0, 10);
     // const memberId=initialData ? initialData._id :''
     // Normalize dates to YYYY-MM-DD
@@ -47,10 +57,18 @@ const CreateMember: React.FC<{
         health_conditions: "",
         marital_status: "",
         member_id_proof: "",
+        address: {
+            addressLine1: "",
+            addressLine2: "",
+            state: "",
+            city: "",
+            pincode: "",
+        },
         ...initialData,
         ...(initialData?.joining_date && { joining_date: normalizeDate(initialData.joining_date) }),
         ...(initialData?.dob && { dob: normalizeDate(initialData.dob) }),
     });
+
 
     useEffect(() => {
         if (initialData) {
@@ -66,31 +84,52 @@ const CreateMember: React.FC<{
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: name === "mobile" ? parseInt(value) || 0 : value,
-        }));
+        if (name.includes("address.")) {
+            const [_, key] = name.split(".");
+            
+            setFormData((prev) => ({
+                ...prev,
+                address: { ...prev.address, [key]: value },
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: name === "mobile" ? parseInt(value) || 0 : value,
+            }));
+        }
     };
+    
 
     const memberSchema = z.object({
-        // _id: z.string().optional(), // Optional
-        name: z.string().min(1, "Name is required"), // Required
+        // _id: z.string().optional(), 
+        name: z.string().min(1, "Name is required"),
         mobile: z
             .number()
             .refine((value) => /^\d{10}$/.test(value.toString()), {
                 message: "Enter a valid 10-digit mobile number",
-            }), // Required
-        gym_member_code: z.string().optional(), // Optional
-        joining_date: z.string().min(1, "Joining date is required"), // Required
-        email: z.string().email("Enter a valid email address").optional(), // Optional
-        center: z.string().min(1, "Center is required"), // Required
-        gender: z.enum(["Male", "Female", "Other"], { required_error: "Gender is required" }), // Required
-        source: z.string().optional(), // Optional
-        occupation: z.string().optional(), // Optional
-        dob: z.string().optional(), // Optional
-        health_conditions: z.string().optional(), // Optional
-        marital_status: z.enum(["Single", "Married"], { required_error: "Marital status is required" }), // Required
-        member_id_proof: z.string().optional(), // Optional
+            }),
+        gym_member_code: z.string().optional(),
+        joining_date: z.string().min(1, "Joining date is required"),
+        email: z.string().email("Enter a valid email address").optional(),
+        center: z.string().min(1, "Center is required"),
+        gender: z.enum(["Male", "Female", "Other"], { required_error: "Gender is required" }),
+        source: z.string().optional(),
+        occupation: z.string().optional(),
+        dob: z.string().optional(),
+        health_conditions: z.string().optional(),
+        marital_status: z.enum(["Single", "Married"], { required_error: "Marital status is required" }),
+        member_id_proof: z.string().optional(),
+        address: z
+            .object({
+                addressLine1: z.string().optional(),
+                addressLine2: z.string().optional(),
+                state: z.string().optional(),
+                city: z.string().optional(),
+                pincode: z
+                    .string()
+                    .regex(/^\d{6}$/, "Pincode must be a valid 6-digit number"),
+            })
+            .optional(),
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -125,7 +164,7 @@ const CreateMember: React.FC<{
                 throw new Error(`Failed to ${mode === "edit" ? "update" : "add"} member`);
             }
             await response.json();
-            toast.success("Member Added Successfully!"); 
+            toast.success("Member Added Successfully!");
             router.push(`/members`);
             // Reset form if adding
             if (mode === "add") {
@@ -143,6 +182,13 @@ const CreateMember: React.FC<{
                     health_conditions: "",
                     marital_status: "",
                     member_id_proof: "",
+                    address: {
+                        addressLine1: "",
+                        addressLine2: "",
+                        state: "",
+                        city: "",
+                        pincode: "",
+                    },
                 });
             }
         } catch (err) {
@@ -419,9 +465,77 @@ const CreateMember: React.FC<{
                         <option value="None">None</option>
                     </select>
                 </div>
+              
+            </div >            
+            <div className="mt-5">
+                <label className="block font-medium">
+                    Address Line 1
+                </label>
+                <input
+                    type="text"
+                    name="address.addressLine1"
+                    placeholder="Address Line 1"
+                    value={formData.address?.addressLine1 || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                />
+            </div>
+            <div>
+                <label className="block font-medium">Address Line 2</label>
+                <input
+                    type="text"
+                    name="address.addressLine2"
+                    placeholder="Address Line 2"
+                    value={formData.address?.addressLine2 || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                />
             </div>
 
-            <Button
+            <div className="flex  space-x-5">
+                <div className="w-full">
+                    <label className=" font-medium">
+                        State
+                    </label>
+                    <input
+                        type="text"
+                        name="address.state"
+                        placeholder="State"
+                        value={formData.address?.state || ""}
+                        pattern="[A-Za-z\s]*"
+                        title="State must contain only letters"
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    />
+
+                </div>
+                <div className="w-full">
+                    <label className=" font-medium">
+                        City
+                    </label>
+                    <input
+                        type="text"
+                        name="address.city"
+                        placeholder="City"
+                        value={formData.address?.city || ""}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    />
+                </div>
+            </div>
+            <div>
+                <label className="block font-medium">
+                    Pincode
+                </label>
+                <input
+                    type="text"
+                    name="address.pincode"
+                    placeholder="Pincode"
+                    value={formData.address?.pincode || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                />
+            </div>            <Button
                 type="submit"
                 className="mt-6"
             >
