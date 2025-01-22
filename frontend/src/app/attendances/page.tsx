@@ -47,19 +47,14 @@ const AttendanceRoute: React.FC = () => {
     useEffect(() => {
         const fetchAttendances = async () => {
             try {
-                const token = localStorage.getItem("authToken");
-                if (!token) {
-                    throw new Error("Authentication token is missing");
-                }
-
                 const response = await fetch(
                     `http://localhost:5000/attendance/user?page=${currentPage}`,
                     {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
                         },
+                        credentials: 'include',
                     }
                 );
 
@@ -94,17 +89,14 @@ const AttendanceRoute: React.FC = () => {
     // Handle delete attendance
     const handleDelete = async (id: string) => {
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) {
-                throw new Error("Authentication token is missing");
-            }
+
 
             const response = await fetch(`http://localhost:5000/attendance/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
+                credentials: 'include',
             });
 
             if (!response.ok) {

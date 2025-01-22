@@ -48,16 +48,12 @@ const MemberRoute: React.FC = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          throw new Error("Authentication token is missing");
-        }
         const response = await fetch("http://localhost:5000/members", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
           },
+          credentials: 'include',
         }); if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -77,14 +73,13 @@ const MemberRoute: React.FC = () => {
   // Handle delete member
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem("authToken");
 
       const response = await fetch(`http://localhost:5000/members/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {

@@ -54,6 +54,13 @@ exports.login = async (req, res) => {
             { expiresIn: '1h' }
         );
 
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000, // 1 hour
+            sameSite: 'lax',
+            path: '/', // Ensure the path is set correctly
+        });
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -50,14 +50,12 @@ const VisitorRoute: React.FC = () => {
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("Authentication token is missing");
         const response = await fetch("http://localhost:5000/visitors", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: 'include',
         });
 
         if (!response.ok) throw new Error("Network response was not ok");
@@ -76,14 +74,12 @@ const VisitorRoute: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem("authToken");
-
       const response = await fetch(`http://localhost:5000/visitors/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
       });
 
       if (!response.ok) throw new Error("Failed to delete visitor");

@@ -103,9 +103,6 @@ const CreateVisitor: React.FC<{
 
         try {
             const validatedData = visitorSchema.parse(formData);
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Authentication token is missing");
-
             const endpoint =
                 mode === "edit"
                     ? `http://localhost:5000/visitors/${initialData?._id}`
@@ -117,8 +114,8 @@ const CreateVisitor: React.FC<{
                 method,
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
                 },
+                credentials: 'include',
                 body: JSON.stringify(validatedData),
             });
 

@@ -48,17 +48,6 @@ const CreateMember: React.FC<{
         joining_date: initialData?.joining_date ? normalizeDate(initialData.joining_date) : currentDate,
         dob: initialData?.dob ? normalizeDate(initialData.dob) : "",
     });
-
-    useEffect(() => {
-        if (initialData) {
-            setFormData((prev) => ({
-                ...prev,
-                ...initialData,
-                joining_date: normalizeDate(initialData.joining_date),
-                dob: normalizeDate(initialData.dob),
-            }));
-        }
-    }, [initialData]);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -116,12 +105,6 @@ const CreateMember: React.FC<{
 
         try {
             const validatedData = memberSchema.parse(formData);
-
-            const token = localStorage.getItem("authToken");
-            if (!token) {
-                throw new Error("Authentication token is missing");
-            }
-
             const endpoint =
                 mode === "edit"
                     //@ts-ignore
@@ -134,8 +117,8 @@ const CreateMember: React.FC<{
                 method,
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
                 },
+                credentials: 'include',
                 body: JSON.stringify(validatedData),
             });
 
@@ -184,6 +167,18 @@ const CreateMember: React.FC<{
             }
         }
     };
+
+
+    // useEffect(() => {
+    //     if (initialData) {
+    //         setFormData((prev) => ({
+    //             ...prev,
+    //             ...initialData,
+    //             joining_date: normalizeDate(initialData.joining_date),
+    //             dob: normalizeDate(initialData.dob),
+    //         }));
+    //     }
+    // }, [initialData]);
 
     return (
         <form onSubmit={handleSubmit} className="mb-4 p-4 border rounded shadow-sm">

@@ -37,6 +37,7 @@ export default function MyForm() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(values), // Send email and password as JSON
       });
 

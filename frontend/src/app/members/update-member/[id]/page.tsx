@@ -12,9 +12,7 @@ const UpdateMember = () => {
     if (memberId) {
       fetch(`http://localhost:5000/members/${memberId}`, {
         method: "GET",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
-        },
+        credentials:'include'
       })
         .then((res) => res.json())
         .then((data) => {

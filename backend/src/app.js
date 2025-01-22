@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
@@ -16,8 +17,12 @@ connectDB();
 
 // Middleware
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Adjust to your frontend URL
+    credentials: true, // Allow credentials (cookies) to be sent
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // User Routes
 app.use('/api/users', userRoutes);

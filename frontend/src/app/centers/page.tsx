@@ -55,16 +55,12 @@ const CenterPage: React.FC = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) {
-          throw new Error("Authentication token is missing");
-        }
         const response = await fetch("http://localhost:5000/center/user", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -86,14 +82,14 @@ const CenterPage: React.FC = () => {
   // Handle delete center
   const handleDelete = async (id: string) => {
     try {
-      const token = localStorage.getItem("authToken");
 
       const response = await fetch(`http://localhost:5000/centers/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
+
       });
 
       if (!response.ok) {
