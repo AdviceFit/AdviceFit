@@ -167,8 +167,6 @@ const CreateMember: React.FC<{
             }
         }
     };
-
-
     // useEffect(() => {
     //     if (initialData) {
     //         setFormData((prev) => ({
@@ -363,6 +361,17 @@ const CreateMember: React.FC<{
                         <option value="Businessman">Businessman</option>
                         <option value="Advocate">Advocate</option>
                         <option value="Other">Other</option>
+                        <option value="Software Engineer">Software Engineer</option>
+                        <option value="Self-Employed">Self-Employed</option>
+                        <option value="Student">Student</option>
+                        <option value="Doctor">Doctor</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Influencer">Influencer</option>
+                        <option value="Painter">Painter</option>
+                        <option value="Tester">Tester</option>
+                        <option value="Private Job">Private Job</option>
+                        <option value="Government Job">Government Job</option>
+                        <option value="Housewife">Housewife</option>
                     </select>
                 </div>
 

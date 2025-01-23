@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner";
 
-interface Member {
+export interface Member {
   _id: string;
   name: string;
   mobile: number;

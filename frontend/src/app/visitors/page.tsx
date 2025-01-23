@@ -46,6 +46,9 @@ const VisitorRoute: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
 
   useEffect(() => {
     const fetchVisitors = async () => {
@@ -62,6 +65,7 @@ const VisitorRoute: React.FC = () => {
 
         const data = await response.json();
         setVisitors(data.visitors);
+        setTotalPages(data.totalPages || 1);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -158,6 +162,36 @@ const VisitorRoute: React.FC = () => {
               </Table>
             </div>
           )}
+        <div className="flex items-center justify-between mt-6">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          >
+            Previous
+          </Button>
+          <div className="hidden md:flex items-center gap-x-3">
+            {[...Array(totalPages)].map((_, i) => (
+              <Button
+                key={i}
+                variant='default'
+                size="sm"
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          >
+            Next
+          </Button>
+        </div>
         </div>
       </div>
     </div>

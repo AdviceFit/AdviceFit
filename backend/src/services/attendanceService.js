@@ -10,11 +10,10 @@ exports.getAllAttendance = async () => {
 };
 
 exports.getAttendanceByUser = async (userId) => {
-    console.log("🚀 ~ Fetching attendance records for user:", userId);
+    // console.log("🚀 ~ Fetching attendance records for user:", userId);
     
     // Fetch all members created by this user
     const members = await Member.find({ createdBy: userId});
-    console.log("Members found:", members);
 
     if (members.length === 0) {
         console.log("No members linked to this user.");
@@ -23,15 +22,11 @@ exports.getAttendanceByUser = async (userId) => {
 
     // Extract member IDs
     const memberIds = members.map((member) => member._id);
-    console.log("Member IDs to query attendance:", memberIds);
-
     // Now fetch attendance records for these members
     const attendanceRecords = await Attendance.find({
         member: { $in: memberIds },
         isDeleted: false, // Ensure isDeleted is false for attendance records
     }).populate('member', 'name email');
-    console.log("Attendance records found:", attendanceRecords);
-
     return attendanceRecords;
 };
 

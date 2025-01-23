@@ -20,6 +20,15 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { AttendanceDialog } from "./addAttendanceModal";
 
 interface Member {
     _id: string;
@@ -44,53 +53,48 @@ const AttendanceRoute: React.FC = () => {
     const router = useRouter();
 
     // Fetch attendances data
-    useEffect(() => {
-        const fetchAttendances = async () => {
-            try {
-                const response = await fetch(
-                    `http://localhost:5000/attendance/user?page=${currentPage}`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        credentials: 'include',
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch attendance data");
+    const fetchAttendances = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `http://localhost:5000/attendance/user?page=${currentPage}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
                 }
+            );
 
-                const result = await response.json();
-
-                console.log("API Response:", result); // Log the API response for debugging
-
-                // Check if success is true and data is an array
-                if (result.success && Array.isArray(result.data)) {
-                    setAttendances(result.data);
-                    // Assuming totalPages is part of your API response or calculate accordingly
-                    setTotalPages(result.totalPages || 1);
-                } else {
-                    console.error("Expected 'data' to be an array");
-                    setAttendances([]); // Set empty array if validation fails
-                }
-            } catch (err) {
-                console.error("Error fetching attendances:", err);
-                setError(err instanceof Error ? err.message : "An error occurred");
-            } finally {
-                setLoading(false);
+            if (!response.ok) {
+                throw new Error("Failed to fetch attendance data");
             }
-        };
 
+            const result = await response.json();
+
+            if (result.success && Array.isArray(result.data)) {
+                setAttendances(result.data);
+                setTotalPages(result.totalPages || 1);
+            } else {
+                setAttendances([]);
+                setError("Unexpected data format from the server");
+            }
+        } catch (err) {
+            console.error("Error fetching attendances:", err);
+            setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchAttendances();
-    }, [currentPage]);
+    }, [currentPage])
 
     // Handle delete attendance
     const handleDelete = async (id: string) => {
         try {
-
-
             const response = await fetch(`http://localhost:5000/attendance/${id}`, {
                 method: "DELETE",
                 headers: {
@@ -134,14 +138,33 @@ const AttendanceRoute: React.FC = () => {
                     <div className="flex flex-col">
                         {/* Add Member Button */}
                         <div className="w-10/12 absolute">
-                            <Button
-                                onClick={() => router.push("/attendances/add-attendance")}
-                                className="float-right"
-                            >
-                                Add Member
-                            </Button>
+                            <div className="float-right">
+                                <AttendanceDialog refetch={fetchAttendances} />
+                            </div>
                         </div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">Share</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Share link</DialogTitle>
+                                    <DialogDescription>
+                                        Anyone who has this link will be able to view this.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex items-center space-x-2">
+                                    <div className="grid flex-1 gap-2">
 
+                                    </div>
+                                    <Button type="submit" size="sm" className="px-3">
+                                        <span className="sr-only">Copy</span>
+
+                                    </Button>
+                                </div>
+
+                            </DialogContent>
+                        </Dialog>
                         {/* Attendance Table */}
                         <div className="flex flex-col mt-12 w-10/12 absolute">
                             <div className="py-2">
@@ -159,8 +182,8 @@ const AttendanceRoute: React.FC = () => {
                                         <TableBody>
                                             {attendances.map((attendance) => (
                                                 <TableRow key={attendance._id}>
-                                                    <TableCell>{attendance.member.name}</TableCell>
-                                                    <TableCell>{attendance.member.email}</TableCell>
+                                                    <TableCell>{attendance.member.name ?? (attendance as any).name}</TableCell>
+                                                    <TableCell>{attendance.member.email ?? (attendance as any).member}</TableCell>
                                                     {/* Format time_in and time_out */}
                                                     <TableCell>{new Date(attendance.time_in).toLocaleString()}</TableCell>
                                                     <TableCell>{new Date(attendance.time_out).toLocaleString()}</TableCell>
@@ -193,7 +216,6 @@ const AttendanceRoute: React.FC = () => {
                                     </Table>
                                 </div>
                             </div>
-
                             {/* Pagination Controls */}
                             <div className="flex items-center justify-between mt-6">
                                 <Button
