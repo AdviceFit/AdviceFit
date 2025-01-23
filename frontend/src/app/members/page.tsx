@@ -104,9 +104,9 @@ const MemberRoute: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex flex-grow">
+      <div className="flex flex-grow" style={{ height: 'calc(100vh - 64px)' }}>
         <Sidebar />
-        <div className="members-list p-6 overflow-y-auto">
+        <div className="members-list p-6 overflow-y-auto" style={{ width: 'calc(100vw - 64px)' }}>
           {loading && <p className="text-center text-lg">Loading...</p>}
           {error && <p className="text-red-500 text-center">{error}</p>}
           {!loading && !error && members.length === 0 && (
