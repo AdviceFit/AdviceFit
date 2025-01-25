@@ -17,7 +17,7 @@ const Header: React.FC = () => {
     toast.success("Logout successful!");
   };
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md border-b border-gray-200">
+    <nav className="bg-white dark:bg-gray-900 h-16 shadow-md border-b border-gray-200 z-10">
       <div className="mx-auto flex items-center justify-between p-4">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
