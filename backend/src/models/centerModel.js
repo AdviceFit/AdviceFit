@@ -25,11 +25,12 @@ const centerSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-            match: /^[0-9]{10}$/,
-        },
+            match: /^\+[1-9]{1}[0-9]{1,14}$/, // E.164 international format
+        },        
         workPhone: {
             type: String,
             trim: false,
+            required: false
         },
         gstNumber: {
             type: String,

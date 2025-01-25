@@ -142,29 +142,6 @@ const AttendanceRoute: React.FC = () => {
                                 <AttendanceDialog refetch={fetchAttendances} />
                             </div>
                         </div>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button variant="outline">Share</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle>Share link</DialogTitle>
-                                    <DialogDescription>
-                                        Anyone who has this link will be able to view this.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="flex items-center space-x-2">
-                                    <div className="grid flex-1 gap-2">
-
-                                    </div>
-                                    <Button type="submit" size="sm" className="px-3">
-                                        <span className="sr-only">Copy</span>
-
-                                    </Button>
-                                </div>
-
-                            </DialogContent>
-                        </Dialog>
                         {/* Attendance Table */}
                         <div className="flex flex-col mt-12 w-10/12 absolute">
                             <div className="py-2">

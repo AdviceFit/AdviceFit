@@ -14,6 +14,10 @@ export interface Address {
     pincode?: string;
 }
 
+interface Center {
+    _id: string;
+    name: string;
+}
 interface NewMember {
     _id?: string;
     name: string;
@@ -49,6 +53,7 @@ const CreateMember: React.FC<{
         dob: initialData?.dob ? normalizeDate(initialData.dob) : "",
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [centers, setCenters] = useState<Center[]>([]); 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -101,8 +106,7 @@ const CreateMember: React.FC<{
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+        e.preventDefault()
         try {
             const validatedData = memberSchema.parse(formData);
             const endpoint =
@@ -167,16 +171,29 @@ const CreateMember: React.FC<{
             }
         }
     };
-    // useEffect(() => {
-    //     if (initialData) {
-    //         setFormData((prev) => ({
-    //             ...prev,
-    //             ...initialData,
-    //             joining_date: normalizeDate(initialData.joining_date),
-    //             dob: normalizeDate(initialData.dob),
-    //         }));
-    //     }
-    // }, [initialData]);
+
+    // Fetch centers from API on component mount
+    useEffect(() => {
+        const fetchCenters = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/center", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch centers");
+                }
+                const data = await response.json();
+                setCenters(data.data);
+            } catch (error) {
+                toast.error(
+                    error instanceof Error ? error.message : "Failed to fetch centers"
+                );
+            }
+        };
+
+        fetchCenters();
+    }, []);
 
     return (
         <form onSubmit={handleSubmit} className="mb-4 p-4 border rounded shadow-sm">
@@ -270,12 +287,13 @@ const CreateMember: React.FC<{
                         className="w-full p-2 border rounded"
                     >
                         <option value="">Select Center</option>
-                        <option value="Gold's Gym">Gold's Gym</option>
-                        <option value="Anytime Fitness">Anytime Fitness</option>
-                        <option value="Snap Fitness">Snap Fitness</option>
-                        <option value="Planet Fitness">Planet Fitness</option>
-                        <option value="CrossFit India">CrossFit India</option>
+                        {centers.map((center) => (
+                            <option key={center._id} value={center.name}>
+                                {center.name}
+                            </option>
+                        ))}
                     </select>
+
                     {errors.center && <p className="text-red-500 text-sm">{errors.center}</p>}
                 </div>
 
@@ -519,6 +537,7 @@ const CreateMember: React.FC<{
                     className="w-full p-2 border rounded"
                 />
             </div>
+            {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
             <Button
                 type="submit"
                 className="mt-6"

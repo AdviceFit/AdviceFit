@@ -1,12 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
-
-
 export interface Address {
     addressLine1?: string;
     addressLine2?: string;
@@ -33,6 +30,10 @@ export interface NewVisitor {
     address?: Address;
 }
 
+interface Center {
+    _id: string;
+    name: string;
+}
 const CreateVisitor: React.FC<{
     mode: "add" | "edit";
     initialData: NewVisitor;
@@ -51,6 +52,8 @@ const CreateVisitor: React.FC<{
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [centers, setCenters] = useState<Center[]>([]); // Store centers from API
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         if (name.includes("address.")) {
@@ -84,21 +87,21 @@ const CreateVisitor: React.FC<{
         health_conditions: z.string().optional(),
         marital_status: z.enum(["Single", "Married"], { required_error: "Marital status is required" }),
         remarks: z.string().optional(),
-        enquire_mode: z.string().optional(),
+        enquire_mode:   z.enum(["Taking", "Waking","Any"], { required_error: "Select Atlist One Enquiry  Mode" }),
         address: z
-                    .object({
-                        addressLine1: z.string().optional(),
-                        addressLine2: z.string().optional(),
-                        state: z.string().optional(),
-                        city: z.string().optional(),
-                        pincode: z
-                            .string()
-                            .regex(/^\d{6}$/, "Pincode must be a valid 6-digit number"),
-                    })
-                    .optional(),
+            .object({
+                addressLine1: z.string().optional(),
+                addressLine2: z.string().optional(),
+                state: z.string().optional(),
+                city: z.string().optional(),
+                pincode: z
+                    .string()
+                    .regex(/^\d{6}$/, "Pincode must be a valid 6-digit number"),
+            })
+            .optional(),
     });
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {        
         e.preventDefault();
 
         try {
@@ -164,6 +167,29 @@ const CreateVisitor: React.FC<{
         }
 
     };
+
+
+    useEffect(() => {
+        const fetchCenters = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/center", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch centers");
+                }
+                const data = await response.json();
+                setCenters(data.data);
+            } catch (error) {
+                toast.error(
+                    error instanceof Error ? error.message : "Failed to fetch centers"
+                );
+            }
+        };
+
+        fetchCenters();
+    }, []);
 
     return (
         <form onSubmit={handleSubmit} className="mb-4 p-6 border rounded shadow-md bg-gray-50">
@@ -248,11 +274,13 @@ const CreateVisitor: React.FC<{
                         name="visiting_center"
                         value={formData.visiting_center}
                         onChange={handleChange}
-                        className={`w-full p-3 border rounded ${errors.visiting_center ? 'border-red-500' : 'border-gray-300'} transition duration-200`}
+                        className="w-full p-2 border rounded"
                     >
                         <option value="">Select Center</option>
-                        {["Gold's Gym", "Anytime Fitness", "Snap Fitness", "Planet Fitness", "CrossFit India"].map(center => (
-                            <option key={center} value={center}>{center}</option>
+                        {centers.map((center) => (
+                            <option key={center._id} value={center.name}>
+                                {center.name}
+                            </option>
                         ))}
                     </select>
                     {errors.visiting_center && <p className="text-red-500 text-sm">{errors.visiting_center}</p>}

@@ -83,13 +83,12 @@ const CenterPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
 
-      const response = await fetch(`http://localhost:5000/centers/${id}`, {
+      const response = await fetch(`http://localhost:5000/center/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: 'include',
-
       });
 
       if (!response.ok) {
@@ -151,8 +150,8 @@ const CenterPage: React.FC = () => {
                           <TableCell>{center.name}</TableCell>
                           <TableCell>{center.centerCode}</TableCell>
                           <TableCell>{center.centerEmail}</TableCell>
-                          <TableCell>{center.biometricSerialNumber}</TableCell>
                           <TableCell>{center.mobileNo}</TableCell>
+                          <TableCell>{center.biometricSerialNumber}</TableCell>
                           <TableCell>{center.address.city}</TableCell>
                           <TableCell>
                             <DropdownMenu>
