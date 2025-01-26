@@ -113,7 +113,7 @@ const Sidebar: React.FC = () => {
 
         {/* Attendance */}
         <div className="relative block w-full">
-          <Link href="/attendance">
+          <Link href="/attendances">
             <div
               className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 group ${
                 isActive("/attendance") ? "text-blue-600" : ""

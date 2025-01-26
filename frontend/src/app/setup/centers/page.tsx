@@ -106,7 +106,7 @@ const CenterPage: React.FC = () => {
 
   // Handle update center
   const handleUpdate = async (id: string) => {
-    router.push(`/centers/update-center/${id}`);
+    router.push(`/setup/centers/update-center/${id}`);
   };
 
   return (
@@ -123,7 +123,7 @@ const CenterPage: React.FC = () => {
           <div className="flex flex-col">
             <div className="w-10/12 absolute">
               <Button
-                onClick={() => router.push("/centers/add-center")}
+                onClick={() => router.push("/setup/centers/add-center")}
                 className="float-right"
               >
                 Add Center

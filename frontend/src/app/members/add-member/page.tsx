@@ -14,7 +14,7 @@ export interface Address {
     pincode?: string;
 }
 
-interface Center {
+export interface Center {
     _id: string;
     name: string;
 }

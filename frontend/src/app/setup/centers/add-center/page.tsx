@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -16,102 +17,107 @@ import {
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
 
 const centerSchema = z.object({
-    _id:z.string().optional(),
+    _id: z.string().optional(),
     name: z.string().min(1, "Name is required"),
     centerCode: z
-      .string()
-      .regex(/^[a-zA-Z]/, "Center code should not start with a number")
-      .min(1, "Center code is required"),
+        .string()
+        .regex(/^[a-zA-Z]/, "Center code should not start with a number")
+        .min(1, "Center code is required"),
     centerEmail: z.string().email("A valid email address is required"),
     mobileNo: z.string().refine((value) => /^[+][1-9][0-9]{1,14}$/.test(value), {
-      message: "Enter a valid international phone number (E.164 format)",
+        message: "Enter a valid international phone number (E.164 format)",
     }),
     workPhone: z.string().optional(),
     gstNumber: z.string().optional(),
     agency: z.string().optional(),
     biometricSerialNumber: z.string().optional(),
     address: z
-      .object({
-        addressLine1: z.string().optional(),
-        addressLine2: z.string().optional(),
-        state: z.string().optional(),
-        city: z.string().optional(),
-        pincode: z
-          .string()
-          .regex(/^[0-9]{6}$/, "Pincode must be a valid 6-digit number"),
-      })
-      .optional(),
-  });
-  
-  export type Center = z.infer<typeof centerSchema>;
+        .object({
+            addressLine1: z.string().optional(),
+            addressLine2: z.string().optional(),
+            state: z.string().optional(),
+            city: z.string().optional(),
+            pincode: z
+                .string()
+                .regex(/^[0-9]{6}$/, "Pincode must be a valid 6-digit number"),
+        })
+        .optional(),
+    aboutUs: z.string().optional(),
+    termsAndConditions: z.string().optional()
+});
+
+export type Center = z.infer<typeof centerSchema>;
 
 
 
 type CreateCenterProps = {
     mode: "add" | "edit";
     initialData?: Center;
-  };
-  
-  
-  const CreateCenter: React.FC<CreateCenterProps> = ({ mode, initialData }) => {
-      const router = useRouter();
-      console.log('initialData',initialData);
+};
+
+
+const CreateCenter: React.FC<CreateCenterProps> = ({ mode, initialData }) => {
+    const router = useRouter();
+    console.log('initialData', initialData);
     const form = useForm<z.infer<typeof centerSchema>>({
-      resolver: zodResolver(centerSchema),
-      defaultValues: initialData || {
-        name: "",
-        centerCode: "",
-        centerEmail: "",
-        mobileNo: "",
-        workPhone: "",
-        gstNumber: "",
-        agency: "",
-        biometricSerialNumber: "",
-        address: {
-          addressLine1: "",
-          addressLine2: "",
-          state: "",
-          city: "",
-          pincode: "",
+        resolver: zodResolver(centerSchema),
+        defaultValues: initialData || {
+            name: "",
+            centerCode: "",
+            centerEmail: "",
+            mobileNo: "",
+            workPhone: "",
+            gstNumber: "",
+            agency: "",
+            biometricSerialNumber: "",
+            address: {
+                addressLine1: "",
+                addressLine2: "",
+                state: "",
+                city: "",
+                pincode: "",
+            },
+            aboutUs: '',
+            termsAndConditions: ''
         },
-      },
     });
-  
+
     const onSubmit = async (values: z.infer<typeof centerSchema>) => {
-      try {
-        const endpoint =
-          mode === "edit"
-            ? `http://localhost:5000/center/${initialData?._id}`
-            : "http://localhost:5000/center";
-  
-        const method = mode === "edit" ? "PUT" : "POST";
-  
-        const response = await fetch(endpoint, {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-          credentials: "include",
-        });
-  
-        if (!response.ok) {
-          throw new Error(
-            `Failed to ${mode === "edit" ? "update" : "add"} the center`
-          );
+        try {
+            const endpoint =
+                mode === "edit"
+                    ? `http://localhost:5000/center/${initialData?._id}`
+                    : "http://localhost:5000/center";
+
+            const method = mode === "edit" ? "PUT" : "POST";
+
+            const response = await fetch(endpoint, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    `Failed to ${mode === "edit" ? "update" : "add"} the center`
+                );
+            }
+
+            toast.success(`Center ${mode === "edit" ? "updated" : "added"} successfully!`);
+            router.push("/setup/centers");
+            form.reset();
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "An unexpected error occurred");
         }
-  
-        toast.success(`Center ${mode === "edit" ? "updated" : "added"} successfully!`);
-        router.push("/centers");
-        form.reset();
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "An unexpected error occurred");
-      }
     };
-  
-  
+
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
@@ -333,7 +339,53 @@ type CreateCenterProps = {
                                 </FormItem>
                             )}
                         />
+
+
+
                     </div>
+
+                    <FormField
+                        control={form.control}
+                        name="aboutUs"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>About Us</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Share the unique features and qualities of your gym"
+                                        className="resize-none"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    Provide a brief description of what makes your gym special and why people should choose it.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="termsAndConditions"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Terms & Conditions</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="State the rules, policies, and guidelines of your gym"
+                                        className="resize-none"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    Outline the terms, conditions, and policies that members must agree to before joining your gym.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                 </div>
 
                 <Button type="submit" className="w-full">
