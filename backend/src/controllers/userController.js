@@ -1,6 +1,7 @@
 const UserService = require('../services/userService');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Role = require('../models/rolesModel');
 
 // Signup Controller
 exports.signup = async (req, res) => {
@@ -13,6 +14,11 @@ exports.signup = async (req, res) => {
             return res.status(400).json({ message: 'Email already in use' });
         }
 
+        const adminRole = await Role.findOne({ name: 'Admin' });
+        if (!adminRole) {
+            return res.status(400).json({ message: 'Admin role not found!' });
+        }
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -20,6 +26,7 @@ exports.signup = async (req, res) => {
         const newUser = await UserService.createUser({
             email,
             password: hashedPassword,
+            role: adminRole._id,
             ...rest,
         });
         // console.log("🚀 ~ exports.signup= ~ newUser:", newUser)
