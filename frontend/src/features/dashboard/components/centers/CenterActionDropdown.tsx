@@ -13,11 +13,10 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
-import AddAndEditMembers from "./AddAndEditMembers";
+import AddAndEditCenters from './AddAndEditCenters';
 
-const MemberActionDropdown = ({ id }: { id: string }) => {
+const CenterrActionDropdown = ({ id }: { id: string }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = (e: React.MouseEvent) => {
@@ -38,11 +37,11 @@ const MemberActionDropdown = ({ id }: { id: string }) => {
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
                         <Button variant="ghost" onClick={handleOpen}>
-                            Edit members
+                            Edit Center
                         </Button>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        Delete Members
+                        Delete Center
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -51,13 +50,13 @@ const MemberActionDropdown = ({ id }: { id: string }) => {
             <Dialog open={isOpen} onOpenChange={handleClose}>
                 <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit Members</DialogTitle>
+                        <DialogTitle>Edit Center</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditMembers  />
+                    <AddAndEditCenters mode="edit"  />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>
     );
 }
 
-export default MemberActionDropdown;
+export default CenterrActionDropdown;

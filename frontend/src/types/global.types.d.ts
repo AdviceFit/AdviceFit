@@ -17,3 +17,41 @@ type MembersParams = {
   type MembersDataParams = {
     members: MembersParams[];
   }
+  type AddressParams = {
+    addressLine1: string;
+    addressLine2?: string;
+    state: string;
+    city: string;
+    pincode: string;
+    _id: string;
+  };
+  
+  type CreatedByParams = {
+    _id: string;
+    email: string;
+  };
+  
+  type CenterParams = {
+    _id: string;
+    name: string;
+    centerCode: string;
+    centerEmail: string;
+    mobileNo: string;
+    workPhone?: string;
+    gstNumber?: string;
+    agency?: string;
+    biometricSerialNumber?: string;
+    address: AddressParams;
+    aboutUs?: string;
+    termsAndConditions?: string;
+    createdBy: CreatedByParams;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+
+
+  type CentersDataParams = {
+    centers: CenterParams[];
+  }
+    

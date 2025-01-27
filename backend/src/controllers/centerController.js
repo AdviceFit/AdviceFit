@@ -13,7 +13,7 @@ exports.createCenter = async (req, res) => {
 exports.getAllCenters = async (req, res) => {
     try {
         const centers = await centerService.getAllCenters();
-        res.status(200).json({ success: true, data: centers });
+        res.status(200).json({centers} );
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }

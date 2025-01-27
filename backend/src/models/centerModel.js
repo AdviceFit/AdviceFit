@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { default: mongoose } = require('mongoose');
 const addressSchema = require('./addressModel');
 
 const centerSchema = new mongoose.Schema(
@@ -70,3 +70,4 @@ const centerSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('Center', centerSchema);
+
