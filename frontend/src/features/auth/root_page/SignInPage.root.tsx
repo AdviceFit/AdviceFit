@@ -48,7 +48,7 @@ export default function MyForm() {
       const data = await response.json();
       console.log(data); // Log the response data
       if (data.token) {
-        console.log(data.token);
+        console.log(data.token, 'tokennnnnnnnnnnn');
         
         localStorage.setItem("authToken", data.token);
       }
@@ -63,7 +63,7 @@ export default function MyForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-3xl mx-auto">
         <FormField
           control={form.control}
           name="email"

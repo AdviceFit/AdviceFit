@@ -70,7 +70,7 @@ body {
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-gray-800;
   }
 
   h1 {
@@ -130,7 +130,7 @@ body {
 @layer components {
 
   .wrapper{
-    @apply min-h-[calc(100vh-6rem)] w-full
+    @apply min-h-[calc(100vh-8rem)] w-full
   }
   .box {
     @apply container mx-auto px-4
