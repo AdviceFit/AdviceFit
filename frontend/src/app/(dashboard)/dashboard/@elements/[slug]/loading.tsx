@@ -1,4 +1,4 @@
-const AttendenceLoading = () => {
+const AttendanceLoading = () => {
   return (
     <div>
       Loading...
@@ -6,4 +6,4 @@ const AttendenceLoading = () => {
   )
 }
 
-export default AttendenceLoading
+export default AttendanceLoading

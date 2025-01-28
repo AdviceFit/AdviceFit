@@ -5,8 +5,8 @@ import React from 'react'
 const SidebarLinks = () => {
     const links = [
         {
-            name: 'Attendence',
-            path: APP_ROUTES.dasboard.attendence
+            name: 'Attendance',
+            path: APP_ROUTES.dasboard.attendance
         },
         {
             name: 'Centers',

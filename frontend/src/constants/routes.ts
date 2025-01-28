@@ -5,7 +5,7 @@ type Routes = {
     allowRoutes: string[];
     dashboardPath: string;
     dasboard: {
-        attendence: string;
+        attendance: string;
         centers: string;
         members: string;
         visitors: string;
@@ -23,10 +23,10 @@ const APP_ROUTES: Routes = {
     home: "/",
     sign_in: "/sign-in",
     sign_up: "/sign-up",
-    allowRoutes: ['attendence', 'centers', 'members', 'visitors','reports', 'sessions', 'expenses', 'message-center', 'setup'],
+    allowRoutes: ['attendance', 'centers', 'members', 'visitors','reports', 'sessions', 'expenses', 'message-center', 'setup'],
     dashboardPath: dashboardPath,
     dasboard: {
-        attendence: `/dashboard/attendence`,
+        attendance: `/dashboard/attendance`,
         centers: `/dashboard/centers`,
         members: `/dashboard/members`, 
         visitors: `/dashboard/visitors`,

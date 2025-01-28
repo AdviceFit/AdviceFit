@@ -1,5 +1,5 @@
 import APP_ROUTES from "@/constants/routes";
-import AttendenceMain from "@/features/dashboard/main/Attendence.main";
+import AttendanceMain from "@/features/dashboard/main/Attendance.main";
 import CentersMain from "@/features/dashboard/main/Centers.main";
 import ExpensesMain from "@/features/dashboard/main/Expenses.main";
 import MembersMain from "@/features/dashboard/main/Members.main";
@@ -18,12 +18,12 @@ const DashboardElementsRoute = async function ({
   const slug = (await params).slug
 
   if (!APP_ROUTES.allowRoutes.includes(slug)) {
-    redirect(APP_ROUTES.dasboard.attendence)
+    redirect(APP_ROUTES.dasboard.attendance)
   }
 
   switch (slug) {
-    case "attendence":
-      return <AttendenceMain/>
+    case "attendance":
+      return <AttendanceMain/>
     case "centers":
       return <CentersMain/>
     case "members":

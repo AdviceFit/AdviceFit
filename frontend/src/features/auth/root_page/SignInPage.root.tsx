@@ -53,7 +53,7 @@ export default function MyForm() {
         localStorage.setItem("authToken", data.token);
       }
       toast.success("Login successful!"); // Show success message
-      router.push("/dashboard");
+      router.push("/dashboard/attendance");
 
     } catch (error) {
       console.error("Form submission error", error);
