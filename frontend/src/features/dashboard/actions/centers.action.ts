@@ -1,63 +1,55 @@
+
 "use server"
 
 import { cookies } from "next/headers";
 
+const API_URL = "http://localhost:5000/center";
 
-const API_URL = "http://localhost:5000/members";
-
-const editMembers = async (id: string) => {
+export const createCenter = async (data: CenterParams) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-    });
 
-    if (!response.ok) {
-        throw new Error("Failed to edit member");
-    }
-
-    return response.json();
-};
-
-const deleteMembers = async (id: string) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to delete member");
-    }
-
-    return response.json();
-};
-
-
-const getAllMembers = async () => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
     const res = await fetch(API_URL, {
-        method: "GET",
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+        body: JSON.stringify(data),
+    });
+
+    return res.json();
+};
+
+export const updateCenter = async (id: string, data: Partial<{ name: string; location: string }>) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+        body: JSON.stringify(data),
+    });
+
+    return res.json();
+};
+
+export const deleteCenter = async (id: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,
         },
         cache: "no-cache",
     });
-    if (!res.ok) {
-        throw new Error("Failed to fetch members");
-    }
-
     return res.json();
 };
-
-export { editMembers, deleteMembers, getAllMembers };

@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
+import { createCenter, updateCenter } from "../../actions/centers.action";
 
 const centerSchema = z.object({
     _id: z.string().optional(),
@@ -54,7 +55,7 @@ export type Center = z.infer<typeof centerSchema>;
 
 
 type CreateCenterProps = {
-    mode ?: "add" | "edit";
+    mode?: "add" | "edit";
     initialData?: Center;
 };
 
@@ -86,30 +87,17 @@ const AddAndEditCenters: React.FC<CreateCenterProps> = ({ mode, initialData }) =
 
     const onSubmit = async (values: z.infer<typeof centerSchema>) => {
         try {
-            const endpoint =
-                mode === "edit"
-                    ? `http://localhost:5000/center/${initialData?._id}`
-                    : "http://localhost:5000/center";
+            let response;
 
-            const method = mode === "edit" ? "PUT" : "POST";
+            if (mode === "edit") {
+                if (!initialData?._id) throw new Error("Center ID is required for editing");
+                response = await updateCenter(initialData._id, values);
+            } else {
 
-            const response = await fetch(endpoint, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error(
-                    `Failed to ${mode === "edit" ? "update" : "add"} the center`
-                );
+                response = await createCenter(values as CenterParams);
             }
-
             toast.success(`Center ${mode === "edit" ? "updated" : "added"} successfully!`);
-            router.push("/setup/centers");
+            router.push("/dashboard/centers");
             form.reset();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "An unexpected error occurred");

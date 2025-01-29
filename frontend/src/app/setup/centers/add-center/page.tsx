@@ -61,7 +61,6 @@ type CreateCenterProps = {
 
 const CreateCenter: React.FC<CreateCenterProps> = ({ mode, initialData }) => {
     const router = useRouter();
-    console.log('initialData', initialData);
     const form = useForm<z.infer<typeof centerSchema>>({
         resolver: zodResolver(centerSchema),
         defaultValues: initialData || {

@@ -1,18 +1,16 @@
 import { ColumnDef } from "@tanstack/react-table";
-import AttendanceActionDropdown from "./AttendanceActionDropdow";
+import AttendanceActionDropdown from "./AttendanceActionDropdown";
 
 const formatDateTime = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleString();
 };
 
-const columns: ColumnDef<any>[] = [
+const columns = (onDeleteSuccess: (id: string) => void): ColumnDef<any>[] => [
   {
-    accessorKey: "member.name", 
+    accessorKey: "member.name",
     header: "Member",
-    cell: ({ row }) => {
-      return <span>{row.original.member.name}</span>;
-    },
+    cell: ({ row }) => <span>{row.original.member.name}</span>,
   },
   {
     accessorKey: "time_in",
@@ -35,7 +33,7 @@ const columns: ColumnDef<any>[] = [
     header: "Actions",
     cell: ({ row }) => {
       const id = row.original._id;
-      return <AttendanceActionDropdown   id={id} />;
+      return <AttendanceActionDropdown id={id} onDeleteSuccess={onDeleteSuccess} />;
     },
   },
 ];

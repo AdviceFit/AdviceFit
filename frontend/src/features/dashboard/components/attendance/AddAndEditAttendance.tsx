@@ -1,14 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
-import TimePicker from "react-time-picker";
-import "react-time-picker/dist/TimePicker.css";
-import "react-clock/dist/Clock.css";
-import {
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogContent,
-} from "@/components/ui/alert-dialog";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +14,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { Period } from "@/lib/time-picker-utils";
+import { Label } from "@/components/ui/label";
+import { TimePickerInput } from "@/components/ui/TimePickerInput";
+import { TimePeriodSelect } from "@/components/ui/period-select";
+import { createAttendance } from "../../actions/attendence.action";
+import { getAllMembers } from "../../actions/members.action";
+import { useRouter } from "next/navigation";
 
 type Member = {
   _id: string;
@@ -35,13 +33,20 @@ const formSchema = z.object({
   time_out: z.string().nonempty("Time-out is required"),
 });
 
-
 const AddAndEditAttendance = () => {
   const [members, setMembers] = useState<Member[]>([]);
+  const router   =useRouter()
   const [timeOut, setTimeOut] = useState('10:00');
-  const [timeIn] = useState(() =>
+  const [timeIn, setTimeIn] = useState<string>(
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   );
+  const [period, setPeriod] = useState<Period>("PM");
+
+  const [date, setDate] = useState<Date>(new Date());
+  const minuteRef = useRef<HTMLInputElement>(null);
+  const hourRef = useRef<HTMLInputElement>(null);
+  const secondRef = useRef<HTMLInputElement>(null);
+  const periodRef = useRef<HTMLButtonElement>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,137 +57,150 @@ const AddAndEditAttendance = () => {
     },
   });
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
+
 
   async function fetchMembers() {
     try {
-      const response = await fetch("http://localhost:5000/members", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch members");
-      }
-
-      const data = await response.json();
-      setMembers(data.members); // Assuming `members` is the key in the response
+      const response = await getAllMembers()
+      setMembers(response.members);
     } catch (error) {
       toast.error("Failed to load members.");
-      console.error(error);
     }
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("http://localhost:5000/attendance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          member: values.member,
-          time_in: new Date(`1970-01-01T${values.time_in}:00`).toISOString(),
-          time_out: new Date(`1970-01-01T${values.time_out}:00`).toISOString(),
-        }),
+      await createAttendance({
+        member: values.member,
+        time_in: new Date(`1970-01-01T${values.time_in}:00`).toISOString(),
+        time_out: new Date(`1970-01-01T${values.time_out}:00`).toISOString(),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit the form.");
-      }
-      // refetch() 
       toast.success("Attendance recorded successfully!");
       setIsDialogOpen(false);
+      router.push("/dashboard/attedance")
     } catch (error) {
       toast.error("Failed to submit attendance.");
-      console.error(error);
     }
   }
 
+  useEffect(() => {
+    fetchMembers();
+  }, []);
+
   return (
-    // <AlertDialogContent>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Member Dropdown */}
-          <FormField
-            control={form.control}
-            name="member"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Member</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a member" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {members.map((member) => (
-                      <SelectItem key={member._id} value={member._id}>
-                        {member.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* Time In */}
-          <FormField
-            control={form.control}
-            name="time_in"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time In</FormLabel>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Member Dropdown */}
+        <FormField
+          control={form.control}
+          name="member"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Member</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <input {...field} className="input read-only" readOnly />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a member" />
+                  </SelectTrigger>
                 </FormControl>
-              </FormItem>
-            )}
-          />
-          {/* Time Out */}
-          <FormField
-            control={form.control}
-            name="time_out"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time Out</FormLabel>
-                <FormControl>
-                  <TimePicker
-                    value={field.value || timeOut} // Use the field value or fallback to state
-                    onChange={(value) => {
-                      setTimeOut(value || ""); // Update local state
-                      field.onChange(value || ""); // Update form value
-                    }}
-                    format="h:mm a" // 12-hour format with AM/PM
-                    disableClock={false} // Allow the clock to open
-                    className="w-full p-2 border rounded-md"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* Submit Button */}
-          <div className="w-full flex justify-end space-x-3" >
+                <SelectContent>
+                  {members.map((member) => (
+                    <SelectItem key={member._id} value={member._id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <Button type="submit" >
-              Submit
-            </Button>
+        {/* Time In */}
+        <FormField
+          control={form.control}
+          name="time_in"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Time In</FormLabel>
+              <FormControl>
+                <input {...field} className="input read-only" readOnly value={timeIn} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
+        {/* <div className="flex items-end gap-2">
+          <div className="grid gap-1 text-center">
+            <Label htmlFor="hours" className="text-xs">Hours</Label>
+            <TimePickerInput
+              picker="12hours"
+              period={period}
+              date={date}
+              setDate={setDate}
+              ref={hourRef}
+              onRightFocus={() => minuteRef.current?.focus()}
+            />
           </div>
-        </form>
-      </Form>
-    // </AlertDialogContent>
-  );
-}
+          <div className="grid gap-1 text-center">
+            <Label htmlFor="minutes" className="text-xs">Minutes</Label>
+            <TimePickerInput
+              picker="minutes"
+              id="minutes12"
+              date={date}
+              setDate={setDate}
+              ref={minuteRef}
+              onLeftFocus={() => hourRef.current?.focus()}
+              onRightFocus={() => secondRef.current?.focus()}
+            />
+          </div>
+          <div className="grid gap-1 text-center">
+            <Label htmlFor="seconds" className="text-xs">Seconds</Label>
+            <TimePickerInput
+              picker="seconds"
+              id="seconds12"
+              date={date}
+              setDate={setDate}
+              ref={secondRef}
+              onLeftFocus={() => minuteRef.current?.focus()}
+              onRightFocus={() => periodRef.current?.focus()}
+            />
+          </div>
+          <div className="grid gap-1 text-center">
+            <Label htmlFor="period" className="text-xs">Period</Label>
+            <TimePeriodSelect
+              period={period}
+              setPeriod={setPeriod}
+              date={date}
+              setDate={setDate}
+              ref={periodRef}
+              onLeftFocus={() => secondRef.current?.focus()}
+            />
+          </div>
+        </div> */}
 
-export default AddAndEditAttendance
+        {/* Time Out */}
+        <FormField
+          control={form.control}
+          name="time_out"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Time Out</FormLabel>
+              <FormControl>
+                <input {...field} className="input" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+
+        {/* Submit Button */}
+        <div className="w-full flex justify-end space-x-3">
+          <Button type="submit">Submit</Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
+export default AddAndEditAttendance;

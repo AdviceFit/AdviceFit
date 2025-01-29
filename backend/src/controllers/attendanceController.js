@@ -42,7 +42,7 @@ exports.getAttendanceByUser = async (req, res) => {
             return res.status(404).json({ success: false, message: 'No attendance records found for this user' });
         }
 
-        return res.status(200).json({ success: true, data: attendanceRecords });
+        return res.status(200).json({ success: true, attendance: attendanceRecords });
     } catch (error) {
         console.error(error);
         res.status(400).json({ success: false, message: error.message });

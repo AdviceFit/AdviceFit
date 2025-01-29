@@ -7,7 +7,7 @@ import AttendanceTable from '../components/attendance/AttendanceTable';
 const getAttendance = async (): Promise<AttendanceDataParams> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
-  const res = await fetch("http://localhost:5000/attendance", {
+  const res = await fetch("http://localhost:5000/attendance/user", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +15,7 @@ const getAttendance = async (): Promise<AttendanceDataParams> => {
     },
     cache: "no-cache",
   });
-  const attendance: AttendanceDataParams = await res.json();
+  const attendance: AttendanceDataParams = await res.json();  
   return attendance;
 };
 

@@ -28,7 +28,6 @@ exports.getAllMembers = async (req, res) => {
 
 // Get all members created by the logged-in user
 exports.getMembersByUser = async (req, res) => {
-    console.log("Fetching members for user:", req);
     try {
         const userId = req.user._id; // Get the logged-in user's ID from req.user
         // console.log("Fetching members for user:", userId);

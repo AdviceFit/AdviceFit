@@ -15,8 +15,13 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import AddAndEditCenters from './AddAndEditCenters';
+import { deleteCenter } from '../../actions/centers.action';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const CenterrActionDropdown = ({ id }: { id: string }) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const router = useRouter()
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = (e: React.MouseEvent) => {
@@ -26,6 +31,19 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
 
     const handleClose = () => {
         setIsOpen(false);
+    };
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        setIsDeleting(true);
+        try {
+            await deleteCenter(id);
+            toast.success("Center deleted successfully!");
+            router.push("/dashboard/centers");
+        } catch (error) {
+            toast.error("Failed to delete attendance.");
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -40,8 +58,10 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
                             Edit Center
                         </Button>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Delete Center
+                    <DropdownMenuItem >
+                        <Button variant="ghost" onClick={handleDelete} disabled={isDeleting}>
+                            {isDeleting ? "Deleting..." : "Delete Center"}
+                        </Button>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -52,7 +72,7 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Center</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditCenters mode="edit"  />
+                    <AddAndEditCenters mode="edit" />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>
