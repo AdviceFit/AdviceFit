@@ -23,7 +23,7 @@ type AddressParams = {
   state: string;
   city: string;
   pincode: string;
-  _id: string;
+  _id?: string;
 };
 
 type CreatedByParams = {
@@ -58,10 +58,38 @@ type CentersDataParams = {
 type AttendanceParams = {
   _id: string;
   member: Member;
-  time_in: string; // ISO date string
-  time_out: string; // ISO date string
+  time_in: string;
+  time_out: string;
 }
 
 type AttendanceDataParams = {
   attendance: AttendanceParams[];
 }
+
+
+type VisitorParams = {
+  _id?: string;
+  name: string;
+  mobile: numberstring;
+  visiting_date?: string;
+  tentative_visiting_date?: Date | string;
+  email: string;
+  visiting_center: string;
+  gender: "Male" | "Female" | "Other";
+  source?: string;
+  occupation?: string;
+  dob?: string;
+  health_conditions: string;
+  marital_status: "Single" | "Married" | "Divorced" | "Widowed";
+  remarks: "High" | "Medium" | "Low";
+  enquire_mode: "Talking" | "Walking" | "Any";
+  address?: AddressParams;  // Assuming AddressParams is a predefined type for the address schema
+  createdBy?: string;
+  updatedBy?: string | null;
+  isDeleted?: boolean;
+};
+
+type VisitorsDataParams = {
+  visitors: VisitorParams[];
+};
+

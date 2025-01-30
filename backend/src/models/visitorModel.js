@@ -8,12 +8,10 @@ const visitorSchema = new mongoose.Schema(
             required: [true, 'Name is required']
         },
         mobile: {
-            type: Number,
-            required: [true, 'Mobile number is required'],
-            validate: {
-                validator: (value) => /^\d{10}$/.test(value.toString()),
-                message: 'Mobile number must be 10 digits',
-            },
+            type: String,
+            required: true,
+            trim: true,
+            match: /^\+[1-9]{1}[0-9]{1,14}$/, // E.164 international format
         },
         visiting_date: {
             type: Date,
@@ -22,7 +20,7 @@ const visitorSchema = new mongoose.Schema(
         tentative_visiting_date:
         {
             type: Date,
-            required: [true, 'Tentative Visiting Date is required']
+            required: false
         },
         email: {
             type: String,
@@ -53,11 +51,13 @@ const visitorSchema = new mongoose.Schema(
             type: String
         },
         dob: {
-            type: Date
+            type: Date,
+            required: false
         },
         health_conditions: {
             type: String,
-            default: 'None'
+            default: 'None',
+            required: false
         },
         marital_status: {
             type: String,
