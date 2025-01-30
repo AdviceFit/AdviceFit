@@ -5,7 +5,7 @@ import { columns } from './coulmns'
 
 const MembersTable = ({adviceFitMembers}: {adviceFitMembers: MembersParams[]}) => {
   return (
-    <div className="container mx-auto py-10">
+    <div className="container py-4">
     <DataTable columns={columns} data={adviceFitMembers} />
   </div>
   )

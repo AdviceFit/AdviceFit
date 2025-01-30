@@ -42,7 +42,9 @@ const MemberActionDropdown = ({ id }: { id: string }) => {
                         </Button>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        Delete Members
+                        <Button variant="ghost">
+                            Delete members
+                        </Button>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
