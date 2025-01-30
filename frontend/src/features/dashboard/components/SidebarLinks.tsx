@@ -52,7 +52,7 @@ const SidebarLinks = () => {
   );
 
   return (
-    <div className="relative flex h-[calc(100vh-64px)] w-full max-w-[250px] flex-col rounded-tr-xl rounded-br-xl bg-clip-border text-gray-700 shadow-xl shadow-blue-gray-900/5 overflow-auto">
+    <div className="relative flex h-[calc(100vh-64px)] flex-col rounded-tr-xl rounded-br-xl bg-clip-border text-gray-700 shadow-xl shadow-blue-gray-900/5 overflow-auto">
       <nav className="flex flex-col gap-1 p-2 font-sans text-base font-normal text-blue-gray-700">
         {renderLink("Dashboard", "/dashboard", <LayoutDashboard />)}
         {renderLink("Visitors", APP_ROUTES.dasboard.visitors, <UserSearch />)}

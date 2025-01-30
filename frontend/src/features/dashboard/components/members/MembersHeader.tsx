@@ -12,7 +12,7 @@ const MembersHeader = () => {
   return (
     <Dialog>
     <DialogTrigger asChild>
-      <Button variant="default">Add members</Button>
+      <Button variant="default" className="relative left-4">Add members</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
       <DialogHeader>
