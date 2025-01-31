@@ -2,10 +2,28 @@
 
 import { cookies } from "next/headers";
 
-const API_URL = "http://localhost:5000/visitors";
+const API_URL = "http://localhost:5000/employee";
 
-// Create a new visitor (POST request)
-export const createVisitor = async (data: VisitorParams) => {
+
+export const getEmployees = async (): Promise<EmployeesDataParams> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken")
+  
+    const res = await fetch(API_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token?.value}`,
+      },
+      cache: "no-cache",
+    });
+  
+    return res.json();
+  };
+
+
+// Create a new employee (POST request)
+export const createEmployee = async (data: EmployeeParams) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 
@@ -21,8 +39,8 @@ export const createVisitor = async (data: VisitorParams) => {
     return res.json();
 };
 
-// Update an existing visitor (PATCH request)
-export const updateVisitor = async (id: string, data: Partial<VisitorParams>) => {
+// Update an existing employee (PATCH request)
+export const updateEmployee = async (id: string, data: Partial<EmployeeParams>) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 
@@ -39,8 +57,8 @@ export const updateVisitor = async (id: string, data: Partial<VisitorParams>) =>
     return res.json();
 };
 
-// Delete a visitor (DELETE request)
-export const deleteVisitor = async (id: string) => {
+// Delete a employee (DELETE request)
+export const deleteEmployee = async (id: string) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 

@@ -1,6 +1,7 @@
 import APP_ROUTES from "@/constants/routes";
 import AttendanceMain from "@/features/dashboard/main/Attendance.main";
 import CentersMain from "@/features/dashboard/main/Centers.main";
+import EmployeeMain from "@/features/dashboard/main/Employee.main";
 import ExpensesMain from "@/features/dashboard/main/Expenses.main";
 import MembersMain from "@/features/dashboard/main/Members.main";
 import MessagesMain from "@/features/dashboard/main/Messages.main";
@@ -23,23 +24,25 @@ const DashboardElementsRoute = async function ({
 
   switch (slug) {
     case "attendance":
-      return <AttendanceMain/>
+      return <AttendanceMain />
     case "centers":
-      return <CentersMain/>
+      return <CentersMain />
     case "members":
-      return <MembersMain/>
+      return <MembersMain />
     case "visitors":
-      return <VisitorsMain/>
+      return <VisitorsMain />
     case "reports":
-      return <ReportsMain/>
+      return <ReportsMain />
     case "sessions":
-      return <SessionsMain/>
+      return <SessionsMain />
     case "expenses":
-      return <ExpensesMain/>
+      return <ExpensesMain />
     case "message-center":
-      return <MessagesMain/>
+      return <MessagesMain />
     case "setup":
-      return <SetupMain/>
+      return <SetupMain />
+    case "employees":
+      return <EmployeeMain />
     default:
       break;
   }

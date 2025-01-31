@@ -14,6 +14,7 @@ type Routes = {
         expenses: string,
         messages: string,
         setup: string,
+        employee: string,
     }
 };
 
@@ -23,18 +24,19 @@ const APP_ROUTES: Routes = {
     home: "/",
     sign_in: "/sign-in",
     sign_up: "/sign-up",
-    allowRoutes: ['attendance', 'centers', 'members', 'visitors','reports', 'sessions', 'expenses', 'message-center', 'setup'],
+    allowRoutes: ['attendance', 'centers', 'members', 'visitors', 'reports', 'sessions', 'expenses', 'message-center', 'setup', 'employees'],
     dashboardPath: dashboardPath,
     dasboard: {
         attendance: `/dashboard/attendance`,
         centers: `/dashboard/centers`,
-        members: `/dashboard/members`, 
+        members: `/dashboard/members`,
         visitors: `/dashboard/visitors`,
         reports: `/dashboard/reports`,
         sessions: `/dashboard/sessions`,
         expenses: `/dashboard/expenses`,
         messages: `/dashboard/message-center`,
         setup: `/dashboard/setup`,
+        employee: `/dashboard/employees`,
     }
 }
 

@@ -664,10 +664,10 @@ const Sidebar: React.FC = () => {
           {isSetupOpen && (
             <div className="block w-full py-1 font-sans text-sm antialiased font-light leading-normal text-gray-700 pl-6">
               <nav className="flex flex-col gap-1 p-0 font-sans text-base font-normal text-blue-gray-700">
-                <Link href="/setup/centers">
+                <Link href="/dashboard/centers">
                   <div
                     className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 ${
-                      isActive("/setup/centers") ? "text-blue-600" : ""
+                      isActive("/dashboard/centers") ? "text-blue-600" : ""
                     }`}
                   >
                     {" "}
@@ -692,10 +692,10 @@ const Sidebar: React.FC = () => {
                     Centers
                   </div>
                 </Link>
-                <Link href="/setup/packages">
+                <Link href="/dashboard/packages">
                   <div
                     className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 ${
-                      isActive("/setup/packages") ? "text-blue-600" : ""
+                      isActive("/dashboard/packages") ? "text-blue-600" : ""
                     }`}
                   >
                     {" "}
@@ -721,10 +721,10 @@ const Sidebar: React.FC = () => {
                     Packages
                   </div>
                 </Link>
-                <Link href="/setup/employees">
+                <Link href="/dashboard/employees">
                   <div
                     className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 ${
-                      isActive("/setup/employees") ? "text-blue-600" : ""
+                      isActive("/dashboard/employees") ? "text-blue-600" : ""
                     }`}
                   >
                     {" "}

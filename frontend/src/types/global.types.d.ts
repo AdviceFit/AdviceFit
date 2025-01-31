@@ -68,7 +68,7 @@ type AttendanceDataParams = {
 
 
 type VisitorParams = {
-  _id?: string;
+  _id: string;
   name: string;
   mobile: numberstring;
   visiting_date?: string;
@@ -93,3 +93,38 @@ type VisitorsDataParams = {
   visitors: VisitorParams[];
 };
 
+
+type EmployeeCenter={
+  _id: string;
+  name: string;
+}
+
+type EmployeeParams = {
+  _id: string;
+  name: string;
+  mobile: string; // Changed to string to match validation format
+  role: "Center Manager" | "Reception" | "Trainer" | "Accountant" | "Housekeeping";
+  center:  EmployeeCenter | string
+  joining_date: Date | string;
+  dob?: date;
+  anniversary_date?: string;
+  email: string;
+  gender: "Male" | "Female" | "Other";
+  description?: string;
+  employee_id_proof?: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  createdBy: string;
+  updatedBy?: string;
+  deletedBy?: string;
+  isDeleted?: boolean;
+};
+
+type EmployeesDataParams = {
+  employees: EmployeeParams[];
+};

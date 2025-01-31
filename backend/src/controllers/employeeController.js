@@ -4,7 +4,7 @@ exports.createEmployee = async (req, res) => {
     try {
         const employeeData = { ...req.body, createdBy: req.user._id }; // Attach the logged-in user's ID
         const employee = await employeeService.createEmployee(employeeData);
-        res.status(201).json({ success: true, data: employee });
+        res.status(201).json({ success: true, employee: employee });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -13,7 +13,7 @@ exports.createEmployee = async (req, res) => {
 exports.getAllEmployees = async (req, res) => {
     try {
         const employees = await employeeService.getAllEmployees();
-        res.status(200).json({ success: true, data: employees });
+        res.status(200).json({ employees });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }

@@ -78,11 +78,11 @@ const SidebarLinks = () => {
         ], isMessageCenterOpen, () => setIsMessageCenterOpen(!isMessageCenterOpen))}
 
         {renderDropdown("Setup", <Settings />, [
-          { name: "Centers", path: "/setup/centers", icon: <MapPinHouse /> },
-          { name: "Packages", path: "/setup/packages", icon: <Boxes /> },
-          { name: "Employees", path: "/setup/employees", icon: <SquareUser /> },
-          { name: "Promos/Coupons", path: "/setup/promos", icon: <Tickets /> },
-          { name: "Company Setup", path: "/setup/company", icon: <Settings /> }
+          { name: "Centers", path: "/dashboard/centers", icon: <MapPinHouse /> },
+          { name: "Packages", path: "/dashboard/packages", icon: <Boxes /> },
+          { name: "Employees", path: "/dashboard/employees", icon: <SquareUser /> },
+          { name: "Promos/Coupons", path: "/dashboard/promos", icon: <Tickets /> },
+          { name: "Company Setup", path: "/dashboard/company", icon: <Settings /> }
         ], isSetupOpen, () => setIsSetupOpen(!isSetupOpen))}
       </nav>
     </div>
