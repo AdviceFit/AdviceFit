@@ -127,7 +127,6 @@ export default function AddAndEditVisitors() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-
     try {
       const response = await createVisitor(values as VisitorParams);
       if (response.visitor) {
@@ -156,11 +155,8 @@ export default function AddAndEditVisitors() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
-
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="name"
@@ -170,19 +166,15 @@ export default function AddAndEditVisitors() {
                   <FormControl>
                     <Input
                       placeholder="john Doe"
-
                       type="text"
                       {...field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="mobile"
@@ -199,15 +191,10 @@ export default function AddAndEditVisitors() {
                 </FormItem>
               )}
             />
-
           </div>
-
         </div>
-
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="visiting_date"
@@ -222,7 +209,6 @@ export default function AddAndEditVisitors() {
           </div>
 
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="tentative_visiting_date"
@@ -331,9 +317,7 @@ export default function AddAndEditVisitors() {
         />
 
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="occupation"
@@ -401,8 +385,8 @@ export default function AddAndEditVisitors() {
                         "Real Estate Agent",
                         "Sales Representative",
                         "Other"
-                      ].map((occ) => (
-                        <SelectItem value={occ}>{occ}</SelectItem>
+                      ].map((occ, index) => (
+                        <SelectItem key={index} value={occ}>{occ}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -440,15 +424,9 @@ export default function AddAndEditVisitors() {
               )}
             />
           </div>
-
-
-
         </div>
-
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-4">
-
             <FormField
               control={form.control}
               name="dob"
@@ -488,13 +466,9 @@ export default function AddAndEditVisitors() {
               )}
             />
           </div>
-
         </div>
-
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-4">
-
             <FormField
               control={form.control}
               name="marital_status"
@@ -546,9 +520,7 @@ export default function AddAndEditVisitors() {
               )}
             />
           </div>
-
           <div className="col-span-4">
-
             <FormField
               control={form.control}
               name="enquire_mode"
@@ -608,12 +580,10 @@ export default function AddAndEditVisitors() {
                   type="text"
                   {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8">
             <FormField
@@ -660,9 +630,8 @@ export default function AddAndEditVisitors() {
             />
           </div>
         </div>
-          <div className="w-full flex ">
-            <Button type="submit">Submit</Button>
-          </div>
+        <Button type="submit" className="w-full sm:w-auto">Submit</Button>
+
       </form>
     </Form>
   )

@@ -6,22 +6,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import AddAndEditVisitors from "./AddAndEditVisitors";
+import AddAndEditPackage from "./AddAndEditPackage";
 
-const VisitorsHeader = () => {
+const PackageHeader = () => {
   return (
     <Dialog>
     <DialogTrigger asChild>
-      <Button variant="default">Add Visitor</Button>
+      <Button variant="default">Add Package</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Add Visitor</DialogTitle>
+        <DialogTitle>Add Package</DialogTitle>
       </DialogHeader>
-        <AddAndEditVisitors />
+        <AddAndEditPackage/>
     </DialogContent>
   </Dialog>
   )
 }
 
-export default VisitorsHeader
+export default PackageHeader

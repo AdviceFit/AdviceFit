@@ -5,6 +5,7 @@ import EmployeeMain from "@/features/dashboard/main/Employee.main";
 import ExpensesMain from "@/features/dashboard/main/Expenses.main";
 import MembersMain from "@/features/dashboard/main/Members.main";
 import MessagesMain from "@/features/dashboard/main/Messages.main";
+import PackagesMain from "@/features/dashboard/main/Packages.main";
 import ReportsMain from "@/features/dashboard/main/Reports.main";
 import SessionsMain from "@/features/dashboard/main/Sessions.main";
 import SetupMain from "@/features/dashboard/main/Setup.main";
@@ -43,6 +44,8 @@ const DashboardElementsRoute = async function ({
       return <SetupMain />
     case "employees":
       return <EmployeeMain />
+    case "packages":
+      return <PackagesMain />
     default:
       break;
   }

@@ -22,8 +22,6 @@ exports.getAllEmployees = async (req, res) => {
 exports.getEmployeesByUser = async (req, res) => {
     try {
         const userId = req.user._id; // Get the logged-in user's ID from req.user
-        console.log("Fetching members for user:", userId);
-
         // Fetch members associated with this user
         const employees = await employeeService.getEmployeesByUser(userId);
 

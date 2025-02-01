@@ -94,7 +94,7 @@ type VisitorsDataParams = {
 };
 
 
-type EmployeeCenter={
+type EmployeeCenter = {
   _id: string;
   name: string;
 }
@@ -104,7 +104,7 @@ type EmployeeParams = {
   name: string;
   mobile: string; // Changed to string to match validation format
   role: "Center Manager" | "Reception" | "Trainer" | "Accountant" | "Housekeeping";
-  center:  EmployeeCenter | string
+  center: EmployeeCenter | string
   joining_date: Date | string;
   dob?: date;
   anniversary_date?: string;
@@ -128,3 +128,26 @@ type EmployeeParams = {
 type EmployeesDataParams = {
   employees: EmployeeParams[];
 };
+
+type PackageParams = {
+  _id: string;
+  packageName: string;
+  price: number;
+  center: Center;
+  productType: string;
+  noOfDays: number;
+  packageTiming: string;
+  trainingType: string;
+  packageType: string;
+  freezeSubscription: {
+    enabled: boolean;
+    maxFreezeDuration?: number;
+  };
+  showAtAdviceFit: boolean;
+}
+
+
+type PackageDataParams =
+  {
+    packages: PackageParams[]
+  } 

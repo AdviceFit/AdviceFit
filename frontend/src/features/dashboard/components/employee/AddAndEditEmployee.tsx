@@ -74,10 +74,10 @@ export default function AddAndEditEmployee() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      "gender": "Male",
-      "role": "Center Manager",
-      "center": "Gold's Gym",
-      "joining_date": new Date(),
+      gender: "Male",
+      role: "Trainer",
+      center: "",
+      joining_date: new Date(),
     },
   });
 
@@ -315,38 +315,31 @@ export default function AddAndEditEmployee() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}> {/* Use value, not defaultValue */}
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Center Manager">Center Manager</SelectItem>
-                      <SelectItem value="Reception">Reception</SelectItem>
-                      <SelectItem value="Trainer">Trainer</SelectItem>
-                      <SelectItem value="Accountant">Accountant</SelectItem>
-                      <SelectItem value="Housekeeping">Housekeeping</SelectItem>
-
-                      <Select>
-                        {[
-                          { value: "Center Manager", label: "Center Manager" },
-                          { value: "Reception", label: "Reception" },
-                          { value: "Trainer", label: "Trainer" },
-                          { value: "Accountant", label: "Accountant" },
-                          { value: "Housekeeping", label: "Housekeeping" },
-                        ].map((role) => (
-                          <SelectItem key={role.value} value={role.value}>
-                            {role.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
+                      {[
+                        { value: "Center Manager", label: "Center Manager" },
+                        { value: "Reception", label: "Reception" },
+                        { value: "Trainer", label: "Trainer" },
+                        { value: "Accountant", label: "Accountant" },
+                        { value: "Housekeeping", label: "Housekeeping" },
+                      ].map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
           </div>
 
 
