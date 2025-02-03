@@ -23,7 +23,7 @@ exports.getPackageById = async (id, userId) => {
   }).populate("center", "name centerCode");
 };
 
-exports.updatePackage = async (id, updateData, userId) => {
+exports.updatePackage = async (id, updateData, userId) => {  
   return await Package.findOneAndUpdate(
     { _id: id, createdBy: userId }, // Ensure the package belongs to the authenticated user
     { $set: updateData },

@@ -40,12 +40,12 @@ export const createPackage = async (data: PackageParams) => {
 };
 
 // Update an existing Packages (PATCH request)
-export const updatePackage = async (id: string, data: Partial<PackageParams>) => {
+export const updatePackage = async (id: string, data: Partial<PackageParams>) => {    
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 
     const res = await fetch(`${API_URL}/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,
@@ -64,6 +64,23 @@ export const deletePackage = async (id: string) => {
 
     const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+    });
+
+    return res.json();
+};
+
+// Get a single Package by ID (GET request)
+export const getPackageById = async (id: string): Promise<PackageDataParams> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,

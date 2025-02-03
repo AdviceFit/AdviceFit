@@ -28,7 +28,7 @@ import { getCenters } from "../../actions/centers.action"
 
 import { toast } from "sonner"
 
-import { createPackage } from "../../actions/packages.action"
+import { createPackage, getPackageById, updatePackage } from "../../actions/packages.action"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const formSchema = z.object({
@@ -45,9 +45,36 @@ const formSchema = z.object({
   showAtAdviceFit: z.boolean().optional(),
 });
 
-export default function AddAndEditPackage() {
+export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClose?: () => void }){
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const router = useRouter()
+  const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
+    _id: data._id || "",
+    packageName: data.packageName || "",
+    price: data.price || 0,
+    center: data.center._id || "",
+    productType: data.productType as "General" | "Gift" | "Registration" | "Session",
+    noOfDays: data.noOfDays || 0,
+    packageTiming: data.packageTiming as "Normal Hours" | "Sunny Hours",
+    trainingType: data.trainingType as "General" | "Personal",
+    packageType: data.packageType as "Main" | "Add On",
+    showAtAdviceFit: data.showAtAdviceFit || false,
+  });
+  
+  useEffect(() => {
+    const fetchPackageDetails = async () => {
+      if (!id) return;
+      try {
+        const data = await getPackageById(id);
+        const formattedData = formatPackageData(data.package);
+        form.reset(formattedData);
+      } catch (error) {
+        toast.error("Failed to fetch package details.");
+      }
+    };
+  
+    fetchPackageDetails();
+  }, [id]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,25 +87,35 @@ export default function AddAndEditPackage() {
       packageTiming: "Normal Hours",
       trainingType: "General",
       packageType: "Main",
-      // cafeSubscription: false,
       showAtAdviceFit: false,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await createPackage(values as PackageParams);
-      if (response.package) {
-        toast.success("Packages added successfully!");
-        router.replace("/dashboard/Packagess")
+      let response;
+      if (id) {
+        response = await updatePackage(id, values);
+        if (response.success) {
+          toast.success("Package updated successfully!");
+        } else {
+          toast.error("Failed to update the package.");
+        }
       } else {
-        toast.error("Failed to submit the form. Please try again");
+        response = await createPackage(values as PackageParams);
+        if (response.package) {
+          toast.success("Package created successfully!");
+        } else {
+          toast.error("Failed to create the package.");
+        }
       }
+      router.replace("/dashboard/packages"); 
+      onClose?.(); 
     } catch (error) {
-      toast.error("Failed to submit the form. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   }
-
+  
   useEffect(() => {
     async function fetchCenters() {
       try {

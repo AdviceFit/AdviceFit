@@ -27,7 +27,6 @@ exports.getEmployeesByUser = async (req, res) => {
 
         res.status(200).json({ employees });
     } catch (error) {
-        console.log('hiiiiiiiiiiiiii')
         res.status(500).json({ message: error.message });
     }
 };

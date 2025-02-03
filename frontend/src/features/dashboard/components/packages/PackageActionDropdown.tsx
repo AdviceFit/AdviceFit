@@ -1,5 +1,6 @@
-"use client"
-import { useState } from 'react';
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -15,15 +16,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import AddAndEditPackage from './AddAndEditPackage';
-import { deletePackage } from '../../actions/packages.action';
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import AddAndEditPackage from "./AddAndEditPackage";
+import { deletePackage } from "../../actions/packages.action";
 
 const PackageActionDropdown = ({ id }: { id: string }) => {
     const [isDeleting, setIsDeleting] = useState(false);
-    const router = useRouter()
     const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter();
 
     const handleOpen = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent dropdown from closing
@@ -42,7 +43,7 @@ const PackageActionDropdown = ({ id }: { id: string }) => {
             toast.success("Package deleted successfully!");
             router.push("/dashboard/packages");
         } catch (error) {
-            toast.error("Failed to delete Packages.");
+            toast.error("Failed to delete package.");
         } finally {
             setIsDeleting(false);
         }
@@ -65,7 +66,6 @@ const PackageActionDropdown = ({ id }: { id: string }) => {
                             {isDeleting ? "Deleting..." : "Delete Package"}
                         </Button>
                     </DropdownMenuItem>
-
                 </DropdownMenuGroup>
             </DropdownMenuContent>
 
@@ -75,11 +75,11 @@ const PackageActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Package</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditPackage />
+                    <AddAndEditPackage id={id} onClose={handleClose} />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>
     );
-}
+};
 
 export default PackageActionDropdown;

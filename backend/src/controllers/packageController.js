@@ -19,7 +19,7 @@ exports.getPackages = async (req, res) => {
 
     // Pass userId to service to ensure only the user's packages are fetched
     const packages = await packageService.getPackages(centerId, userId);
-    res.status(200).json({ success: true, packages });
+    res.status(200).json({ success: true, package:packages });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

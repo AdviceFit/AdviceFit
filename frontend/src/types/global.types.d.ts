@@ -149,5 +149,5 @@ type PackageParams = {
 
 type PackageDataParams =
   {
-    packages: PackageParams[]
+    package: PackageParams[]
   } 

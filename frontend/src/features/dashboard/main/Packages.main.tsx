@@ -5,11 +5,11 @@ import PackagesTable from '../components/packages/PackageTable';
 
 
 const PackagesMain = async () => {
-  const adviceFitPackages = await getPackages();  
+  const adviceFitPackages = await getPackages();    
   return (
     <>
       <PackageHeader />
-      <PackagesTable adviceFitPackages={adviceFitPackages?.packages} />
+      <PackagesTable adviceFitPackages={adviceFitPackages?.package} />
     </>
   )
 }
