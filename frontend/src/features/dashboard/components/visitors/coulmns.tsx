@@ -23,37 +23,12 @@ const columns: ColumnDef<VisitorParams>[] = [
     },
     {
         accessorKey: "visiting_center",
-        header: "Visiting Center",
+        header: "Gym Name",
     },
     {
         accessorKey: "visiting_date",
         header: "Visiting Date",
         cell: ({ getValue }) => <span>{formatDate(getValue() as string)}</span>,
-    },
-    {
-        accessorKey: "tentative_visiting_date",
-        header: "Tentative Visiting Date",
-        cell: ({ getValue }) => <span>{formatDate(getValue() as string)}</span>,
-    },
-    {
-        accessorKey: "gender",
-        header: "Gender",
-    },
-    {
-        accessorKey: "health_conditions",
-        header: "Health Conditions",
-    },
-    {
-        accessorKey: "marital_status",
-        header: "Marital Status",
-    },
-    {
-        accessorKey: "remarks",
-        header: "Remarks",
-    },
-    {
-        accessorKey: "enquire_mode",
-        header: "Enquire Mode",
     },
     {
         accessorKey:"action",

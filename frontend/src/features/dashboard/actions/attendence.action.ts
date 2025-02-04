@@ -35,7 +35,7 @@ export const updateAttendance = async (id: string, data: Partial<{ member: strin
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
     const res = await fetch(`${API_URL}/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,

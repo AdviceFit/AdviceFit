@@ -26,7 +26,6 @@ const VisitorActionDropdown = ({ id }: { id: string }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent dropdown from closing
         setIsOpen(true);
     };
 
@@ -35,7 +34,6 @@ const VisitorActionDropdown = ({ id }: { id: string }) => {
     };
 
     const handleDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation();
         setIsDeleting(true);
         try {
             await deleteVisitor(id);
@@ -75,7 +73,7 @@ const VisitorActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Visitors</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditVisitors />
+                    <AddAndEditVisitors id={id} onClose={handleClose} />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>

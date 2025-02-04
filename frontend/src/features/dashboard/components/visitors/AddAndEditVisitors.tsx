@@ -70,76 +70,122 @@ import { getCenters } from "../../actions/centers.action"
 import { useEffect, useState } from "react"
 import LocationSelector from "@/components/ui/location-input"
 import { useRouter } from "next/navigation"
-import { createVisitor } from "../../actions/visitors.action"
+import { createVisitor, getVisitorById, updateVisitor } from "../../actions/visitors.action"
 
 const formSchema = z.object({
+  _id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  // mobile: z.number().refine((value) => /^\d{10}$/.test(value.toString()), {
-  //     message: "Enter a valid 10-digit mobile number",
-  // }),
   mobile: z.string().min(1).max(15),
-  visiting_date: z.string().min(1, "Visiting date is required").optional(),
-  // tentative_visiting_date: z.string().min(1, "Tentative Visiting date is required"),
+  visiting_date: z.coerce.date().optional(),
   tentative_visiting_date: z.coerce.date().optional(),
   email: z.string().email("Enter a valid email address").optional(),
   visiting_center: z.string().min(1, "Center is required"),
   gender: z.enum(["Male", "Female", "Other"], { required_error: "Gender is required" }),
   source: z.string().optional(),
   occupation: z.string().optional(),
-  // dob: z.string().optional(),
   dob: z.coerce.date().optional(),
   health_conditions: z.string().optional(),
   marital_status: z.enum(["Single", "Married"], { required_error: "Marital status is required" }),
   remarks: z.string().optional(),
-  enquire_mode: z.enum(["Talking", "WalKing", "Any"], { required_error: "Select Atlist One Enquiry  Mode" }),
+  enquire_mode: z.enum(["Talking", "Walking", "Any"], { required_error: "Select at least one enquiry mode" }),
   address: z
     .object({
       addressLine1: z.string().optional(),
       addressLine2: z.string().optional(),
       state: z.string().optional(),
       city: z.string().optional(),
-      pincode: z
-        .string()
-        .regex(/^\d{6}$/, "Pincode must be a valid 6-digit number").optional(),
+      pincode: z.string().regex(/^\d{6}$/, "Pincode must be a valid 6-digit number").optional(),
     })
     .optional(),
 });
 
-
-export default function AddAndEditVisitors() {
+export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClose?: () => void }) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const router = useRouter()
   const [countryName, setCountryName] = useState<string>('');
   const [stateName, setStateName] = useState<string>('');
+  const formatVisitorData = (data: any): z.infer<typeof formSchema> => ({
+    _id: data._id || "",
+    name: data.name || "",
+    mobile: data.mobile || "",
+    visiting_date: data.visiting_date || new Date().toISOString().slice(0, 10),
+    tentative_visiting_date: data.tentative_visiting_date || undefined,
+    email: data.email || "",
+    visiting_center: data.visiting_center || "Gold's Gym",
+    gender: data.gender as "Male" | "Female" | "Other",
+    source: data.source || "Banner",
+    occupation: data.occupation || "Student",
+    dob: data.dob || new Date(),
+    health_conditions: data.health_conditions || 'None',
+    marital_status: data.marital_status as "Single" | "Married",
+    remarks: data.remarks || "Medium",
+    enquire_mode: data.enquire_mode as "Talking" | "Walking" | "Any",
+    address: data.address || { addressLine1: "", addressLine2: "", state: "", city: "", pincode: "" },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      "visiting_date": new Date().toISOString().slice(0, 10),
-      "marital_status": "Single",
-      "enquire_mode": "Talking",
-      "gender": "Male",
-      "visiting_center": "Gold's Gym",
-      "source": "Banner",
-      "occupation": "Student",
-      "remarks": "Medium"
-
+      name: "",
+      mobile: "",
+      visiting_date: new Date(),
+      email: "",
+      visiting_center: "Gold's Gym",
+      gender: "Male",
+      source: "Banner",
+      occupation: "Student",
+      health_conditions: "",
+      marital_status: "Single",
+      remarks: "Medium",
+      enquire_mode: "Talking",
+      address: { addressLine1: "", addressLine2: "", state: "", city: "", pincode: "" },
     },
-  })
+  });
+
+  useEffect(() => {
+    async function fetchVisitorDetails() {
+      if (!id) return;
+
+      try {
+        const visitorData = await getVisitorById(id);
+        if (visitorData?.visitor) {
+          form.reset(formatVisitorData(visitorData.visitor));
+        } else {
+          toast.error("Visitor not found.");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch visitor details.");
+      }
+    }
+
+    fetchVisitorDetails();
+  }, [id]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await createVisitor(values as VisitorParams);
-      if (response.visitor) {
-        toast.success("Visitor added successfully!");
-        router.replace("/dashboard/visitors")
+      let response;
+      if (id) {
+        response = await updateVisitor(id, values as VisitorParams);
+        if (response.visitor) {
+          toast.success("Visitor updated successfully!");
+        } else {
+          toast.error("Failed to update visitor.");
+        }
       } else {
-        toast.error("Failed to submit the form. Please try again");
+        response = await createVisitor(values as VisitorParams);
+        if (response.visitor) {
+          toast.success("Visitor added successfully!");
+        } else {
+          toast.error("Failed to create visitor.");
+        }
       }
+      onClose?.();
     } catch (error) {
-      toast.error("Failed to submit the form. Please try again.");
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      router.replace("/dashboard/visitors")
     }
   }
-
   useEffect(() => {
     async function fetchCenters() {
       try {
@@ -201,7 +247,33 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Visiting Date</FormLabel>
-                  <DatePickerDemo />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
@@ -264,7 +336,7 @@ export default function AddAndEditVisitors() {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                          {field.value ? centers.find((center) => center._id === field.value)?.name : "Select a center"}
+                          {field.value || "Select a center"} {/* Display the stored name */}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -276,8 +348,12 @@ export default function AddAndEditVisitors() {
                           <CommandEmpty>No centers found.</CommandEmpty>
                           <CommandGroup>
                             {centers.map((center) => (
-                              <CommandItem key={center._id} value={center.name} onSelect={() => form.setValue("visiting_center", center._id)}>
-                                <Check className={cn("mr-2 h-4 w-4", center._id === field.value ? "opacity-100" : "opacity-0")} />
+                              <CommandItem
+                                key={center._id}
+                                value={center.name}
+                                onSelect={() => form.setValue("visiting_center", center.name)} // Store name instead of _id
+                              >
+                                <Check className={cn("mr-2 h-4 w-4", center.name === field.value ? "opacity-100" : "opacity-0")} />
                                 {center.name}
                               </CommandItem>
                             ))}
@@ -290,6 +366,7 @@ export default function AddAndEditVisitors() {
                 </FormItem>
               )}
             />
+
           </div>
         </div>
         <FormField
@@ -298,7 +375,7 @@ export default function AddAndEditVisitors() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Gender</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Male" />
@@ -324,7 +401,7 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Occupation</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Student" />
@@ -405,7 +482,7 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Source</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Banner" />
@@ -475,7 +552,7 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Marital Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Single" />
@@ -502,7 +579,7 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Remarks</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Medium" />
@@ -527,14 +604,14 @@ export default function AddAndEditVisitors() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Enquire Mode</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="WalKing" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {["Talking", "WalKing", "Any"].map(src => (
+                      {["Talking", "Walking", "Any"].map(src => (
                         <SelectItem key={src} value={src}>{src}</SelectItem>
                       ))}
                     </SelectContent>
