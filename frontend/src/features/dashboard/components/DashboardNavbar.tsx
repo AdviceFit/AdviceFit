@@ -7,12 +7,16 @@ import { useRouter } from 'next/navigation';
 import { Popover, PopoverTrigger, PopoverContent } from "../../../components/ui/popover";
 import LogoIcon from "../../../../public/favicon-32x32.png";
 import { toast } from "sonner";
+import { useLocalStorageHook } from "@/hooks/useLocalStorageHook";
 
 const DashboardNavbar: React.FC = () => {
   const router = useRouter();
 
+  const localStorageHook = useLocalStorageHook();
+  const userDetails = localStorageHook.userDetails;
+
   const handleSignOut = () => {
-    localStorage.removeItem('authToken'); 
+    localStorageHook.clearLocalStorage();
     router.push('/sign-in');
     toast.success("Logout successful!");
   };
@@ -47,7 +51,7 @@ const DashboardNavbar: React.FC = () => {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-green-800 hover:bg-gray-700 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600"
+                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-300 hover:bg-gray-700 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600"
               >
                 <Image
                   src={LogoIcon} // Replace with the user's avatar
@@ -62,10 +66,10 @@ const DashboardNavbar: React.FC = () => {
             <PopoverContent className="w-48">
               <div className="p-4 border-b dark:border-gray-700">
                 <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                  Bonnie Green
+                   {userDetails?.gym_owner_name || ''}
                 </span>
                 <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                  name@flowbite.com
+                   {userDetails?.email || ''} 
                 </span>
               </div>
               <ul className="py-2 text-sm text-gray-700 dark:text-gray-300">
@@ -83,14 +87,6 @@ const DashboardNavbar: React.FC = () => {
                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
                     Settings
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/earnings"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    Earnings
                   </Link>
                 </li>
               </ul>

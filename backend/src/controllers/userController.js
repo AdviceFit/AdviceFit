@@ -73,3 +73,14 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Me Route
+exports.getMe = async (req, res) => {
+    try {
+        // Send user data from req using middleware 
+        res.status(200).json({ user: req?.user || '' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -37,21 +37,37 @@ export default function MyForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(values), // Send email and password as JSON
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
       const data = await response.json();
-      if (data.token) {        
+      if (data.token) {
         localStorage.setItem("authToken", data.token);
       }
-      toast.success("Login successful!"); // Show success message
-      router.push("/dashboard/attendance");
+      const responseOfMe = await fetch("http://localhost:5000/api/users/me", {
+        method: "GET",
+        credentials: "include",
+      });
 
+      if (!responseOfMe.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const userData = await responseOfMe.json();
+      if (userData.user) {
+        localStorage.setItem("user", JSON.stringify(userData.user));
+      }
+      toast.success("Login successful!"); // Show success message
+
+      if(userData.user.role.name === 'Admin'){
+        router.push("/dashboard/attendance");
+      }else if(userData.user.role.name === 'Member'){
+        router.push("/profile");
+      }
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -60,7 +76,10 @@ export default function MyForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-3xl mx-auto">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 max-w-3xl mx-auto"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -72,7 +91,7 @@ export default function MyForm() {
                   placeholder="johndoe@example.com"
                   type="email"
                   {...field}
-                  value={field.value || ''} // Ensure fallback to empty string
+                  value={field.value || ""} // Ensure fallback to empty string
                 />
               </FormControl>
               <FormDescription>Enter your email to sign in.</FormDescription>
@@ -91,7 +110,7 @@ export default function MyForm() {
                 <PasswordInput
                   placeholder="password"
                   {...field}
-                  value={field.value || ''} // Ensure fallback to empty string
+                  value={field.value || ""} // Ensure fallback to empty string
                 />
               </FormControl>
               <FormDescription>Enter your password.</FormDescription>
