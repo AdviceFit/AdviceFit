@@ -105,9 +105,9 @@ type EmployeeParams = {
   mobile: string; // Changed to string to match validation format
   role: "Center Manager" | "Reception" | "Trainer" | "Accountant" | "Housekeeping";
   center: EmployeeCenter | string
-  joining_date: Date | string;
+  joining_date: string | Date;
   dob?: date;
-  anniversary_date?: string;
+  anniversary_date?: string | Date;
   email: string;
   gender: "Male" | "Female" | "Other";
   description?: string;
@@ -119,7 +119,7 @@ type EmployeeParams = {
     postalCode: string;
     country: string;
   };
-  createdBy: string;
+  createdBy?: string;
   updatedBy?: string;
   deletedBy?: string;
   isDeleted?: boolean;

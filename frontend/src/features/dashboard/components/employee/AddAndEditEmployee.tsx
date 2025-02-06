@@ -34,13 +34,14 @@ import { format } from "date-fns"
 import { ChevronsUpDown, Check } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { createEmployee } from "../../actions/employee.action"
+import { createEmployee, getEmployeeById, updateEmployee } from "../../actions/employee.action"
 import { PopoverContent } from "@radix-ui/react-popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
+    _id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   mobile: z.string().min(1).max(15, "Mobile number must be between 1 and 15 characters"),
   email: z.string().email("Enter a valid email address").optional(),
@@ -65,7 +66,7 @@ const formSchema = z.object({
     .optional(),
 });
 
-export default function AddAndEditEmployee() {
+export default function AddAndEditEmployee({ id, onClose }: { id?: string; onClose?: () => void }) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const router = useRouter()
   const [countryName, setCountryName] = useState<string>('');
@@ -81,17 +82,62 @@ export default function AddAndEditEmployee() {
     },
   });
 
+
+  const formatEmployeeData = (data: any): z.infer<typeof formSchema> => ({
+    _id: data._id || "",
+    name: data.name || "",
+    mobile: data.mobile || "",
+    role: data.role as "Center Manager" | "Reception" | "Trainer" | "Accountant" | "Housekeeping",
+    center: typeof data.center === "string" ? data.center : data.center._id, // Handle center object
+    joining_date: data.joining_date,
+    dob: data.dob,
+    anniversary_date: data.anniversary_date ?? "",
+    email: data.email || "",
+    gender: data.gender as "Male" | "Female" | "Other",
+    description: data.description || "",
+  });
+
+  useEffect(() => {
+    const fetchEmployeeDetails = async () => {
+      if (!id) return;
+      try {
+        const data = await getEmployeeById(id);        
+        if (data?.employee) {
+          form.reset(formatEmployeeData(data.employee));
+        } else {
+          toast.error("Employee not found.");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch employee details.");
+      } finally {
+      }
+    };
+
+    fetchEmployeeDetails();
+  }, [id]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await createEmployee(values as EmployeeParams);
-      if (response.employee) {
-        toast.success("Employee added successfully!");
-        router.replace("/dashboard/employees")
+      let response;
+      if (id) {
+        response = await updateEmployee(id, values as EmployeeParams);
+        if (response.success) {
+          toast.success("Employee updated successfully!");
+        } else {
+          toast.error("Failed to update employee.");
+        }
       } else {
-        toast.error("Failed to submit the form. Please try again");
+        response = await createEmployee(values as EmployeeParams);
+        if (response.employee) {
+          toast.success("Employee created successfully!");
+        } else {
+          toast.error("Failed to create employee.");
+        }
       }
+      router.replace("/dashboard/employees");
+      onClose?.();
     } catch (error) {
-      toast.error("Failed to submit the form. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   }
 

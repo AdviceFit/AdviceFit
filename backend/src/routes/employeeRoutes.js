@@ -10,7 +10,8 @@ router.use(authMiddleware.authenticate);
 // Define routes
 router.post('/', employeeController.createEmployee); // Create Employee
 router.get('/', employeeController.getAllEmployees); // Get All Employees
-router.get('/:id', employeeController.getEmployeesByUser); // Get Employee by ID
+// router.get('/:id', employeeController.getEmployeesByUser); // Get Employee by ID
+router.get('/:id',  employeeController.getEmployeeById);
 router.put('/:id', employeeController.updateEmployee); // Update Employee
 router.delete('/:id', employeeController.deleteEmployee); // Delete Employee (Soft Delete)
 

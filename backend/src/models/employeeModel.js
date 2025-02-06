@@ -9,7 +9,7 @@ const employeeSchema = new mongoose.Schema(
       required: [true, 'Name is required'],
     },
     mobile: {
-      type: Number,
+      type: String,
       required: [true, 'Mobile number is required'],
       trim: true,
       match: /^\+[1-9]{1}[0-9]{1,14}$/, // E.164 international format

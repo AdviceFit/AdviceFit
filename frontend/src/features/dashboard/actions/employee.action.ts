@@ -39,13 +39,13 @@ export const createEmployee = async (data: EmployeeParams) => {
     return res.json();
 };
 
-// Update an existing employee (PATCH request)
+// Update an existing employee (PUT request)
 export const updateEmployee = async (id: string, data: Partial<EmployeeParams>) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 
     const res = await fetch(`${API_URL}/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,
@@ -64,6 +64,22 @@ export const deleteEmployee = async (id: string) => {
 
     const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+    });
+
+    return res.json();
+};
+
+export const getEmployeeById = async (id: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,

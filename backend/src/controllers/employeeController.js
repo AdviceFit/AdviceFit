@@ -23,9 +23,9 @@ exports.getEmployeesByUser = async (req, res) => {
     try {
         const userId = req.user._id; // Get the logged-in user's ID from req.user
         // Fetch members associated with this user
-        const employees = await employeeService.getEmployeesByUser(userId);
+        const employee = await employeeService.getEmployeesByUser(userId);
 
-        res.status(200).json({ employees });
+        res.status(200).json({ employee });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -40,9 +40,26 @@ exports.updateEmployee = async (req, res) => {
         if (!updatedEmployee) {
             return res.status(404).json({ success: false, message: 'Employee not found' });
         }
-        res.status(200).json({ success: true, data: updatedEmployee });
+        res.status(200).json({ success: true, employee: updatedEmployee });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+
+exports.getEmployeeById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const employee = await employeeService.findEmployeeById(id);
+
+        if (!employee) {
+            return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        res.status(200).json({ employee });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 

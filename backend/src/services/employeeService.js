@@ -21,6 +21,9 @@ exports.updateEmployee = async (id, updateData) => {
     });
 };
 
+exports.findEmployeeById = async (id) => {
+    return await Employee.findById(id);
+};
 exports.deleteEmployee = async (id, userId) => {
     const employee = await Employee.findOne({ _id: id, isDeleted: false });
     if (!employee) return null;

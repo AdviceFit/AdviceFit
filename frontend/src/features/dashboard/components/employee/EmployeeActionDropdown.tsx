@@ -75,7 +75,7 @@ const EmployeeActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Employee</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditEmployee />
+                    <AddAndEditEmployee id={id} onClose={handleClose} />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>
