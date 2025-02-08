@@ -16,7 +16,7 @@ exports.createAttendance = async (req, res) => {
         const attendance = await attendanceService.createAttendance(attendanceData);
 
         // Respond with the created attendance
-        res.status(201).json({ success: true, data: attendance });
+        res.status(201).json({ success: true, attendance });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -56,7 +56,7 @@ exports.getAttendanceById = async (req, res) => {
         if (!attendance) {
             return res.status(404).json({ success: false, message: 'Attendance not found' });
         }
-        res.status(200).json({ success: true, data: attendance });
+        res.status(200).json({ success: true, attendance });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -69,7 +69,7 @@ exports.updateAttendance = async (req, res) => {
         if (!attendance) {
             return res.status(404).json({ success: false, message: 'Attendance not found' });
         }
-        res.status(200).json({ success: true, data: attendance });
+        res.status(200).json({ success: true, attendance });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }

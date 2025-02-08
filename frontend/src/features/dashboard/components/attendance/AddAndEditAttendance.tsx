@@ -18,7 +18,7 @@ import { Period } from "@/lib/time-picker-utils";
 import { Label } from "@/components/ui/label";
 import { TimePickerInput } from "@/components/ui/TimePickerInput";
 import { TimePeriodSelect } from "@/components/ui/period-select";
-import { createAttendance } from "../../actions/attendence.action";
+import { createAttendance, getAttendanceById, updateAttendance } from "../../actions/attendance.action";
 import { getAllMembers } from "../../actions/members.action";
 import { useRouter } from "next/navigation";
 
@@ -33,9 +33,11 @@ const formSchema = z.object({
   time_out: z.string().nonempty("Time-out is required"),
 });
 
-const AddAndEditAttendance = () => {
+export default function AddAndEditAttendance({ id, onClose }: { id?: string; onClose?: () => void }) {
+
   const [members, setMembers] = useState<Member[]>([]);
-  const router   =useRouter()
+
+  const router = useRouter()
   const [timeOut, setTimeOut] = useState('10:00');
   const [timeIn, setTimeIn] = useState<string>(
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -47,45 +49,81 @@ const AddAndEditAttendance = () => {
   const hourRef = useRef<HTMLInputElement>(null);
   const secondRef = useRef<HTMLInputElement>(null);
   const periodRef = useRef<HTMLButtonElement>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      member: "",
-      time_in: timeIn,
+      member: '',
+      // time_in: timeIn,
       time_out: "",
     },
   });
 
 
-
-  async function fetchMembers() {
-    try {
-      const response = await getAllMembers()
-      setMembers(response.members);
-    } catch (error) {
-      toast.error("Failed to load members.");
+  useEffect(() => {
+    async function fetchMembers() {
+      try {
+        const response = await getAllMembers();
+        setMembers(response.members);
+      } catch (error) {
+        toast.error("Failed to load members.");
+      }
     }
-  }
+    fetchMembers();
+  }, []);
+
+  useEffect(() => {
+    async function fetchAttendanceDetails() {
+      if (!id) return;
+      try {
+        const response = await getAttendanceById(id);
+        
+        if (response?.attendance) {
+          const { member, time_in, time_out } = response.attendance;
+          form.reset({
+            member: member._id,
+            time_in: new Date(time_in).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+            time_out: new Date(time_out).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+          });
+        } else {
+          toast.error("Attendance record not found.");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch attendance details.");
+      }
+    }
+
+    fetchAttendanceDetails();
+  }, [id]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await createAttendance({
+      const formattedData = {
         member: values.member,
         time_in: new Date(`1970-01-01T${values.time_in}:00`).toISOString(),
         time_out: new Date(`1970-01-01T${values.time_out}:00`).toISOString(),
-      });
-      toast.success("Attendance recorded successfully!");
-      setIsDialogOpen(false);
-      router.push("/dashboard/attedance")
+      };
+
+      if (id) {
+        const response = await updateAttendance(id, formattedData);
+        if (response.success) {
+          toast.success("Attendance updated successfully!");
+        } else {
+          toast.error("Attendance to update Attendance.");
+        }
+      } else {
+        const response = await createAttendance(formattedData);
+        if (response.attendance) {
+          toast.success("Attendance created successfully!");
+        } else {
+          toast.error("Failed to create Attendance.");
+        }
+      }
+      router.replace("/dashboard/attendance");
+      onClose?.();
     } catch (error) {
       toast.error("Failed to submit attendance.");
     }
   }
-
-  useEffect(() => {
-    fetchMembers();
-  }, []);
 
   return (
     <Form {...form}>
@@ -97,7 +135,7 @@ const AddAndEditAttendance = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Member</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a member" />
@@ -124,11 +162,26 @@ const AddAndEditAttendance = () => {
             <FormItem>
               <FormLabel>Time In</FormLabel>
               <FormControl>
-                <input {...field} className="input read-only" readOnly value={timeIn} />
+                <input {...field} className="input read-only" />
               </FormControl>
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="time_out"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Time Out</FormLabel>
+              <FormControl>
+                <input {...field} className="input" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+
 
         {/* <div className="flex items-end gap-2">
           <div className="grid gap-1 text-center">
@@ -180,18 +233,6 @@ const AddAndEditAttendance = () => {
         </div> */}
 
         {/* Time Out */}
-        <FormField
-          control={form.control}
-          name="time_out"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time Out</FormLabel>
-              <FormControl>
-                <input {...field} className="input" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
 
 
         {/* Submit Button */}
@@ -203,4 +244,3 @@ const AddAndEditAttendance = () => {
   );
 };
 
-export default AddAndEditAttendance;

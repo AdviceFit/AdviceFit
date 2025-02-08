@@ -18,22 +18,31 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import AddAndEditAttendance from "./AddAndEditAttendance";
-import { deleteAttendance } from "../../actions/attendence.action";
+import { deleteAttendance } from "../../actions/attendance.action";
+import { useRouter } from "next/navigation";
 
-const AttendanceActionDropdown = ({ id, onDeleteSuccess }: { id: string; onDeleteSuccess: (id: string) => void }) => {
+const AttendanceActionDropdown =  ({ id }: { id: string }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+        const router = useRouter()
+    
+
+    const handleOpen = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent dropdown from closing
+        setIsOpen(true);
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+    };
   
     const handleDelete = async (e: React.MouseEvent) => {
       e.stopPropagation();
-  
       setIsDeleting(true);
       try {
         await deleteAttendance(id);
         toast.success("Attendance deleted successfully!");
-        // Remove from state
-        onDeleteSuccess(id);
-        setIsOpen(false)
+        router.push("/dashboard/attendace");
       } catch (error) {
         toast.error("Failed to delete attendance.");
       } finally {
@@ -49,7 +58,7 @@ const AttendanceActionDropdown = ({ id, onDeleteSuccess }: { id: string; onDelet
         <DropdownMenuContent className="w-40">
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <Button variant="ghost" onClick={() => setIsOpen(true)}>
+              <Button variant="ghost" onClick={handleOpen}>
                 Edit Attendance
               </Button>
             </DropdownMenuItem>
@@ -62,12 +71,12 @@ const AttendanceActionDropdown = ({ id, onDeleteSuccess }: { id: string; onDelet
         </DropdownMenuContent>
   
         {/* Edit Dialog */}
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Attendance</DialogTitle>
             </DialogHeader>
-            <AddAndEditAttendance />
+            <AddAndEditAttendance id={id} onClose={handleClose} />
           </DialogContent>
         </Dialog>
       </DropdownMenu>

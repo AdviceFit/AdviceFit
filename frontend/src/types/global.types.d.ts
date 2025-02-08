@@ -58,8 +58,8 @@ type CentersDataParams = {
 type AttendanceParams = {
   _id: string;
   member: Member;
-  time_in: string;
-  time_out: string;
+  time_in: Date ;
+  time_out: Date;
 }
 
 type AttendanceDataParams = {

@@ -65,3 +65,19 @@ export const deleteAttendance = async (id: string) => {
     });
     return res.json();
 };
+
+export const getAttendanceById = async (id: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+    });
+
+    return res.json();
+};

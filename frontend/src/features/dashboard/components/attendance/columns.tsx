@@ -6,7 +6,8 @@ const formatDateTime = (dateString: string) => {
   return date.toLocaleString();
 };
 
-const columns = (onDeleteSuccess: (id: string) => void): ColumnDef<any>[] => [
+  const columns: ColumnDef<any>[] = [
+
   {
     accessorKey: "member.name",
     header: "Member",
@@ -33,7 +34,7 @@ const columns = (onDeleteSuccess: (id: string) => void): ColumnDef<any>[] => [
     header: "Actions",
     cell: ({ row }) => {
       const id = row.original._id;
-      return <AttendanceActionDropdown id={id} onDeleteSuccess={onDeleteSuccess} />;
+      return <AttendanceActionDropdown id={id}  />;
     },
   },
 ];
