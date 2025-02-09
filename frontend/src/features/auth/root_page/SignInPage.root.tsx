@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -25,6 +26,7 @@ const formSchema = z.object({
 
 export default function MyForm() {
   const router = useRouter();
+  const [role, setRole] = useState<"Member" | "Admin">("Member");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -32,13 +34,18 @@ export default function MyForm() {
   // Update onSubmit function to handle API call
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      const dataToSend = { 
+        ...values, // Includes email and password
+        role, // Adds the selected role (either 'Member' or 'Admin')
+      };
+
       const response = await fetch("http://localhost:5000/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(values), // Send email and password as JSON
+        body: JSON.stringify(dataToSend), // Send email and password as JSON
       });
 
       if (!response.ok) {
@@ -63,9 +70,9 @@ export default function MyForm() {
       }
       toast.success("Login successful!"); // Show success message
 
-      if(userData.user.role.name === 'Admin'){
+      if (userData.user.role.name === "Admin") {
         router.push("/dashboard/attendance");
-      }else if(userData.user.role.name === 'Member'){
+      } else if (userData.user.role.name === "Member") {
         router.push("/profile");
       }
     } catch (error) {
@@ -80,6 +87,31 @@ export default function MyForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 max-w-3xl mx-auto"
       >
+        <div className="flex mt-4">
+          <Button
+            type="button"
+            onClick={() => setRole("Member")}
+            className={`bg-white hover:bg-white text-black w-1/2 shadow-none rounded-none ${
+              role === "Member"
+                ? "border-b-2 border-black"
+                : "border-b text-gray-500"
+            }`}
+          >
+            Member
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setRole("Admin")}
+            className={`bg-white hover:bg-white text-black w-1/2 shadow-none rounded-none ${
+              role === "Admin"
+                ? "border-b-2 border-black"
+                : "border-b text-gray-500"
+            }`}
+          >
+            Partner
+          </Button>
+        </div>
+
         <FormField
           control={form.control}
           name="email"

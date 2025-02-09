@@ -1,4 +1,33 @@
 const MemberService = require('../services/memberService');
+const nodemailer = require('nodemailer');
+
+// Function to send email
+exports.sendConfirmationEmail = async (memberEmail, memberName, memberPassLink) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        }
+    });
+
+    // Define the email options
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: memberEmail,
+        subject: 'Welcome to Our Service – Set Your Password',
+        text: `Hi ${memberName},\n\nThank you for joining us! We are excited to have you as a member.\n\nTo complete your registration, please set your password by clicking the link below:\n\n${memberPassLink}\n\nBest Regards,\nThe Team`, // plain text body
+        html: `<p>Hi ${memberName},</p><p>Thank you for joining us! We are excited to have you as a member.</p><p>To complete your registration, please set your password by clicking the link below:</p><p><a href="${memberPassLink}">Set Your Password</a></p><p>Best Regards,<br>The Team</p>` // HTML body
+    };
+
+    try {
+        // Send email
+        await transporter.sendMail(mailOptions);
+        console.log('Confirmation email sent to ' + memberEmail);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+}
 
 // Create Member
 exports.createMember = async (req, res) => {
@@ -10,6 +39,12 @@ exports.createMember = async (req, res) => {
 
         const newMember = await MemberService.createMember(memberData);
 
+        const memberPassLink = `${process.env.MEMBER_PASS_SET_LINK}={newMember?._id}`;
+        const updateData = { password_set_link: memberPassLink };
+
+        await MemberService.updateMember(newMember?._id, updateData);
+
+        await sendConfirmationEmail(newMember?.email, newMember?.name, memberPassLink);
         res.status(201).json({ message: 'Member created successfully', member: newMember });
     } catch (error) {
         res.status(500).json({ message: error.message });

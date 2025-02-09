@@ -12,4 +12,10 @@ router.post('/login', userController.login);
 // Me Route
 router.get('/me', authMiddleware.authenticate, userController.getMe);
 
+// Validate Member link
+router.get('/validate-member-pass/:id', userController.validateMemberLink);
+
+// Set Member Password
+router.patch('/set-member-password/:id', userController.setMemberPassword);
+
 module.exports = router;

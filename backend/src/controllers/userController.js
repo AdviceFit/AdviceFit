@@ -1,4 +1,5 @@
 const UserService = require('../services/userService');
+const MemberService = require('../services/memberService');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/rolesModel');
@@ -41,7 +42,8 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
+        // console.log(req.body);
+        
         // Check if the user exists
         const user = await UserService.findUserByEmail(email);
         if (!user) {
@@ -80,7 +82,68 @@ exports.getMe = async (req, res) => {
         // Send user data from req using middleware 
         res.status(200).json({ user: req?.user || '' });
     } catch (error) {
-        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Validate Member link
+exports.validateMemberLink = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const member = await MemberService.findMemberById(id);
+      
+      if (!member || member.is_password_set) {
+        return res.status(400).json({
+          isMemberPassLinkValid: false,
+          message: "Link is invalid or password is already set. Please contact the administrator for more queries."
+        });
+      }
+
+      return res.status(200).json({
+        isMemberPassLinkValid: true,
+        message: "Link is valid."
+      });
+  
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Set Member Password
+exports.setMemberPassword = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const { password } = req.body;
+
+      if (!password) {
+        return res.status(400).json({ message: 'Password is required.' });
+      }
+
+      const member = await MemberService.findMemberById(id);
+      
+      if (!member) {
+        return res.status(400).json({ message: 'member not found' });
+      }
+
+      if (member.is_password_set) {
+        return res.status(400).json({ message: 'Password is already set for this member.' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const updateData = {
+        password: hashedPassword,
+        is_password_set: true,
+      };
+      const updatedMember = await MemberService.updateMember(id, updateData);
+
+      return res.status(200).json({
+        member: updatedMember,
+        message: 'Password has been successfully set.',
+      });
+  
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };

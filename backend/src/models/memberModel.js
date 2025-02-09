@@ -36,6 +36,18 @@ const memberSchema = new mongoose.Schema(
                 message: 'Invalid email format',
             },
         },
+        password: {
+            type: String,
+            required: false,
+        },
+        is_password_set: {
+            type: Boolean,
+            default: false, 
+        },
+        password_set_link: {
+            type: String,
+            required: false,
+        },
         center: {
             type: String,
             required: [true, 'Center is required'],
