@@ -18,7 +18,8 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
-import { createCenter, updateCenter } from "../../actions/centers.action";
+import { createCenter, getCenterById, updateCenter } from "../../actions/centers.action";
+import { useEffect } from "react";
 
 const centerSchema = z.object({
     _id: z.string().optional(),
@@ -52,19 +53,11 @@ const centerSchema = z.object({
 
 export type Center = z.infer<typeof centerSchema>;
 
-
-
-type CreateCenterProps = {
-    mode?: "add" | "edit";
-    initialData?: Center;
-};
-
-
-const AddAndEditCenters: React.FC<CreateCenterProps> = ({ mode, initialData }) => {
+export default function AddAndEditCenters({ id, onClose }: { id?: string; onClose?: () => void }) {
     const router = useRouter();
     const form = useForm<z.infer<typeof centerSchema>>({
         resolver: zodResolver(centerSchema),
-        defaultValues: initialData || {
+        defaultValues: {
             name: "",
             centerCode: "",
             centerEmail: "",
@@ -85,22 +78,70 @@ const AddAndEditCenters: React.FC<CreateCenterProps> = ({ mode, initialData }) =
         },
     });
 
+    // Format Center Data for Form Pre-filling
+    const formatCenterData = (data: any): z.infer<typeof centerSchema> => ({
+        _id: data._id || "",
+        name: data.name || "",
+        centerCode: data.centerCode || "",
+        centerEmail: data.centerEmail || "",
+        mobileNo: data.mobileNo || "",
+        workPhone: data.workPhone || "",
+        gstNumber: data.gstNumber || "",
+        agency: data.agency || "",
+        biometricSerialNumber: data.biometricSerialNumber || "",
+        address: {
+            addressLine1: data.address?.addressLine1 || "",
+            addressLine2: data.address?.addressLine2 || "",
+            state: data.address?.state || "",
+            city: data.address?.city || "",
+            pincode: data.address?.pincode || "",
+        },
+        aboutUs: data.aboutUs || "",
+        termsAndConditions: data.termsAndConditions || "",
+    });
+
+    // Fetch Center Details if Editing
+    useEffect(() => {
+        async function fetchCenterDetails() {
+            if (!id) return;
+
+            try {
+                const response = await getCenterById(id);
+                if (response?.center) {
+                    form.reset(formatCenterData(response.center));
+                } else {
+                    toast.error("Center not found.");
+                }
+            } catch (error) {
+                toast.error("Failed to fetch center details.");
+            }
+        }
+
+        fetchCenterDetails();
+    }, [id]);
     const onSubmit = async (values: z.infer<typeof centerSchema>) => {
         try {
             let response;
-
-            if (mode === "edit") {
-                if (!initialData?._id) throw new Error("Center ID is required for editing");
-                response = await updateCenter(initialData._id, values);
+            if (id) {
+                response = await updateCenter(id, values as CenterParams);
+                if (response.center) {
+                    toast.success("Center updated successfully!");
+                } else {
+                    toast.error("Failed to update Center.");
+                }
             } else {
-
                 response = await createCenter(values as CenterParams);
+                if (response.center) {
+                    toast.success("Center added successfully!");
+                } else {
+                    toast.error("Failed to create Center.");
+                }
             }
-            toast.success(`Center ${mode === "edit" ? "updated" : "added"} successfully!`);
+            onClose?.();
+        } catch (error) {
+            toast.error("Something went wrong. Please try again.");
+        } finally {
             router.push("/dashboard/centers");
-            form.reset();
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "An unexpected error occurred");
         }
     };
 
@@ -384,4 +425,3 @@ const AddAndEditCenters: React.FC<CreateCenterProps> = ({ mode, initialData }) =
 }
 
 
-export default AddAndEditCenters;

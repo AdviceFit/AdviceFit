@@ -41,12 +41,12 @@ export const createCenter = async (data: CenterParams) => {
     return res.json();
 };
 
-export const updateCenter = async (id: string, data: Partial<{ name: string; location: string }>) => {
+export const updateCenter = async (id: string, data: Partial<CenterParams>) => {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
 
     const res = await fetch(`${API_URL}/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token?.value}`,
@@ -70,5 +70,20 @@ export const deleteCenter = async (id: string) => {
         },
         cache: "no-cache",
     });
+    return res.json();
+};
+
+export const getCenterById = async (id: string) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token?.value}`,
+        },
+        cache: "no-cache",
+    });
+
     return res.json();
 };

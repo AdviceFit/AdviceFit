@@ -72,7 +72,7 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Center</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditCenters mode="edit" />
+                    <AddAndEditCenters  id={id} onClose={handleClose} />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>

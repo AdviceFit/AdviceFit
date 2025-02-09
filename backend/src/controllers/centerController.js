@@ -25,7 +25,7 @@ exports.getCenterById = async (req, res) => {
         if (!center) {
             return res.status(404).json({ success: false, message: 'Center not found' });
         }
-        res.status(200).json({ success: true, data: center });
+        res.status(200).json({ success: true,  center });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -37,7 +37,7 @@ exports.updateCenter = async (req, res) => {
         if (!updatedCenter) {
             return res.status(404).json({ success: false, message: 'Center not found' });
         }
-        res.status(200).json({ success: true, data: updatedCenter });
+        res.status(200).json({ success: true, center: updatedCenter });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
