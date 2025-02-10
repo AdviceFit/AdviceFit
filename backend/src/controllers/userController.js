@@ -41,13 +41,21 @@ exports.signup = async (req, res) => {
 // Login Controller
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        // console.log(req.body);
-        
-        // Check if the user exists
-        const user = await UserService.findUserByEmail(email);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        const { email, password, role } = req.body;
+
+        let user;
+        if (role === 'Admin') {
+            user = await UserService.findUserByEmail(email);
+            if (!user) {
+                return res.status(404).json({ message: 'Admin not found' });
+            }
+        } else if (role === 'Member') {
+            user = await UserService.findMemberByEmail(email);            
+            if (!user) {
+                return res.status(404).json({ message: 'Member not found' });
+            }
+        } else {
+            return res.status(400).json({ message: 'Invalid role provided' });
         }
 
         // Check if the password is correct
@@ -58,7 +66,7 @@ exports.login = async (req, res) => {
 
         // Generate a JWT token
         const token = jwt.sign(
-            { id: user._id, email: user.email },
+            { id: user._id, email: user.email, role },
             process.env.JWT_SECRET,
             { expiresIn: '5h' }
         );

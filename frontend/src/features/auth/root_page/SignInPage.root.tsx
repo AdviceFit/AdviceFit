@@ -73,7 +73,7 @@ export default function MyForm() {
       if (userData.user.role.name === "Admin") {
         router.push("/dashboard/attendance");
       } else if (userData.user.role.name === "Member") {
-        router.push("/profile");
+        router.push("/personal-details");
       }
     } catch (error) {
       console.error("Form submission error", error);

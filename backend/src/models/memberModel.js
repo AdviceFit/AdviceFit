@@ -48,6 +48,11 @@ const memberSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+        role: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Role',
+            required: true,
+        },
         center: {
             type: String,
             required: [true, 'Center is required'],

@@ -33,7 +33,12 @@ exports.sendConfirmationEmail = async (memberEmail, memberName, memberPassLink) 
 exports.createMember = async (req, res) => {
     try {
         const memberData = req.body;
-
+        
+        const memberRole = await Role.findOne({ name: 'Member' });
+        if (!memberRole) {
+            return res.status(400).json({ message: 'Member role not found!' });
+        }
+        memberData.role = memberRole._id;
         // Add the createdBy field from the logged-in user's ID
         memberData.createdBy = req.user._id;
 
