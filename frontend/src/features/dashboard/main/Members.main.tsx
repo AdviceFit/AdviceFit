@@ -26,7 +26,7 @@ const MembersMain = async () => {
   return (
     <>
       <MembersHeader />
-      <MembersTable adviceFitMembers={adviceFitMembers?.members} />
+      <MembersTable adviceFitMembers={adviceFitMembers?.members ?? []} />
     </>
   )
 }

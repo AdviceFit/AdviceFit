@@ -26,7 +26,7 @@ const AttendanceMain = async () => {
   return (
     <>
       <AttendanceHeader />
-      <AttendanceTable adviceFitAttendance={adviceFitAttendance?.attendance} />
+      <AttendanceTable adviceFitAttendance={adviceFitAttendance?.attendance ?? []} />
     </>
   )
 }

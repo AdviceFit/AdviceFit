@@ -9,7 +9,7 @@ const CentersMain = async () => {
   return (
     <>
       <CentersHeader />
-      <CentersTable adviceFitCenters={adviceFitCenters?.centers} />
+      <CentersTable adviceFitCenters={adviceFitCenters?.centers ?? []} />
     </>
   )
 }

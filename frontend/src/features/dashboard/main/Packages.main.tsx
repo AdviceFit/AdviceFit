@@ -9,7 +9,7 @@ const PackagesMain = async () => {
   return (
     <>
       <PackageHeader />
-      <PackagesTable adviceFitPackages={adviceFitPackages?.package} />
+      <PackagesTable adviceFitPackages={adviceFitPackages?.package ?? []} />
     </>
   )
 }

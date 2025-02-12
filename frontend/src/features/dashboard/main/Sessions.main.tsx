@@ -1,10 +1,16 @@
-import React from 'react'
 
-const SessionsMain = () => {
+import { getSessions } from '../actions/sessions.action';
+import SessionHeader from '../components/sessions/SessionHeader';
+import SessionTable from '../components/sessions/SessionTable';
+
+
+const SessionsMain = async () => {
+  const adviceFitSessions = await getSessions();      
   return (
-    <div>
-      SessionsMain
-    </div>
+    <>
+      <SessionHeader />
+      <SessionTable adviceFitSession={adviceFitSessions.session ?? []} />
+    </>
   )
 }
 

@@ -58,7 +58,7 @@ type CentersDataParams = {
 type AttendanceParams = {
   _id: string;
   member: Member;
-  time_in: Date ;
+  time_in: Date;
   time_out: Date;
 }
 
@@ -146,8 +146,24 @@ type PackageParams = {
   showAtAdviceFit: boolean;
 }
 
+type PackageDataParams = {
+  package: PackageParams[]
+}
 
-type PackageDataParams =
-  {
-    package: PackageParams[]
-  } 
+type SessionParams = {
+  _id?: string;
+  title: string;
+  center: {
+    _id: string;
+    name: string;
+    centerCode: string;
+  };
+  session_date: string | Date;
+  start_time: string;
+  end_time: string;
+  member_capacity: number;
+};
+
+type SessionDataParams = {
+  session: SessionParams[];
+};

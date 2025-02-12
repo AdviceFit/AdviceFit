@@ -9,7 +9,7 @@ const EmployeeMain = async () => {
   return (
     <>
       <EmployeeHeader />
-      <EmployeeTable adviceFitEmployee={adviceFitEmployee?.employees} />
+      <EmployeeTable adviceFitEmployee={adviceFitEmployee?.employees ?? []} />
     </>
   )
 }

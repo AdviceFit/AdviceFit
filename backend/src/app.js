@@ -10,6 +10,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes')
 const centerRoutes = require('./routes/centerRoutes')
 const packageRoutes = require('./routes/packageRoutes')
 const employeeRoutes = require('./routes/employeeRoutes')
+const sessionsRoutes = require('./routes/sessionRoutes')
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/attendance', attendanceRoutes);
 app.use('/center', centerRoutes);
 app.use('/packages', packageRoutes);
 app.use('/employee', employeeRoutes);
+app.use('/sessions', sessionsRoutes);
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');
