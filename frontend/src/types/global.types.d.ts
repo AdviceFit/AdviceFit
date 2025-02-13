@@ -167,3 +167,33 @@ type SessionParams = {
 type SessionDataParams = {
   session: SessionParams[];
 };
+
+
+type ExpenseParams = {
+  _id?: string;
+  expense_title: string;
+  amount: number;
+  type_of_expense: 
+    | "Electric Bill"
+    | "Water Bill"
+    | "Internet Bill"
+    | "Medical Kit"
+    | "Cleaning Kit"
+    | "AC Service"
+    | "Rent"
+    | "Employee Salary"
+    | "Other";
+  center: {
+    _id: string;
+    name: string;
+    centerCode: string;
+  };
+  expense_date: string | Date;
+  payment_mode: "Cash" | "Cheque" | "Paytm" | "Bank Transfer" | "UPI" | "Card";
+  comment?: string;
+};
+
+type ExpenseDataParams = {
+  expense: ExpenseParams[];
+};
+

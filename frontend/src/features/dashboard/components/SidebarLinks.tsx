@@ -69,7 +69,7 @@ const SidebarLinks = () => {
           { name: "Download Reports", path: "/reports/download-reports", icon: <HardDriveDownload /> }
         ], isReportsOpen, () => setIsReportsOpen(!isReportsOpen))}
 
-        {renderLink("Expenses", "/expenses", <Wallet />)}
+        {renderLink("Expenses", "/dashboard/expenses", <Wallet />)}
 
         {renderDropdown("Message Center", <MessageSquareMore />, [
           { name: "Send Bulk Message", path: "/message-center/send-bulk-message", icon: <MessagesSquare /> },

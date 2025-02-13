@@ -413,10 +413,10 @@ const Sidebar: React.FC = () => {
 
         {/* Expenses */}
         <div className="relative block w-full">
-          <Link href="/expenses">
+          <Link href="/dashboard/expenses">
             <div
               className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 ${
-                isActive("/expenses") ? "text-blue-600" : ""
+                isActive("/dashboard/expenses") ? "text-blue-600" : ""
               }`}
             >
               {" "}

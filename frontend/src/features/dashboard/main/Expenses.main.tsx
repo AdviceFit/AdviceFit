@@ -1,11 +1,15 @@
-import React from 'react'
+import { getExpenses } from '../actions/expenses.action';
+import ExpenseHeader from '../components/expenses/ExpenseHeader';
+import ExpenseTable from '../components/expenses/ExpenseTable';
 
-const ExpensesMain = () => {
+const ExpensesMain = async () => {
+  const adviceFitExpense = await getExpenses();        
   return (
-    <div>
-      ExpensesMain
-    </div>
+    <>
+      <ExpenseHeader />
+      <ExpenseTable adviceFitExpense={adviceFitExpense?.expense ?? []} />
+    </>	
   )
 }
 
-export default ExpensesMain
+export default ExpensesMain;
