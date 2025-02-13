@@ -17,6 +17,16 @@ type Routes = {
         employee: string,
         packages: string,
     }
+    memberScreen: {
+        personalDetails: string;
+        mySubscription: string,
+        paymentHistory: string,
+        orderHistory: string,
+        dietPlan: string,
+        fitnessData: string,
+        myReview: string,
+        attendance: string,
+    }
 };
 
 const dashboardPath = "/dashboard";
@@ -25,7 +35,8 @@ const APP_ROUTES: Routes = {
     home: "/",
     sign_in: "/sign-in",
     sign_up: "/sign-up",
-    allowRoutes: ['attendance', 'centers', 'members', 'visitors', 'reports', 'sessions', 'expenses', 'message-center', 'setup', 'employees', 'packages'],
+    allowRoutes: ['attendance', 'centers', 'members', 'visitors', 'reports', 'sessions', 'expenses', 'message-center', 'setup', 'employees', 'packages',
+         'personal-details', 'my-subscription', 'payment-history', 'order-history', 'diet-plan', 'fitness-data', 'my-review', 'attendance'],
     dashboardPath: dashboardPath,
     dasboard: {
         attendance: `/dashboard/attendance`,
@@ -39,6 +50,16 @@ const APP_ROUTES: Routes = {
         setup: `/dashboard/setup`,
         employee: `/dashboard/employees`,
         packages: `/dashboard/packages`,
+    },
+    memberScreen: {
+        personalDetails: `/personal-details`,
+        mySubscription: `/my-subscription`,
+        paymentHistory: `/payment-history`,
+        orderHistory: `/order-history`,
+        dietPlan: `/diet-plan`,
+        fitnessData: `/fitness-data`,
+        myReview: `/my-review`,
+        attendance: `/attendance`,
     }
 }
 
