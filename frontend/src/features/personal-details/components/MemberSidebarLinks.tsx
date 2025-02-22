@@ -75,7 +75,10 @@ const MemberSidebarLinks = () => {
   return (
     <div className="relative flex h-[calc(100vh-64px)] flex-col rounded-br-xl bg-clip-border text-gray-700 shadow-xl shadow-blue-gray-900/5 overflow-auto">
       <nav className="flex flex-col font-sans text-base font-normal text-blue-gray-700">
-        <div className="flex flex-col items-center justify-center w-full h-40 bg-gray-400">
+        <div
+          style={{ background: "rgba(234,234,234,1)" }}
+          className="flex flex-col items-center justify-center w-full h-40"
+        >
           <Image
             src={LogoIcon} // Replace with the user's avatar
             alt="User Avatar"
@@ -83,7 +86,9 @@ const MemberSidebarLinks = () => {
             width={100}
             height={100}
           />
-          <span className="text-lg font-medium text-black-500">{userDetails?.name || "Name john"}</span>
+          <span className="text-lg font-medium text-black-500">
+            {userDetails?.name || "Name john"}
+          </span>
         </div>
         {renderLink(
           "Personal Detail",

@@ -63,7 +63,7 @@ const formSchema = z.object({
   city: z.string(),
   pincode: z.coerce.number(),
   blood_group: z.enum(["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]),
-//   health_condition: z.string().min(2).max(50),
+  //   health_condition: z.string().min(2).max(50),
   //   center: z.string(),
   //   source: z.string().optional(),
   //   occupation: z.string().optional(),
@@ -741,9 +741,13 @@ const PersonalDetailsSection = () => {
             </div>
 
             <div className="flex justify-end">
-            <Button type="submit" className="w-full sm:w-auto mt-4">
-              Save Changes
-            </Button>
+              <Button
+                type="submit"
+                // style={{ background: "#4E31AA" }}
+                className="w-full sm:w-auto mt-4 bg-blue-300"
+              >
+                Save Changes
+              </Button>
             </div>
           </form>
         </Form>
