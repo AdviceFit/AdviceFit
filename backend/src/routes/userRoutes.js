@@ -1,21 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authMiddleware = require('../middlewares/authMiddleware');
-const userController = require('../controllers/userController');
+const authMiddleware = require("../middlewares/authMiddleware");
+const userController = require("../controllers/userController");
 
 // Signup Route
-router.post('/signup', userController.signup);
+router.post("/signup", userController.signup);
 
 // Login Route
-router.post('/login', userController.login);
+router.post("/login", userController.login);
 
 // Me Route
-router.get('/me', authMiddleware.authenticate, userController.getMe);
+router.get("/me", authMiddleware.authenticate, userController.getMe);
 
 // Validate Member link
-router.get('/validate-member-pass/:id', userController.validateMemberLink);
+router.get("/validate-member-pass/:id", userController.validateMemberLink);
 
 // Set Member Password
-router.patch('/set-member-password/:id', userController.setMemberPassword);
+router.patch("/set-member-password/:id", userController.setMemberPassword);
+
+// Get All Roles
+router.get("/roles", authMiddleware.authenticate, userController.getAllRoles);
+
+// Get All Rights
+router.get("/rights", authMiddleware.authenticate, userController.getAllRights);
 
 module.exports = router;

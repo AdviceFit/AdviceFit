@@ -4,10 +4,31 @@ import APP_ROUTES from "@/constants/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-import { LayoutDashboard, UserSearch, Users, CalendarDays, TvMinimalPlay, FileChartColumn, WalletCards, 
-  HandCoins, BookOpenCheck, FileInput, Files, HardDriveDownload, Wallet, MessageSquareMore, MessagesSquare, 
-  Mails, MessageSquareShare, Settings, MapPinHouse, Boxes, SquareUser, Tickets, ChevronDown 
-} from 'lucide-react';
+import {
+  LayoutDashboard,
+  UserSearch,
+  Users,
+  CalendarDays,
+  TvMinimalPlay,
+  FileChartColumn,
+  WalletCards,
+  HandCoins,
+  BookOpenCheck,
+  FileInput,
+  Files,
+  HardDriveDownload,
+  Wallet,
+  MessageSquareMore,
+  MessagesSquare,
+  Mails,
+  MessageSquareShare,
+  Settings,
+  MapPinHouse,
+  Boxes,
+  SquareUser,
+  Tickets,
+  ChevronDown,
+} from "lucide-react";
 
 const SidebarLinks = () => {
   const [isReportsOpen, setIsReportsOpen] = useState(false);
@@ -20,23 +41,43 @@ const SidebarLinks = () => {
   const renderLink = (name: string, path: string, icon: React.ReactNode) => (
     <div key={path} className="relative block w-full">
       <Link href={path}>
-        <div className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 group ${isActive(path) ? "text-blue-600" : ""}`}>
-          <div className="grid mr-4 place-items-center">
-            {icon}
-          </div>
+        <div
+          className={`flex items-center w-full p-3 leading-tight transition-all rounded-lg outline-none text-start hover:bg-blue-gray-50 hover:text-blue-600 group ${
+            isActive(path) ? "text-blue-600" : ""
+          }`}
+        >
+          <div className="grid mr-4 place-items-center">{icon}</div>
           {name}
         </div>
       </Link>
     </div>
   );
-  
-  const renderDropdown = (title: string, icon: React.ReactNode, items: { name: string; path: string; icon: React.ReactNode }[], isOpen: boolean, toggle: () => void) => (
+
+  const renderDropdown = (
+    title: string,
+    icon: React.ReactNode,
+    items: { name: string; path: string; icon: React.ReactNode }[],
+    isOpen: boolean,
+    toggle: () => void
+  ) => (
     <div className="relative block w-full">
-      <button type="button" className="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-700 hover:text-blue-600" onClick={toggle}>
+      <button
+        type="button"
+        className="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-700 hover:text-blue-600"
+        onClick={toggle}
+      >
         <div className="grid mr-4 place-items-center">{icon}</div>
-        <p className={`block mr-auto font-sans text-base antialiased font-normal leading-relaxed ${isActive("/reports") ? "text-blue-600" : "text-blue-gray-900"}`}>{title}</p>
+        <p
+          className={`block mr-auto font-sans text-base antialiased font-normal leading-relaxed ${
+            isActive("/reports") ? "text-blue-600" : "text-blue-gray-900"
+          }`}
+        >
+          {title}
+        </p>
         <span className="ml-4">
-          <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          <ChevronDown
+            className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+          />
         </span>
       </button>
       {isOpen && (
@@ -57,33 +98,111 @@ const SidebarLinks = () => {
         {renderLink("Dashboard", "/dashboard", <LayoutDashboard />)}
         {renderLink("Visitors", APP_ROUTES.dasboard.visitors, <UserSearch />)}
         {renderLink("Members", APP_ROUTES.dasboard.members, <Users />)}
-        {renderLink("Attendance", APP_ROUTES.dasboard.attendance, <CalendarDays />)}
-        {renderLink("Sessions", APP_ROUTES.dasboard.sessions, <TvMinimalPlay />)}
+        {renderLink(
+          "Attendance",
+          APP_ROUTES.dasboard.attendance,
+          <CalendarDays />
+        )}
+        {renderLink(
+          "Sessions",
+          APP_ROUTES.dasboard.sessions,
+          <TvMinimalPlay />
+        )}
 
-        {renderDropdown("Reports", <FileChartColumn />, [
-          { name: "Subscriptions", path: "/reports/subscriptions", icon: <WalletCards /> },
-          { name: "Payments", path: "/reports/payments", icon: <HandCoins /> },
-          { name: "Follow Ups", path: "/reports/follow-ups", icon: <BookOpenCheck /> },
-          { name: "Login Reports", path: "/reports/login-reports", icon: <FileInput /> },
-          { name: "Audit Reports", path: "/reports/audit-reports", icon: <Files /> },
-          { name: "Download Reports", path: "/reports/download-reports", icon: <HardDriveDownload /> }
-        ], isReportsOpen, () => setIsReportsOpen(!isReportsOpen))}
+        {renderDropdown(
+          "Reports",
+          <FileChartColumn />,
+          [
+            {
+              name: "Subscriptions",
+              path: "/reports/subscriptions",
+              icon: <WalletCards />,
+            },
+            {
+              name: "Payments",
+              path: "/reports/payments",
+              icon: <HandCoins />,
+            },
+            {
+              name: "Follow Ups",
+              path: "/reports/follow-ups",
+              icon: <BookOpenCheck />,
+            },
+            {
+              name: "Login Reports",
+              path: "/reports/login-reports",
+              icon: <FileInput />,
+            },
+            {
+              name: "Audit Reports",
+              path: "/reports/audit-reports",
+              icon: <Files />,
+            },
+            {
+              name: "Download Reports",
+              path: "/reports/download-reports",
+              icon: <HardDriveDownload />,
+            },
+          ],
+          isReportsOpen,
+          () => setIsReportsOpen(!isReportsOpen)
+        )}
 
         {renderLink("Expenses", "/dashboard/expenses", <Wallet />)}
 
-        {renderDropdown("Message Center", <MessageSquareMore />, [
-          { name: "Send Bulk Message", path: "/message-center/send-bulk-message", icon: <MessagesSquare /> },
-          { name: "Send Bulk Email", path: "/message-center/send-bulk-email", icon: <Mails /> },
-          { name: "Message History", path: "/message-center/message-history", icon: <MessageSquareShare /> }
-        ], isMessageCenterOpen, () => setIsMessageCenterOpen(!isMessageCenterOpen))}
+        {renderDropdown(
+          "Message Center",
+          <MessageSquareMore />,
+          [
+            {
+              name: "Send Bulk Message",
+              path: "/message-center/send-bulk-message",
+              icon: <MessagesSquare />,
+            },
+            {
+              name: "Send Bulk Email",
+              path: "/message-center/send-bulk-email",
+              icon: <Mails />,
+            },
+            {
+              name: "Message History",
+              path: "/message-center/message-history",
+              icon: <MessageSquareShare />,
+            },
+          ],
+          isMessageCenterOpen,
+          () => setIsMessageCenterOpen(!isMessageCenterOpen)
+        )}
 
-        {renderDropdown("Setup", <Settings />, [
-          { name: "Centers", path: "/dashboard/centers", icon: <MapPinHouse /> },
-          { name: "Packages", path: "/dashboard/packages", icon: <Boxes /> },
-          { name: "Employees", path: "/dashboard/employees", icon: <SquareUser /> },
-          { name: "Promos/Coupons", path: "/dashboard/promos", icon: <Tickets /> },
-          { name: "Company Setup", path: "/dashboard/company", icon: <Settings /> }
-        ], isSetupOpen, () => setIsSetupOpen(!isSetupOpen))}
+        {renderDropdown(
+          "Setup",
+          <Settings />,
+          [
+            {
+              name: "Centers",
+              path: "/dashboard/centers",
+              icon: <MapPinHouse />,
+            },
+            { name: "Packages", path: "/dashboard/packages", icon: <Boxes /> },
+            {
+              name: "Employees",
+              path: "/dashboard/employees",
+              icon: <SquareUser />,
+            },
+            {
+              name: "Promos/Coupons",
+              path: "/dashboard/promos",
+              icon: <Tickets />,
+            },
+            {
+              name: "Company Setup",
+              path: "/dashboard/setup",
+              icon: <Settings />,
+            },
+          ],
+          isSetupOpen,
+          () => setIsSetupOpen(!isSetupOpen)
+        )}
       </nav>
     </div>
   );
