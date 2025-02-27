@@ -13,6 +13,7 @@ const employeeRoutes = require("./routes/employeeRoutes");
 const sessionsRoutes = require("./routes/sessionRoutes");
 const expensesRoutes = require("./routes/expenseRoutes");
 const adminRightsRoutes = require("./routes/adminRightsRoutes");
+const bulkMessageRoutes = require('./routes/bulkMessageRoutes');
 
 const app = express();
 
@@ -41,6 +42,8 @@ app.use("/employee", employeeRoutes);
 app.use("/sessions", sessionsRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/admin-rights", adminRightsRoutes);
+app.use('/bulk-message', bulkMessageRoutes);
+
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');

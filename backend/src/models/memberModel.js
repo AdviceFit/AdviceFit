@@ -55,8 +55,8 @@ const memberSchema = new mongoose.Schema(
         },
         center: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Center',
-            default: null,
+            ref: 'Center', 
+            required: [true, 'Center is required']
         },
         gender: {
             type: String,

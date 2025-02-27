@@ -5,7 +5,7 @@ type MembersParams = {
   gym_member_code: string;
   joining_date: string;
   email: string;
-  center: string;
+  center:  EmployeeCenter | string;
   gender: "Male" | "Female";
   source: string;
   occupation: string;
@@ -66,6 +66,10 @@ type AttendanceDataParams = {
   attendance: AttendanceParams[];
 }
 
+type EmployeeCenter = {
+  _id: string;
+  name: string;
+}
 
 type VisitorParams = {
   _id: string;
@@ -74,7 +78,7 @@ type VisitorParams = {
   visiting_date?: string;
   tentative_visiting_date?: Date | string;
   email: string;
-  visiting_center: string;
+  visiting_center: EmployeeCenter | string  ;
   gender: "Male" | "Female" | "Other";
   source?: string;
   occupation?: string;
@@ -92,12 +96,6 @@ type VisitorParams = {
 type VisitorsDataParams = {
   visitors: VisitorParams[];
 };
-
-
-type EmployeeCenter = {
-  _id: string;
-  name: string;
-}
 
 type EmployeeParams = {
   _id: string;

@@ -17,8 +17,7 @@ const visitorSchema = new mongoose.Schema(
             type: Date,
             required: [true, 'Visiting Date is required']
         },
-        tentative_visiting_date:
-        {
+        tentative_visiting_date: {
             type: Date,
             required: false
         },
@@ -36,7 +35,8 @@ const visitorSchema = new mongoose.Schema(
             },
         },
         visiting_center: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Center',  
             required: [true, 'Center is required']
         },
         gender: {

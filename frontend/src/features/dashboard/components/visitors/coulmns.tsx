@@ -24,6 +24,11 @@ const columns: ColumnDef<VisitorParams>[] = [
     {
         accessorKey: "visiting_center",
         header: "Gym Name",
+        cell: ({ row }) => {
+            const center = row.original.visiting_center;
+            const gymName = typeof center === "object" && center !== null ? center.name : "No gym name";
+            return <span>{gymName}</span>;
+        }
     },
     {
         accessorKey: "visiting_date",

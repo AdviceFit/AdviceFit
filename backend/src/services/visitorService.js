@@ -8,17 +8,18 @@ exports.createVisitor = async (visitorData) => {
 
 // Get all visitors
 exports.findAllVisitors = async () => {
-    return await Visitor.find();
+    return await Visitor.find()
+        .populate('visiting_center', '_id name')
 };
 
 // Get all visitors by User
 exports.findVisitorsByUser = async (userId) => {
-    return await Visitor.find({ createdBy: userId, isDeleted: false });
+    return await Visitor.find({ createdBy: userId, isDeleted: false }).populate('visiting_center', '_id name')
 };
 
 // Get a visitor by ID
 exports.findVisitorById = async (id) => {
-    return await Visitor.findById(id);
+    return await Visitor.findById(id).populate('visiting_center', '_id name')
 };
 
 // Update a visitor by ID

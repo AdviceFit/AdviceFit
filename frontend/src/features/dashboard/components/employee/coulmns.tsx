@@ -24,7 +24,6 @@ const columns: ColumnDef<EmployeeParams>[] = [
             const gymName = typeof center === "object" && center !== null ? center.name : "No gym name";
             return <span>{gymName}</span>;
         }
-
     },
 
     {

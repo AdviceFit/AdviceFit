@@ -100,7 +100,7 @@ const formSchema = z.object({
 });
 
 export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClose?: () => void }) {
-  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
+  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);  
   const router = useRouter()
   const [countryName, setCountryName] = useState<string>('');
   const [stateName, setStateName] = useState<string>('');
@@ -111,7 +111,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
     visiting_date: data.visiting_date || new Date().toISOString().slice(0, 10),
     tentative_visiting_date: data.tentative_visiting_date || undefined,
     email: data.email || "",
-    visiting_center: data.visiting_center || "Gold's Gym",
+    visiting_center: typeof data.visiting_center === "string" ? data.visiting_center : data.visiting_center._id,
     gender: data.gender as "Male" | "Female" | "Other",
     source: data.source || "Banner",
     occupation: data.occupation || "Student",
@@ -130,7 +130,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       mobile: "",
       visiting_date: new Date(),
       email: "",
-      visiting_center: "Gold's Gym",
+      visiting_center: "",
       gender: "Male",
       source: "Banner",
       occupation: "Student",
@@ -332,36 +332,20 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Visiting Center</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                          {field.value || "Select a center"} {/* Display the stored name */}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput placeholder="Search centers..." />
-                        <CommandList>
-                          <CommandEmpty>No centers found.</CommandEmpty>
-                          <CommandGroup>
-                            {centers.map((center) => (
-                              <CommandItem
-                                key={center._id}
-                                value={center.name}
-                                onSelect={() => form.setValue("visiting_center", center.name)} // Store name instead of _id
-                              >
-                                <Check className={cn("mr-2 h-4 w-4", center.name === field.value ? "opacity-100" : "opacity-0")} />
-                                {center.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a center" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {centers.map(center => (
+                            <SelectItem key={center._id} value={center._id}>
+                              {center.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                   <FormMessage />
                 </FormItem>
               )}

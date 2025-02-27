@@ -4,7 +4,7 @@ import VisitorsHeader from '../components/visitors/VisitorsHeader';
 import VisitorsTable from '../components/visitors/VisitorsTable';
 import { BASE_URL } from '@/constants/constant';
 
-const getMembers = async (): Promise<VisitorsDataParams> => {
+const getVisitor = async (): Promise<VisitorsDataParams> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
   const res = await fetch(`${BASE_URL}/visitors`, {
@@ -16,13 +16,14 @@ const getMembers = async (): Promise<VisitorsDataParams> => {
     cache: "no-cache",
     credentials: "include"
   });
-  const members = await res.json();
-  return members;
+  const visitors = await res.json();
+  return visitors;
 };
 
-const MembersMain = async () => {
-  const adviceFitVisitors = await getMembers();
-  
+const visitorsMain = async () => {
+
+  const adviceFitVisitors = await getVisitor();
+
   return (
     <>
       <VisitorsHeader />
@@ -31,4 +32,4 @@ const MembersMain = async () => {
   )
 }
 
-export default MembersMain
+export default visitorsMain
