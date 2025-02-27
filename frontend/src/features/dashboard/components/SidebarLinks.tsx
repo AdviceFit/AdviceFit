@@ -115,32 +115,32 @@ const SidebarLinks = () => {
           [
             {
               name: "Subscriptions",
-              path: "/reports/subscriptions",
+              path: "/dashboard/subscriptions",
               icon: <WalletCards />,
             },
             {
               name: "Payments",
-              path: "/reports/payments",
+              path: "/dashboard/payments",
               icon: <HandCoins />,
             },
             {
               name: "Follow Ups",
-              path: "/reports/follow-ups",
+              path: "/dashboard/follow-ups",
               icon: <BookOpenCheck />,
             },
             {
               name: "Login Reports",
-              path: "/reports/login-reports",
+              path: "/dashboard/login-reports",
               icon: <FileInput />,
             },
             {
               name: "Audit Reports",
-              path: "/reports/audit-reports",
+              path: "/dashboard/audit-reports",
               icon: <Files />,
             },
             {
               name: "Download Reports",
-              path: "/reports/download-reports",
+              path: "/dashboard/download-reports",
               icon: <HardDriveDownload />,
             },
           ],
@@ -156,17 +156,17 @@ const SidebarLinks = () => {
           [
             {
               name: "Send Bulk Message",
-              path: "/message-center/send-bulk-message",
+              path: "/dashboard/message-center",
               icon: <MessagesSquare />,
             },
             {
               name: "Send Bulk Email",
-              path: "/message-center/send-bulk-email",
+              path: "/dashboard/send-bulk-email",
               icon: <Mails />,
             },
             {
               name: "Message History",
-              path: "/message-center/message-history",
+              path: "/dashboard/message-history",
               icon: <MessageSquareShare />,
             },
           ],

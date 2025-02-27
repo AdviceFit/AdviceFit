@@ -9,46 +9,49 @@ import PackagesMain from "@/features/dashboard/main/Packages.main";
 import ReportsMain from "@/features/dashboard/main/Reports.main";
 import SessionsMain from "@/features/dashboard/main/Sessions.main";
 import SetupMain from "@/features/dashboard/main/Setup.main";
+import SubscriptionsMain from "@/features/dashboard/main/Subscriptions.main";
 import VisitorsMain from "@/features/dashboard/main/Visitors.main";
 import { redirect } from "next/navigation";
 
 const DashboardElementsRoute = async function ({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }) {
-  const slug = (await params).slug
+  const slug = (await params).slug;
 
   if (!APP_ROUTES.allowRoutes.includes(slug)) {
-    redirect(APP_ROUTES.dasboard.attendance)
+    redirect(APP_ROUTES.dasboard.attendance);
   }
 
   switch (slug) {
     case "attendance":
-      return <AttendanceMain />
+      return <AttendanceMain />;
     case "centers":
-      return <CentersMain />
+      return <CentersMain />;
     case "members":
-      return <MembersMain />
+      return <MembersMain />;
     case "visitors":
-      return <VisitorsMain />
+      return <VisitorsMain />;
     case "reports":
-      return <ReportsMain />
+      return <ReportsMain />;
+    case "subscriptions":
+      return <SubscriptionsMain />;
     case "sessions":
-      return <SessionsMain />
+      return <SessionsMain />;
     case "expenses":
-      return <ExpensesMain />
+      return <ExpensesMain />;
     case "message-center":
-      return <MessagesMain />
+      return <MessagesMain />;
     case "setup":
-      return <SetupMain />
+      return <SetupMain />;
     case "employees":
-      return <EmployeeMain />
+      return <EmployeeMain />;
     case "packages":
-      return <PackagesMain />
+      return <PackagesMain />;
     default:
       break;
   }
-}
+};
 
-export default DashboardElementsRoute
+export default DashboardElementsRoute;
