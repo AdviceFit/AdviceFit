@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
+import { BASE_URL } from "@/constants/constant";
 
 const centerSchema = z.object({
     _id: z.string().optional(),
@@ -88,8 +89,8 @@ const CreateCenter: React.FC<CreateCenterProps> = ({ mode, initialData }) => {
         try {
             const endpoint =
                 mode === "edit"
-                    ? `http://localhost:5000/center/${initialData?._id}`
-                    : "http://localhost:5000/center";
+                    ? `${BASE_URL}/center/${initialData?._id}`
+                    : `${BASE_URL}/center`;
 
             const method = mode === "edit" ? "PUT" : "POST";
 

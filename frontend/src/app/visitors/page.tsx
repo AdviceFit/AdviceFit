@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Address } from "../members/add-member/page";
+import { BASE_URL } from "@/constants/constant";
 
 export interface Visitor {
   _id: string;
@@ -53,7 +54,7 @@ const VisitorRoute: React.FC = () => {
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
-        const response = await fetch("http://localhost:5000/visitors", {
+        const response = await fetch(`${BASE_URL}/visitors`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +79,7 @@ const VisitorRoute: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/visitors/${id}`, {
+      const response = await fetch(`${BASE_URL}/visitors/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { BASE_URL } from "@/constants/constant";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -111,9 +112,8 @@ const CreateMember: React.FC<{
             const validatedData = memberSchema.parse(formData);
             const endpoint =
                 mode === "edit"
-                    //@ts-ignore
-                    ? `http://localhost:5000/members/${initialData?._id}` // Use ID for editing
-                    : "http://localhost:5000/members";
+                    ? `${BASE_URL}/members/${initialData?._id}` // Use ID for editing
+                    : `${BASE_URL}/members`;
 
             const method = mode === "edit" ? "PUT" : "POST";
 
@@ -176,7 +176,7 @@ const CreateMember: React.FC<{
     useEffect(() => {
         const fetchCenters = async () => {
             try {
-                const response = await fetch("http://localhost:5000/center", {
+                const response = await fetch(`${BASE_URL}/center`, {
                     method: "GET",
                     credentials: "include",
                 });

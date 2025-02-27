@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/textarea"
 import LocationSelector from "@/components/ui/location-input"
 import { useRouter } from "next/navigation"
+import { BASE_URL } from "@/constants/constant"
 
 const formSchema = z.object({
   gym_name: z.string().min(2).max(50),
@@ -86,7 +87,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
   };
 
   try {
-    const response = await fetch('http://localhost:5000/api/users/signup', {     
+    const response = await fetch(`${BASE_URL}/api/users/signup`, {     
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

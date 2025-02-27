@@ -2,11 +2,13 @@
 import { cookies } from 'next/headers'
 import MembersHeader from '../components/members/MembersHeader';
 import MembersTable from '../components/members/MembersTable';
+import { BASE_URL } from '@/constants/constant';
+import { getCenters } from '../actions/centers.action';
 
 const getMembers = async (): Promise<MembersDataParams> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
-  const res = await fetch("http://localhost:5000/members", {
+  const res = await fetch(`${BASE_URL}/members`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -20,12 +22,11 @@ const getMembers = async (): Promise<MembersDataParams> => {
 };
 
 const MembersMain = async () => {
-
   const adviceFitMembers = await getMembers();
-
+  const centers = await getCenters();
   return (
     <>
-      <MembersHeader />
+      <MembersHeader centers={centers.centers} />
       <MembersTable adviceFitMembers={adviceFitMembers?.members ?? []} />
     </>
   )

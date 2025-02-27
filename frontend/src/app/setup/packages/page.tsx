@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Center } from "../centers/add-center/page";
+import { BASE_URL } from "@/constants/constant";
 
 export interface Package {
     _id: string;
@@ -51,7 +52,7 @@ const PackageRoute: React.FC = () => {
     useEffect(() => {
         const fetchPackages = async () => {
             try {
-                const response = await fetch("http://localhost:5000/packages", {
+                const response = await fetch(`${BASE_URL}/packages`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -79,7 +80,7 @@ const PackageRoute: React.FC = () => {
     // Handle delete package
     const handleDelete = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:5000/packages/${id}`, {
+            const response = await fetch(`${BASE_URL}/packages/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

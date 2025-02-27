@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "@/constants/constant";
 
 const packageSchema = z.object({
     _id: z.string().optional(),
@@ -66,8 +67,8 @@ const CreatePackage: React.FC<CreatePackageProps> = ({ mode, initialData }) => {
         try {
             const endpoint =
                 mode === "edit"
-                    ? `http://localhost:5000/packages/${initialData?._id}`
-                    : "http://localhost:5000/packages";
+                    ? `${BASE_URL}/packages/${initialData?._id}`
+                    : `${BASE_URL}/packages`;
 
             const method = mode === "edit" ? "PUT" : "POST";
 
@@ -98,7 +99,7 @@ const CreatePackage: React.FC<CreatePackageProps> = ({ mode, initialData }) => {
     useEffect(() => {
         const fetchCenters = async () => {
             try {
-                const response = await fetch("http://localhost:5000/center", {
+                const response = await fetch(`${BASE_URL}/center`, {
                     method: "GET",
                     credentials: "include",
                 });

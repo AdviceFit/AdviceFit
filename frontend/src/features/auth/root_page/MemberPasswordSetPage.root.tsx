@@ -16,6 +16,7 @@ import {
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "@/constants/constant";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -35,7 +36,7 @@ export default function MyForm() {
   async function validateLink() {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/users/validate-member-pass/${id}`,
+        `${BASE_URL}/api/users/validate-member-pass/${id}`,
         {
           method: "GET",
           credentials: "include",
@@ -71,7 +72,7 @@ export default function MyForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/users/set-member-password/${id}`,
+        `${BASE_URL}/api/users/set-member-password/${id}`,
         {
           method: "PATCH",
           headers: {

@@ -16,6 +16,11 @@ exports.createMember = async (memberData) => {
     return await member.save();
 };
 
+// Find a member by filter
+exports.findMemberByFilter = async (filter) => {
+    return await Member.findOne(filter);
+};
+
 exports.findMembersByUser = async (userId) => {
     return await Member.find({ createdBy: userId, isDeleted: false });
 };

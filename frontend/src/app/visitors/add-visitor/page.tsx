@@ -4,6 +4,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { BASE_URL } from "@/constants/constant";
 export interface Address {
     addressLine1?: string;
     addressLine2?: string;
@@ -57,7 +58,7 @@ const CreateVisitor: React.FC<{
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         if (name.includes("address.")) {
-            const [_, key] = name.split(".");
+            const [, key] = name.split(".");
 
             setFormData((prev) => ({
                 ...prev,
@@ -108,8 +109,8 @@ const CreateVisitor: React.FC<{
             const validatedData = visitorSchema.parse(formData);
             const endpoint =
                 mode === "edit"
-                    ? `http://localhost:5000/visitors/${initialData?._id}`
-                    : "http://localhost:5000/visitors";
+                    ? `${BASE_URL}/visitors/${initialData?._id}`
+                    :  `${BASE_URL}/visitors`;
 
             const method = mode === "edit" ? "PUT" : "POST";
 
@@ -172,7 +173,7 @@ const CreateVisitor: React.FC<{
     useEffect(() => {
         const fetchCenters = async () => {
             try {
-                const response = await fetch("http://localhost:5000/center", {
+                const response = await fetch(`${BASE_URL}/center`, {
                     method: "GET",
                     credentials: "include",
                 });

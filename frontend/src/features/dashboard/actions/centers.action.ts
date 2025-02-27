@@ -1,9 +1,10 @@
 
 "use server"
 
+import { BASE_URL } from "@/constants/constant";
 import { cookies } from "next/headers";
 
-const API_URL = "http://localhost:5000/center";
+const API_URL = `${BASE_URL}/center`;
 
 
 export const getCenters = async (): Promise<CentersDataParams> => {

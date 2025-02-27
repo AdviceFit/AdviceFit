@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BASE_URL } from "@/constants/constant";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -39,7 +40,7 @@ export default function MyForm() {
         role, // Adds the selected role (either 'Member' or 'Admin')
       };
 
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(`${BASE_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ export default function MyForm() {
       if (data.token) {
         localStorage.setItem("authToken", data.token);
       }
-      const responseOfMe = await fetch("http://localhost:5000/api/users/me", {
+      const responseOfMe = await fetch(`${BASE_URL}/api/users/me`, {
         method: "GET",
         credentials: "include",
       });

@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import CreateCenter from "../../add-center/page";
+import { BASE_URL } from "@/constants/constant";
 
 const UpdateMember = () => {
   const { id: centerId } = useParams();
@@ -10,7 +11,7 @@ const UpdateMember = () => {
 
   useEffect(() => {
     if (centerId) {
-      fetch(`http://localhost:5000/center/${centerId}`, {
+      fetch(`${BASE_URL}/center/${centerId}`, {
         method: "GET",
         credentials:'include'
       })

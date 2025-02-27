@@ -1,8 +1,9 @@
 "use server";
 
+import { BASE_URL } from "@/constants/constant";
 import { cookies } from "next/headers";
 
-const API_URL = "http://localhost:5000/visitors";
+const API_URL = `${BASE_URL}/visitors`;
 
 // Create a new visitor (POST request)
 export const createVisitor = async (data: VisitorParams) => {

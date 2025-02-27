@@ -12,7 +12,6 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -29,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { BASE_URL } from "@/constants/constant";
 
 type Member = {
   _id: string;
@@ -64,7 +64,7 @@ export function AttendanceDialog({refetch}:any) {
 
   async function fetchMembers() {
     try {
-      const response = await fetch("http://localhost:5000/members", {
+      const response = await fetch(`${BASE_URL}/members`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export function AttendanceDialog({refetch}:any) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch("http://localhost:5000/attendance", {
+      const response = await fetch(`${BASE_URL}/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

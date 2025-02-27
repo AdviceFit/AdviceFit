@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import CreatePackage from "../../add-package/page";
+import { BASE_URL } from "@/constants/constant";
 
 const UpdateMember = () => {
   const { id: packageId } = useParams();
@@ -10,7 +11,7 @@ const UpdateMember = () => {
 
   useEffect(() => {
     if (packageId) {
-      fetch(`http://localhost:5000/packages/${packageId}`, {
+      fetch(`${BASE_URL}/packages/${packageId}`, {
         method: "GET",
         credentials:'include'
       })

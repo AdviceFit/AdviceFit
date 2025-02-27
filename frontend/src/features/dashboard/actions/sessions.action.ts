@@ -1,8 +1,9 @@
 // sessions.action.ts
 "use server";
+import { BASE_URL } from "@/constants/constant";
 import { cookies } from "next/headers";
 
-const API_URL = "http://localhost:5000/sessions";
+const API_URL = `${BASE_URL}/sessions`;
 
 export const getSessions = async (): Promise<SessionDataParams> => {
     const cookieStore = await cookies();

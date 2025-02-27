@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import AdminRightsSetup from "../components/setup/AdminRightsSetup";
+import { BASE_URL } from "@/constants/constant";
 
 async function fetchAdminRightsData() {
   try {
@@ -10,7 +11,7 @@ async function fetchAdminRightsData() {
     // Fetch Roles, Rights, and Existing Admin Rights
     const [rolesResponse, rightsResponse, adminRightsResponse] =
       await Promise.all([
-        fetch("http://localhost:5000/api/users/roles", {
+        fetch(`${BASE_URL}/api/users/roles`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -19,7 +20,7 @@ async function fetchAdminRightsData() {
           cache: "no-cache",
           credentials: "include",
         }),
-        fetch("http://localhost:5000/api/users/rights", {
+        fetch(`${BASE_URL}/api/users/rights`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -28,7 +29,7 @@ async function fetchAdminRightsData() {
           cache: "no-cache",
           credentials: "include",
         }),
-        fetch("http://localhost:5000/admin-rights", {
+        fetch(`${BASE_URL}/admin-rights`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

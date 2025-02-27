@@ -2,11 +2,12 @@
 import { cookies } from 'next/headers'
 import VisitorsHeader from '../components/visitors/VisitorsHeader';
 import VisitorsTable from '../components/visitors/VisitorsTable';
+import { BASE_URL } from '@/constants/constant';
 
 const getMembers = async (): Promise<VisitorsDataParams> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
-  const res = await fetch("http://localhost:5000/visitors", {
+  const res = await fetch(`${BASE_URL}/visitors`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -20,9 +21,8 @@ const getMembers = async (): Promise<VisitorsDataParams> => {
 };
 
 const MembersMain = async () => {
-
   const adviceFitVisitors = await getMembers();
-
+  
   return (
     <>
       <VisitorsHeader />

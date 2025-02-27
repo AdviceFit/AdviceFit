@@ -1,23 +1,11 @@
-"use client"
-import {
-  useState
-} from "react"
-import {
-  toast
-} from "sonner"
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {
-  cn
-} from "@/lib/utils"
-import {
-  Button
-} from "@/components/ui/button"
+"use client";
+import { Dispatch, SetStateAction, useState } from "react";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -26,100 +14,78 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import {
-  Input
-} from "@/components/ui/input"
-import {
-  format
-} from "date-fns"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
-import {
-  Calendar
-} from "@/components/ui/calendar"
-import {
-  Calendar as CalendarIcon
-} from "lucide-react"
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Calendar as CalendarIcon } from "lucide-react";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
-} from "@/components/ui/command"
-import {
-  Check,
-  ChevronsUpDown
-} from "lucide-react"
-import LocationSelector from "@/components/ui/location-input"
+  CommandList,
+} from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import LocationSelector from "@/components/ui/location-input";
+import { addMembers } from "../../actions/members.action";
+import { MEMBERS_SOURCES, OCCUPATIONS } from "@/constants/constant";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
-  name: z.string().min(2).max(50),
-  mobile: z.coerce.number().min(10000000, { message: "Must be at least 8 digits" }).max(999999999999),
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(50, { message: "Name must be at most 50 characters" }),
+  mobile: z.coerce
+    .number()
+    .refine((value) => /^\d{10}$/.test(value.toString()), {
+      message: "Mobile number must be 10 digits",
+    }),
   gym_member_code: z.string().optional(),
-  joining_date: z.coerce.date(),
-  email: z.string().email(),
-  center: z.string(),
+  joining_date: z.coerce.date({ required_error: "Joining date is required" }),
+  email: z
+    .string()
+    .email({ message: "Invalid email format" })
+    .refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
+      message: "Invalid email format",
+    }),
+  center: z.string().nonempty({ message: "Center is required" }),
   source: z.string().optional(),
   occupation: z.string().optional(),
-  dob: z.coerce.date(),
-  health_condition: z.string().min(2).max(50),
-  member_id_proof: z.string(),
-  addressLine1: z.string(),
+  dob: z.coerce.date({ required_error: "Date of birth is required" }),
+  health_conditions: z
+    .string()
+    .min(2, { message: "Health condition must be at least 2 characters" })
+    .max(50, { message: "Health condition must be at most 50 characters" }),
+  addressLine1: z.string().nonempty({ message: "Address Line 1 is required" }),
   addressLine2: z.string().optional(),
-  name_4582541361: z.tuple([z.string(), z.string().optional()]),
-  city: z.string(),
-  pincode: z.coerce.number(),
+  name_4582541361: z.tuple([
+    z.string().nonempty({ message: "First value is required" }),
+    z.string().optional(),
+  ]),
+  city: z.string().nonempty({ message: "City is required" }),
+  pincode: z.coerce.number({ required_error: "Pincode is required" }),
+  gender: z.enum(["Male", "Female", "Other"], {
+    message: "Gender must be Male, Female, or Other",
+  }),
 });
 
-
-const AddAndEditMembers = () => {
-  const languages = [{
-    label: "English",
-    value: "en"
-  },
-  {
-    label: "French",
-    value: "fr"
-  },
-  {
-    label: "German",
-    value: "de"
-  },
-  {
-    label: "Spanish",
-    value: "es"
-  },
-  {
-    label: "Portuguese",
-    value: "pt"
-  },
-  {
-    label: "Russian",
-    value: "ru"
-  },
-  {
-    label: "Japanese",
-    value: "ja"
-  },
-  {
-    label: "Korean",
-    value: "ko"
-  },
-  {
-    label: "Chinese",
-    value: "zh"
-  },
-  ] as
-    const;
-
-  const [countryName, setCountryName] = useState<string>('');
-  const [stateName, setStateName] = useState<string>('');
+const AddAndEditMembers = ({
+  centers = [],
+  setOpenState,
+}: {
+  centers: CenterParams[];
+  setOpenState: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const [stateName, setStateName] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -129,26 +95,33 @@ const AddAndEditMembers = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
-    } catch (error) {
-      toast.error("Failed to submit the form. Please try again.");
-    }
-  }
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formattedPayload = {
+      ...values,
+      county: values.name_4582541361[0],
+      stateName: values.name_4582541361[1],
+    };
+    const response = await addMembers(formattedPayload);
 
+    // Added the toast for the error
+
+    if(response.error) {
+      toast.error(response.error)
+      return
+    }
+
+    setOpenState(false);
+    toast.success("Form submitted successfully!");
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto pt-4 pb-4">
-
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-full mx-auto pt-4 pb-4"
+      >
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
           <div>
-
             <FormField
               control={form.control}
               name="name"
@@ -156,11 +129,7 @@ const AddAndEditMembers = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="John doe"
-
-                      type="text"
-                      {...field} />
+                    <Input placeholder="John doe" type="text" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -169,7 +138,6 @@ const AddAndEditMembers = () => {
             />
           </div>
           <div>
-
             <FormField
               control={form.control}
               name="mobile"
@@ -177,18 +145,47 @@ const AddAndEditMembers = () => {
                 <FormItem>
                   <FormLabel>Mobile</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="0000000000"
-
-                      type="number"
-                      {...field} />
+                    <Input placeholder="0000000000" type="number" {...field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Gender</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    {...field}
+                    onValueChange={(value) => field.onChange(value)}
+                    defaultValue="male"
+                    className="flex flex-row gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Male" id="r1" />
+                      <Label htmlFor="r1">Male</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Female" id="r2" />
+                      <Label htmlFor="r2">Female</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Other" id="r3" />
+                      <Label htmlFor="r3">Other</Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
@@ -200,11 +197,7 @@ const AddAndEditMembers = () => {
                 <FormItem>
                   <FormLabel>Gym member code</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="code.."
-
-                      type="text"
-                      {...field} />
+                    <Input placeholder="GYM Member Code .." type="text" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -214,7 +207,6 @@ const AddAndEditMembers = () => {
           </div>
 
           <div>
-
             <FormField
               control={form.control}
               name="joining_date"
@@ -255,7 +247,6 @@ const AddAndEditMembers = () => {
               )}
             />
           </div>
-
         </div>
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
@@ -269,9 +260,9 @@ const AddAndEditMembers = () => {
                   <FormControl>
                     <Input
                       placeholder="johndoe@example.com"
-
                       type="email"
-                      {...field} />
+                      {...field}
+                    />
                   </FormControl>
 
                   <FormMessage />
@@ -296,13 +287,13 @@ const AddAndEditMembers = () => {
                             "justify-between",
                             !field.value && "text-muted-foreground"
                           )}
-
                         >
                           {field.value
-                            ? languages.find(
-                              (language) => language.value === field.value
-                            )?.label
-                            : "Select language"}
+                            ? centers
+                                .map((c) => ({ label: c.name, value: c._id }))
+                                .find((center) => center.value === field.value)
+                                ?.label
+                            : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -311,27 +302,31 @@ const AddAndEditMembers = () => {
                       <Command>
                         <CommandInput placeholder="Search language..." />
                         <CommandList>
-                          <CommandEmpty>No language found.</CommandEmpty>
+                          <CommandEmpty>No Center found.</CommandEmpty>
                           <CommandGroup>
-                            {languages.map((language) => (
-                              <CommandItem
-                                value={language.label}
-                                key={language.value}
-                                onSelect={() => {
-                                  form.setValue("center", language.value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    language.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {language.label}
-                              </CommandItem>
-                            ))}
+                            {centers &&
+                              centers
+                                .map((c) => ({ label: c.name, value: c._id }))
+                                .map((center) => (
+                                  <CommandItem
+                                    value={center.label}
+                                    key={center.value}
+                                    onSelect={() => {
+                                      field.onChange(center.value);
+                                      form.setValue("center", center.value);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        center.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {center.label}
+                                  </CommandItem>
+                                ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -343,7 +338,6 @@ const AddAndEditMembers = () => {
               )}
             />
           </div>
-
         </div>
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
@@ -364,12 +358,11 @@ const AddAndEditMembers = () => {
                             "justify-between",
                             !field.value && "text-muted-foreground"
                           )}
-
                         >
                           {field.value
-                            ? languages.find(
-                              (language) => language.value === field.value
-                            )?.label
+                            ? MEMBERS_SOURCES.find(
+                                (source) => source.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -377,27 +370,27 @@ const AddAndEditMembers = () => {
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
                       <Command>
-                        <CommandInput placeholder="Search language..." />
+                        <CommandInput placeholder="Search Member..." />
                         <CommandList>
-                          <CommandEmpty>No language found.</CommandEmpty>
+                          <CommandEmpty>No Members found.</CommandEmpty>
                           <CommandGroup>
-                            {languages.map((language) => (
+                            {MEMBERS_SOURCES.map((source, idx) => (
                               <CommandItem
-                                value={language.label}
-                                key={language.value}
+                                value={source.label}
+                                key={idx + 1}
                                 onSelect={() => {
-                                  form.setValue("source", language.value);
+                                  form.setValue("source", source.value);
                                 }}
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    language.value === field.value
+                                    source.value === field.value
                                       ? "opacity-100"
                                       : "opacity-0"
                                   )}
                                 />
-                                {language.label}
+                                {source.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -429,12 +422,11 @@ const AddAndEditMembers = () => {
                             "justify-between",
                             !field.value && "text-muted-foreground"
                           )}
-
                         >
                           {field.value
-                            ? languages.find(
-                              (language) => language.value === field.value
-                            )?.label
+                            ? OCCUPATIONS.find(
+                                (occupation) => occupation.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -442,27 +434,27 @@ const AddAndEditMembers = () => {
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
                       <Command>
-                        <CommandInput placeholder="Search language..." />
+                        <CommandInput placeholder="Search Occupation..." />
                         <CommandList>
-                          <CommandEmpty>No language found.</CommandEmpty>
+                          <CommandEmpty>No Occupation found.</CommandEmpty>
                           <CommandGroup>
-                            {languages.map((language) => (
+                            {OCCUPATIONS.map((occupation, idx) => (
                               <CommandItem
-                                value={language.label}
-                                key={language.value}
+                                value={occupation.label}
+                                key={idx + 1}
                                 onSelect={() => {
-                                  form.setValue("occupation", language.value);
+                                  form.setValue("occupation", occupation.value);
                                 }}
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    language.value === field.value
+                                    occupation.value === field.value
                                       ? "opacity-100"
                                       : "opacity-0"
                                   )}
                                 />
-                                {language.label}
+                                {occupation.label}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -476,7 +468,6 @@ const AddAndEditMembers = () => {
               )}
             />
           </div>
-
         </div>
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
@@ -523,19 +514,18 @@ const AddAndEditMembers = () => {
           </div>
 
           <div>
-
             <FormField
               control={form.control}
-              name="health_condition"
+              name="health_conditions"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Health condition</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Your health condition"
-
                       type="text"
-                      {...field} />
+                      {...field}
+                    />
                   </FormControl>
 
                   <FormMessage />
@@ -543,9 +533,8 @@ const AddAndEditMembers = () => {
               )}
             />
           </div>
-
         </div>
-        <FormField
+        {/* <FormField
           control={form.control}
           name="member_id_proof"
           render={({ field }) => (
@@ -561,12 +550,11 @@ const AddAndEditMembers = () => {
                         "justify-between",
                         !field.value && "text-muted-foreground"
                       )}
-
                     >
                       {field.value
                         ? languages.find(
-                          (language) => language.value === field.value
-                        )?.label
+                            (language) => language.value === field.value
+                          )?.label
                         : "Select language"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -606,7 +594,7 @@ const AddAndEditMembers = () => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
           <FormField
@@ -646,25 +634,35 @@ const AddAndEditMembers = () => {
               <FormControl>
                 <LocationSelector
                   onCountryChange={(country) => {
-                    setCountryName(country?.name || '')
-                    form.setValue(field.name, [country?.name || '', stateName || ''])
+                    field.onChange([
+                      country?.name || "",
+                      stateName || "",
+                    ])
+                    form.setValue(field.name, [
+                      country?.name || "",
+                      stateName || "",
+                    ]);
                   }}
                   onStateChange={(state) => {
-                    setStateName(state?.name || '')
-                    form.setValue(field.name, [form.getValues(field.name)[0] || '', state?.name || ''])
+                    setStateName(state?.name || "");
+                    form.setValue(field.name, [
+                      form.getValues(field.name)[0] || "",
+                      state?.name || "",
+                    ]);
                   }}
                 />
               </FormControl>
-              <FormDescription>If your country has states, it will be appear after selecting country</FormDescription>
+              <FormDescription>
+                If your country has states, it will be appear after selecting
+                country
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
-
           <div>
-
             <FormField
               control={form.control}
               name="city"
@@ -672,11 +670,7 @@ const AddAndEditMembers = () => {
                 <FormItem>
                   <FormLabel>City</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Delhi"
-
-                      type=""
-                      {...field} />
+                    <Input placeholder="Delhi" type="" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -686,7 +680,6 @@ const AddAndEditMembers = () => {
           </div>
 
           <div>
-
             <FormField
               control={form.control}
               name="pincode"
@@ -694,11 +687,7 @@ const AddAndEditMembers = () => {
                 <FormItem>
                   <FormLabel>Pincode</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="000000"
-
-                      type="number"
-                      {...field} />
+                    <Input placeholder="000000" type="number" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -706,12 +695,13 @@ const AddAndEditMembers = () => {
               )}
             />
           </div>
-
         </div>
-        <Button type="submit" className="w-full sm:w-auto">Submit</Button>
+        <Button type="submit" className="w-full sm:w-auto">
+          Submit
+        </Button>
       </form>
     </Form>
-  )
-}
+  );
+};
 
-export default AddAndEditMembers
+export default AddAndEditMembers;

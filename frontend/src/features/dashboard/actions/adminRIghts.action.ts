@@ -1,5 +1,6 @@
 "use server";
 
+import { BASE_URL } from "@/constants/constant";
 import { cookies } from "next/headers";
 
 export const updateAdminRights = async (adminRightsData: any) => {
@@ -9,7 +10,7 @@ export const updateAdminRights = async (adminRightsData: any) => {
 
     console.log(adminRightsData);
 
-    const response = await fetch("http://localhost:5000/admin-rights", {
+    const response = await fetch(`${BASE_URL}/admin-rights`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

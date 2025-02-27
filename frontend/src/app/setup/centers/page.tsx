@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { BASE_URL } from "@/constants/constant";
 
 interface Center {
   _id: string;
@@ -55,7 +56,7 @@ const CenterPage: React.FC = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const response = await fetch("http://localhost:5000/center/user", {
+        const response = await fetch(`${BASE_URL}/center/user`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -83,7 +84,7 @@ const CenterPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
 
-      const response = await fetch(`http://localhost:5000/center/${id}`, {
+      const response = await fetch(`${BASE_URL}/center/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

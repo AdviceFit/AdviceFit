@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner";
+import { BASE_URL } from "@/constants/constant";
 
 export interface Member {
   _id: string;
@@ -48,7 +49,7 @@ const MemberRoute: React.FC = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/members", {
+        const response = await fetch(`${BASE_URL}/members`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +75,7 @@ const MemberRoute: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
 
-      const response = await fetch(`http://localhost:5000/members/${id}`, {
+      const response = await fetch(`${BASE_URL}/members/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -20,15 +20,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
 import { AttendanceDialog } from "./addAttendanceModal";
+import { BASE_URL } from "@/constants/constant";
 
 interface Member {
     _id: string;
@@ -57,7 +50,7 @@ const AttendanceRoute: React.FC = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:5000/attendance/user?page=${currentPage}`,
+                `${BASE_URL}/attendance/user?page=${currentPage}`,
                 {
                     method: "GET",
                     headers: {
@@ -95,7 +88,7 @@ const AttendanceRoute: React.FC = () => {
     // Handle delete attendance
     const handleDelete = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:5000/attendance/${id}`, {
+            const response = await fetch(`${BASE_URL}/attendance/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

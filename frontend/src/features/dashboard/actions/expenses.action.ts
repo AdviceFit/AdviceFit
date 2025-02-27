@@ -1,7 +1,8 @@
 "use server";
+import { BASE_URL } from "@/constants/constant";
 import { cookies } from "next/headers";
 
-const API_URL = "http://localhost:5000/expenses";
+const API_URL = `${BASE_URL}/expenses`;
 
 export const getExpenses = async (): Promise<ExpenseDataParams> => {
     const cookieStore = await cookies();

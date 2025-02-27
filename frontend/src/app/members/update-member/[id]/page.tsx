@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import CreateMember from "../../add-member/page";
+import { BASE_URL } from "@/constants/constant";
 
 const UpdateMember = () => {
   const { id: memberId } = useParams();
@@ -10,7 +11,7 @@ const UpdateMember = () => {
 
   useEffect(() => {
     if (memberId) {
-      fetch(`http://localhost:5000/members/${memberId}`, {
+      fetch(`${BASE_URL}/members/${memberId}`, {
         method: "GET",
         credentials:'include'
       })
