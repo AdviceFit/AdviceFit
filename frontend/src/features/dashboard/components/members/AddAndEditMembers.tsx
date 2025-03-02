@@ -35,7 +35,11 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import LocationSelector from "@/components/ui/location-input";
 import { addMembers, editMember } from "../../actions/members.action";
-import { MEMBERS_SOURCES, OCCUPATIONS, TOAST_MESSAGES } from "@/constants/constant";
+import {
+  MEMBERS_SOURCES,
+  OCCUPATIONS,
+  TOAST_MESSAGES,
+} from "@/constants/constant";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -78,22 +82,38 @@ const formSchema = z.object({
   }),
   marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"], {
     message: "Marital Status must be Single, Married, or Divorce , Widowed",
-  })
+  }),
+  package: z.string().min(2).max(50),
+  promoCoupon: z.string().optional(),
+  offerAmount: z.coerce
+    .number()
+    .min(0, { message: "Offer Amount must be a positive number" }),
+  paymentDate: z.coerce.date(),
+  startDate: z.coerce.date(),
+  paidAmount: z.coerce
+    .number()
+    .min(0, { message: "Paid Amount must be a positive number" }),
+  paymentMode: z.string().min(2).max(50),
+  paymentDueDate: z.coerce.date(),
+  comments: z.string().optional(),
 });
 
 const AddAndEditMembers = ({
   setOpenState,
   centers = [],
-  columnData
+  columnData,
 }: {
   setOpenState: Dispatch<SetStateAction<boolean>>;
   centers: CenterParams[];
-  columnData?: Record<string, any>
+  columnData?: Record<string, any>;
 }) => {
   const [stateName, setStateName] = useState<string>("");
+  const [showSubscription, setShowSubscription] = useState(false);
 
   const defaultValues = {
-    joining_date: columnData?.joining_date ? new Date(columnData.joining_date.toString()) : new Date(),
+    joining_date: columnData?.joining_date
+      ? new Date(columnData.joining_date.toString())
+      : new Date(),
     dob: columnData?.dob ? new Date(columnData.dob.toString()) : new Date(),
     marital_status: columnData?.marital_status || "Single",
     gender: columnData?.gender || "Male",
@@ -107,14 +127,28 @@ const AddAndEditMembers = ({
     health_conditions: columnData?.health_conditions || "",
     addressLine1: columnData?.address?.addressLine1 || "",
     addressLine2: columnData?.address?.addressLine2 || "",
-    name_4582541361: [columnData?.address?.country, columnData?.address?.stateName] as any,
+    name_4582541361: [
+      columnData?.address?.country,
+      columnData?.address?.stateName,
+    ] as any,
     city: columnData?.address?.city || "",
     pincode: columnData?.address?.pincode || "",
+    // package: columnData?.subscriptionDetails?.package || "",
+    // promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+    // offerAmount: columnData?.subscriptionDetails?.offerAmount,
+    // paymentDate: columnData?.subscriptionDetails?.paymentDate
+    //   ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+    //   : new Date(),
+    // startDate: columnData?.subscriptionDetails?.startDate || "",
+    // paidAmount: columnData?.subscriptionDetails?.paidAmount,
+    // paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+    // paymentDueDate: columnData?.subscriptionDetails?.paymentDueDate || "",
+    // comments: columnData?.subscriptionDetails?.comments || "",
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues
+    defaultValues: defaultValues,
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -127,27 +161,36 @@ const AddAndEditMembers = ({
         stateName: values.name_4582541361[1],
         city: values.city || "",
         pincode: values.pincode || "",
-      }
+      },
+      subscriptionDetails: {
+        package: values.package || "",
+        promoCoupon: values.promoCoupon || "",
+        offerAmount: values.offerAmount || 0,
+        paymentDate: values.paymentDate || "",
+        startDate: values.startDate || "",
+        paidAmount: values.paidAmount || 0,
+        paymentMode: values.paymentMode || "",
+        paymentDueDate: values.paymentDueDate || "",
+        comments: values.comments || "",
+      },
     };
 
     if (columnData) {
-      const response = await editMember(columnData._id , formattedPayload);
+      const response = await editMember(columnData._id, formattedPayload);
       if (response.error) {
-        toast.error(response.error)
-        return
+        toast.error(response.error);
+        return;
       }
       toast.success(TOAST_MESSAGES.memberUpdated);
-    }
-    else {
+    } else {
       const response = await addMembers(formattedPayload);
       if (response.error) {
-        toast.error(response.error)
-        return
+        toast.error(response.error);
+        return;
       }
       toast.success(TOAST_MESSAGES.memberAdded);
     }
     setOpenState(false);
-
   }
 
   return (
@@ -269,7 +312,11 @@ const AddAndEditMembers = ({
                 <FormItem>
                   <FormLabel>Gym member code</FormLabel>
                   <FormControl>
-                    <Input placeholder="GYM Member Code .." type="text" {...field} />
+                    <Input
+                      placeholder="GYM Member Code .."
+                      type="text"
+                      {...field}
+                    />
                   </FormControl>
 
                   <FormMessage />
@@ -362,9 +409,9 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? centers
-                              .map((c) => ({ label: c.name, value: c._id }))
-                              .find((center) => center.value === field.value)
-                              ?.label
+                                .map((c) => ({ label: c.name, value: c._id }))
+                                .find((center) => center.value === field.value)
+                                ?.label
                             : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -433,8 +480,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? MEMBERS_SOURCES.find(
-                              (source) => source.value === field.value
-                            )?.label
+                                (source) => source.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -497,8 +544,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? OCCUPATIONS.find(
-                              (occupation) => occupation.value === field.value
-                            )?.label
+                                (occupation) => occupation.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -707,10 +754,7 @@ const AddAndEditMembers = ({
                 <LocationSelector
                   value={field.value[0]}
                   onCountryChange={(country) => {
-                    field.onChange([
-                      country?.name || "",
-                      stateName || "",
-                    ])
+                    field.onChange([country?.name || "", stateName || ""]);
                     form.setValue(field.name, [
                       country?.name || "",
                       stateName || "",
@@ -769,6 +813,263 @@ const AddAndEditMembers = ({
             />
           </div>
         </div>
+
+        {!columnData && (
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="subscription"
+              checked={showSubscription}
+              onChange={(e) => setShowSubscription(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <label htmlFor="subscription" className="text-sm font-medium">
+              Add Subscription Details
+            </label>
+          </div>
+        )}
+        {showSubscription && (
+          <>
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="package"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Package</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Package" type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="promoCoupon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Promo / Coupon</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Promo / Coupon"
+                          type="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="offerAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Offer Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Offer Amount"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="paymentDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Payment Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="paidAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Paid Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Paid Amount"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="paymentMode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payment Mode</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Payment Mode"
+                          type="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="paymentDueDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Payment Due Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div>
+              <FormField
+                control={form.control}
+                name="comments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comments</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Comments" type="text" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </>
+        )}
         <Button type="submit" className="w-full sm:w-auto">
           Submit
         </Button>
