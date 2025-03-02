@@ -1,35 +1,37 @@
+'use client'
 
-import { cookies } from 'next/headers'
-import MembersHeader from '../components/members/MembersHeader';
-import MembersTable from '../components/members/MembersTable';
-import { BASE_URL } from '@/constants/constant';
-import { getCenters } from '../actions/centers.action';
+import MembersHeader from "../components/members/MembersHeader";
+import MembersTable from "../components/members/MembersTable";
+import { getCenters } from "../actions/centers.action";
+import { getAllMembers } from "../actions/members.action";
+import { useEffect, useState } from "react";
 
-const getMembers = async (): Promise<MembersDataParams> => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const res = await fetch(`${BASE_URL}/members`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token?.value}`,
-    },
-    cache: "no-cache",
-    credentials: "include"
-  });
-  const members = await res.json();
-  return members;
-};
+const MembersMain = () => {
+  const [memberState, setMemberState] = useState<{
+    centers: CenterParams[];
+    members: MembersParams[];
+  }>({ centers: [], members: [] });
 
-const MembersMain = async () => {
-  const adviceFitMembers = await getMembers();
-  const centers = await getCenters();
+  const getRequiredData = async () => {
+    const { members } = await getAllMembers();
+    const { centers } = await getCenters();
+    setMemberState({ members, centers });
+  };
+
+  useEffect(() => {
+    getRequiredData();
+  }, []);
+  
   return (
     <>
-      <MembersHeader centers={centers.centers} />
-      <MembersTable centers={centers.centers} adviceFitMembers={adviceFitMembers?.members ?? []} />
+      <MembersHeader centers={memberState.centers} setMemberState={setMemberState}/>
+      <MembersTable
+        centers={memberState.centers}
+        adviceFitMembers={memberState.members}
+        setMemberState={setMemberState}
+      />
     </>
-  )
-}
+  );
+};
 
-export default MembersMain
+export default MembersMain;

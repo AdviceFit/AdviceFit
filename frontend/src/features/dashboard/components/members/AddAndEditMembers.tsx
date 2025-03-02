@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import LocationSelector from "@/components/ui/location-input";
-import { addMembers, editMember } from "../../actions/members.action";
+import { addMembers, editMember, getAllMembers } from "../../actions/members.action";
 import {
   MEMBERS_SOURCES,
   OCCUPATIONS,
@@ -83,29 +83,31 @@ const formSchema = z.object({
   marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"], {
     message: "Marital Status must be Single, Married, or Divorce , Widowed",
   }),
-  package: z.string().min(2).max(50),
-  promoCoupon: z.string().optional(),
-  offerAmount: z.coerce
-    .number()
-    .min(0, { message: "Offer Amount must be a positive number" }),
-  paymentDate: z.coerce.date(),
-  startDate: z.coerce.date(),
-  paidAmount: z.coerce
-    .number()
-    .min(0, { message: "Paid Amount must be a positive number" }),
-  paymentMode: z.string().min(2).max(50),
-  paymentDueDate: z.coerce.date(),
-  comments: z.string().optional(),
+  // package: z.string().min(2).max(50),
+  // promoCoupon: z.string().optional(),
+  // offerAmount: z.coerce
+  //   .number()
+  //   .min(0, { message: "Offer Amount must be a positive number" }),
+  // paymentDate: z.coerce.date(),
+  // startDate: z.coerce.date(),
+  // paidAmount: z.coerce
+  //   .number()
+  //   .min(0, { message: "Paid Amount must be a positive number" }),
+  // paymentMode: z.string().min(2).max(50),
+  // paymentDueDate: z.coerce.date(),
+  // comments: z.string().optional(),
 });
 
 const AddAndEditMembers = ({
   setOpenState,
   centers = [],
   columnData,
+  setMemberState
 }: {
   setOpenState: Dispatch<SetStateAction<boolean>>;
   centers: CenterParams[];
   columnData?: Record<string, any>;
+  setMemberState? : any
 }) => {
   const [stateName, setStateName] = useState<string>("");
   const [showSubscription, setShowSubscription] = useState(false);
@@ -129,7 +131,7 @@ const AddAndEditMembers = ({
     addressLine2: columnData?.address?.addressLine2 || "",
     name_4582541361: [
       columnData?.address?.country,
-      columnData?.address?.stateName,
+      columnData?.address?.state,
     ] as any,
     city: columnData?.address?.city || "",
     pincode: columnData?.address?.pincode || "",
@@ -158,21 +160,21 @@ const AddAndEditMembers = ({
         addressLine1: values.addressLine1 || "",
         addressLine2: values.addressLine2 || "",
         country: values.name_4582541361[0],
-        stateName: values.name_4582541361[1],
+        state: values.name_4582541361[1],
         city: values.city || "",
         pincode: values.pincode || "",
       },
-      subscriptionDetails: {
-        package: values.package || "",
-        promoCoupon: values.promoCoupon || "",
-        offerAmount: values.offerAmount || 0,
-        paymentDate: values.paymentDate || "",
-        startDate: values.startDate || "",
-        paidAmount: values.paidAmount || 0,
-        paymentMode: values.paymentMode || "",
-        paymentDueDate: values.paymentDueDate || "",
-        comments: values.comments || "",
-      },
+      // subscriptionDetails: {
+      //   package: values.package || "",
+      //   promoCoupon: values.promoCoupon || "",
+      //   offerAmount: values.offerAmount || 0,
+      //   paymentDate: values.paymentDate || "",
+      //   startDate: values.startDate || "",
+      //   paidAmount: values.paidAmount || 0,
+      //   paymentMode: values.paymentMode || "",
+      //   paymentDueDate: values.paymentDueDate || "",
+      //   comments: values.comments || "",
+      // },
     };
 
     if (columnData) {
@@ -190,6 +192,8 @@ const AddAndEditMembers = ({
       }
       toast.success(TOAST_MESSAGES.memberAdded);
     }
+    const { members } = await getAllMembers();
+    setMemberState((prev : any) =>  ({ ...prev , members }))
     setOpenState(false);
   }
 
@@ -752,7 +756,7 @@ const AddAndEditMembers = ({
               <FormLabel>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
-                  value={field.value[0]}
+                  value={field.value}
                   onCountryChange={(country) => {
                     field.onChange([country?.name || "", stateName || ""]);
                     form.setValue(field.name, [
@@ -828,7 +832,7 @@ const AddAndEditMembers = ({
             </label>
           </div>
         )}
-        {showSubscription && (
+        {/* {showSubscription && (
           <>
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
               <div>
@@ -1069,7 +1073,7 @@ const AddAndEditMembers = ({
               />
             </div>
           </>
-        )}
+        )} */}
         <Button type="submit" className="w-full sm:w-auto">
           Submit
         </Button>
