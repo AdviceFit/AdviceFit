@@ -5,24 +5,6 @@ import { cookies } from "next/headers";
 
 const API_URL = `${BASE_URL}/members`;
 
-const editMembers = async (id: string) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to edit member");
-  }
-
-  return response.json();
-};
-
 const addMembers = async (payload: unknown) => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
@@ -41,6 +23,26 @@ const addMembers = async (payload: unknown) => {
 
   return response.json();
 };
+
+const editMember = async (id : string , payload: unknown) => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("authToken");
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token?.value}`,
+    },
+  });
+
+  if (!response.ok) {
+    return { error: (await response.json())?.error ?? "Failed to add member" };
+  }
+
+  return response.json();
+};
+
 
 const deleteMembers = async (id: string) => {
   const cookieStore = await cookies();
@@ -78,4 +80,4 @@ const getAllMembers = async () => {
   return res.json();
 };
 
-export { editMembers, deleteMembers, getAllMembers, addMembers };
+export { deleteMembers, getAllMembers, addMembers , editMember };

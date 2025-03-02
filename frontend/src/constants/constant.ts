@@ -1,5 +1,10 @@
 export const BASE_URL = "http://localhost:5001";
 
+export const TOAST_MESSAGES = {
+  memberAdded : "Member added successfully ..",
+  memberUpdated : "Member updated successfully ..",
+}
+
 export const MEMBERS_SOURCES = [
   { label: "Walk In", value: "walkIn" },
   { label: "Search Engine", value: "searchEngine" },

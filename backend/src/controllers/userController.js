@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
     }
 
     // Check if the password is correct
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -79,13 +79,23 @@ exports.login = async (req, res) => {
       // secure: process.env.NODE_ENV === 'production',
       maxAge: 86400000, // 24 hours in milliseconds
       sameSite: "lax",
-      path: "/", // Ensure the path is set correctly
+      path: "/",
     });
+
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.logout = async (req, res) => {
+  try {    
+    res.setHeader('Set-Cookie', [`authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict`]);
+    res.status(200).json({ message: 'Logout Successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 // Me Route
 exports.getMe = async (req, res) => {

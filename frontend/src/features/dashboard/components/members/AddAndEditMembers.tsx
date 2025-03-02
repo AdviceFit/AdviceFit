@@ -34,8 +34,8 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import LocationSelector from "@/components/ui/location-input";
-import { addMembers } from "../../actions/members.action";
-import { MEMBERS_SOURCES, OCCUPATIONS } from "@/constants/constant";
+import { addMembers, editMember } from "../../actions/members.action";
+import { MEMBERS_SOURCES, OCCUPATIONS, TOAST_MESSAGES } from "@/constants/constant";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -76,42 +76,78 @@ const formSchema = z.object({
   gender: z.enum(["Male", "Female", "Other"], {
     message: "Gender must be Male, Female, or Other",
   }),
+  marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"], {
+    message: "Marital Status must be Single, Married, or Divorce , Widowed",
+  })
 });
 
 const AddAndEditMembers = ({
-  centers = [],
   setOpenState,
+  centers = [],
+  columnData
 }: {
-  centers: CenterParams[];
   setOpenState: Dispatch<SetStateAction<boolean>>;
+  centers: CenterParams[];
+  columnData?: Record<string, any>
 }) => {
   const [stateName, setStateName] = useState<string>("");
 
+  const defaultValues = {
+    joining_date: columnData?.joining_date ? new Date(columnData.joining_date.toString()) : new Date(),
+    dob: columnData?.dob ? new Date(columnData.dob.toString()) : new Date(),
+    marital_status: columnData?.marital_status || "Single",
+    gender: columnData?.gender || "Male",
+    name: columnData?.name || "",
+    mobile: columnData?.mobile || "",
+    gym_member_code: columnData?.gym_member_code || "",
+    email: columnData?.email || "",
+    center: columnData?.center?._id || "",
+    source: columnData?.source || "",
+    occupation: columnData?.occupation || "",
+    health_conditions: columnData?.health_conditions || "",
+    addressLine1: columnData?.address?.addressLine1 || "",
+    addressLine2: columnData?.address?.addressLine2 || "",
+    name_4582541361: [columnData?.address?.country, columnData?.address?.stateName] as any,
+    city: columnData?.address?.city || "",
+    pincode: columnData?.address?.pincode || "",
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      joining_date: new Date(),
-      dob: new Date(),
-    },
+    defaultValues: defaultValues
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const formattedPayload = {
       ...values,
-      county: values.name_4582541361[0],
-      stateName: values.name_4582541361[1],
+      address: {
+        addressLine1: values.addressLine1 || "",
+        addressLine2: values.addressLine2 || "",
+        country: values.name_4582541361[0],
+        stateName: values.name_4582541361[1],
+        city: values.city || "",
+        pincode: values.pincode || "",
+      }
     };
-    const response = await addMembers(formattedPayload);
 
-    // Added the toast for the error
-
-    if(response.error) {
-      toast.error(response.error)
-      return
+    if (columnData) {
+      const response = await editMember(columnData._id , formattedPayload);
+      if (response.error) {
+        toast.error(response.error)
+        return
+      }
+      toast.success(TOAST_MESSAGES.memberUpdated);
     }
-
+    else {
+      const response = await addMembers(formattedPayload);
+      if (response.error) {
+        toast.error(response.error)
+        return
+      }
+      toast.success(TOAST_MESSAGES.memberAdded);
+    }
     setOpenState(false);
-    toast.success("Form submitted successfully!");
+
   }
 
   return (
@@ -165,7 +201,7 @@ const AddAndEditMembers = ({
                   <RadioGroup
                     {...field}
                     onValueChange={(value) => field.onChange(value)}
-                    defaultValue="male"
+                    defaultValue="Male"
                     className="flex flex-row gap-2"
                   >
                     <div className="flex items-center space-x-2">
@@ -179,6 +215,42 @@ const AddAndEditMembers = ({
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="Other" id="r3" />
                       <Label htmlFor="r3">Other</Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="marital_status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Marital Status</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    {...field}
+                    onValueChange={(value) => field.onChange(value)}
+                    defaultValue="Single"
+                    className="flex flex-row gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Single" id="r2" />
+                      <Label htmlFor="r2">Single</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Married" id="r1" />
+                      <Label htmlFor="r1">Married</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Divorced" id="r3" />
+                      <Label htmlFor="r3">Divorced</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Widowed" id="r3" />
+                      <Label htmlFor="r3">Widowed</Label>
                     </div>
                   </RadioGroup>
                 </FormControl>
@@ -290,9 +362,9 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? centers
-                                .map((c) => ({ label: c.name, value: c._id }))
-                                .find((center) => center.value === field.value)
-                                ?.label
+                              .map((c) => ({ label: c.name, value: c._id }))
+                              .find((center) => center.value === field.value)
+                              ?.label
                             : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -361,8 +433,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? MEMBERS_SOURCES.find(
-                                (source) => source.value === field.value
-                              )?.label
+                              (source) => source.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -425,8 +497,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? OCCUPATIONS.find(
-                                (occupation) => occupation.value === field.value
-                              )?.label
+                              (occupation) => occupation.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -633,6 +705,7 @@ const AddAndEditMembers = ({
               <FormLabel>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
+                  value={field.value[0]}
                   onCountryChange={(country) => {
                     field.onChange([
                       country?.name || "",

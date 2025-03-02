@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -71,12 +71,14 @@ interface LocationSelectorProps {
   disabled?: boolean
   onCountryChange?: (country: CountryProps | null) => void
   onStateChange?: (state: StateProps | null) => void
+  value? : string
 }
 
 const LocationSelector = ({
   disabled,
   onCountryChange,
   onStateChange,
+  value,
 }: LocationSelectorProps) => {
   const [selectedCountry, setSelectedCountry] = useState<CountryProps | null>(
     null,
@@ -105,6 +107,10 @@ const LocationSelector = ({
     setSelectedState(state)
     onStateChange?.(state)
   }
+
+  useEffect(() => {
+    setSelectedCountry(countriesData.find((country) => country.name == value) ?? null)
+  } , [])
 
   return (
     <div className="flex gap-4">

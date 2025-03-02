@@ -18,8 +18,12 @@ const addressSchema = new Schema({
         type: String,
         trim: true,
     },
-    pincode: {
+    country: {
         type: String,
+        trim:  true,
+    },
+    pincode: {
+        type: Number,
         trim: true,
         match: /^[0-9]{6}$/,
     },

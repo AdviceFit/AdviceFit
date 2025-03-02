@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -13,11 +13,10 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import AddAndEditMembers from "./AddAndEditMembers";
 
-const MemberActionDropdown = ({ id }: { id: string }) => {
+const MemberActionDropdown = ({ columnData , centers}: { columnData: Record<string , unknown> , centers : CenterParams[] }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = (e: React.MouseEvent) => {
@@ -28,6 +27,7 @@ const MemberActionDropdown = ({ id }: { id: string }) => {
     const handleClose = () => {
         setIsOpen(false);
     };
+
 
     return (
         <DropdownMenu>
@@ -55,7 +55,7 @@ const MemberActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Members</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditMembers  />
+                    <AddAndEditMembers centers={centers} columnData={columnData} setOpenState={setIsOpen}  />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>

@@ -1,12 +1,14 @@
-import React from 'react'
+"use client"
+
+import React, { useEffect } from 'react'
 import { DataTable } from './data-table'
-import { columns } from './coulmns'
+import { getColumns } from './coulmns'
  
 
-const MembersTable = ({adviceFitMembers}: {adviceFitMembers: MembersParams[]}) => {
+const MembersTable = ({ centers , adviceFitMembers }: { centers : CenterParams[] ,  adviceFitMembers: MembersParams[] }) => {
   return (
     <div className="container py-6 mx-auto">
-    <DataTable columns={columns} data={adviceFitMembers} />
+    <DataTable columns={getColumns(adviceFitMembers , centers)} data={adviceFitMembers} />
   </div>
   )
 }

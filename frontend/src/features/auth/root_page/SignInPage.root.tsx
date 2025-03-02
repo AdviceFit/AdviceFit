@@ -52,10 +52,7 @@ export default function MyForm() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      const data = await response.json();
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-      }
+
       const responseOfMe = await fetch(`${BASE_URL}/api/users/me`, {
         method: "GET",
         credentials: "include",

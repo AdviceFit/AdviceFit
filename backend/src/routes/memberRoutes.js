@@ -10,7 +10,7 @@ router.get('/:id', authMiddleware.authenticate, MemberController.getMemberById);
 
 router.post('/', authMiddleware.authenticate, MemberController.createMember);
 
-router.put('/:id', authMiddleware.authenticate, MemberController.updateMember);
+router.patch('/:id', authMiddleware.authenticate, MemberController.updateMember);
 
 router.delete('/:id', authMiddleware.authenticate, MemberController.deleteMember);
 

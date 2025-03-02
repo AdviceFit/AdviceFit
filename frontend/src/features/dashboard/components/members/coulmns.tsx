@@ -91,14 +91,20 @@ const columns: ColumnDef<MembersParams>[] = [
     },
     {
         accessorKey:"action",
-        header: "Action",
-        cell: ({ row }) => {
-            const id = row.original._id;
-            return (
-                <MemberActionDropdown id={id} />
-            );
-        },
+        header: "Action"
     }
 ];
 
-export { columns };
+const getColumns = (payload : Record<string , unknown>[] , centers : CenterParams[]) => {
+  let tempColumns = columns;
+  tempColumns[tempColumns.length - 1].cell = ({ row }) => {
+      const columnData = payload[row.index]      
+      return (
+          <MemberActionDropdown centers={centers} columnData={columnData} />
+      );
+  }
+
+  return tempColumns;
+}
+
+export { columns , getColumns };
