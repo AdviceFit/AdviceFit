@@ -5,18 +5,19 @@ type MembersParams = {
   gym_member_code: string;
   joining_date: string;
   email: string;
-  center:  EmployeeCenter | string;
+  center: EmployeeCenter | string;
   gender: "Male" | "Female";
   source: string;
   occupation: string;
   dob: string;
   health_conditions: string;
   marital_status: "Single" | "Married" | "Widowed";
+  subscriptionDetails: SubscriptionsParams;
 };
 
 type MembersDataParams = {
   members: MembersParams[];
-}
+};
 type AddressParams = {
   addressLine1: string;
   addressLine2?: string;
@@ -50,26 +51,25 @@ type CenterParams = {
   updatedAt: string;
 };
 
-
 type CentersDataParams = {
   centers: CenterParams[];
-}
+};
 
 type AttendanceParams = {
   _id: string;
   member: Member;
   time_in: Date;
   time_out: Date;
-}
+};
 
 type AttendanceDataParams = {
   attendance: AttendanceParams[];
-}
+};
 
 type EmployeeCenter = {
   _id: string;
   name: string;
-}
+};
 
 type VisitorParams = {
   _id: string;
@@ -78,7 +78,7 @@ type VisitorParams = {
   visiting_date?: string;
   tentative_visiting_date?: Date | string;
   email: string;
-  visiting_center: EmployeeCenter | string  ;
+  visiting_center: EmployeeCenter | string;
   gender: "Male" | "Female" | "Other";
   source?: string;
   occupation?: string;
@@ -87,7 +87,7 @@ type VisitorParams = {
   marital_status: "Single" | "Married" | "Divorced" | "Widowed";
   remarks: "High" | "Medium" | "Low";
   enquire_mode: "Talking" | "Walking" | "Any";
-  address?: AddressParams;  // Assuming AddressParams is a predefined type for the address schema
+  address?: AddressParams; // Assuming AddressParams is a predefined type for the address schema
   createdBy?: string;
   updatedBy?: string | null;
   isDeleted?: boolean;
@@ -97,12 +97,34 @@ type VisitorsDataParams = {
   visitors: VisitorParams[];
 };
 
+type SubscriptionsParams = {
+  _id: string;
+  package: string;
+  promoCoupon: string;
+  offerAmount: number;
+  paymentDate: string;
+  startDate: string;
+  paidAmount: number;
+  paymentMode: string;
+  paymentDueDate: string;
+  comments: string;
+};
+
+// type SubscriptionsDataParams = {
+//   subscriptions: SubscriptMemionsParams[];
+// };
+
 type EmployeeParams = {
   _id: string;
   name: string;
   mobile: string; // Changed to string to match validation format
-  role: "Center Manager" | "Reception" | "Trainer" | "Accountant" | "Housekeeping";
-  center: EmployeeCenter | string
+  role:
+    | "Center Manager"
+    | "Reception"
+    | "Trainer"
+    | "Accountant"
+    | "Housekeeping";
+  center: EmployeeCenter | string;
   joining_date: string | Date;
   dob?: date;
   anniversary_date?: string | Date;
@@ -142,11 +164,11 @@ type PackageParams = {
     maxFreezeDuration?: number;
   };
   showAtAdviceFit: boolean;
-}
+};
 
 type PackageDataParams = {
-  package: PackageParams[]
-}
+  package: PackageParams[];
+};
 
 type SessionParams = {
   _id?: string;
@@ -166,12 +188,11 @@ type SessionDataParams = {
   session: SessionParams[];
 };
 
-
 type ExpenseParams = {
   _id?: string;
   expense_title: string;
   amount: number;
-  type_of_expense: 
+  type_of_expense:
     | "Electric Bill"
     | "Water Bill"
     | "Internet Bill"
@@ -194,4 +215,3 @@ type ExpenseParams = {
 type ExpenseDataParams = {
   expense: ExpenseParams[];
 };
-

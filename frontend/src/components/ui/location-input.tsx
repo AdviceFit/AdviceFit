@@ -71,7 +71,7 @@ interface LocationSelectorProps {
   disabled?: boolean
   onCountryChange?: (country: CountryProps | null) => void
   onStateChange?: (state: StateProps | null) => void
-  value? : string
+  value? : [string, string | undefined]
 }
 
 const LocationSelector = ({
@@ -109,7 +109,8 @@ const LocationSelector = ({
   }
 
   useEffect(() => {
-    setSelectedCountry(countriesData.find((country) => country.name == value) ?? null)
+    setSelectedCountry(countriesData.find((country) => value && country.name == value[0]) ?? null)
+    setSelectedState(availableStates.find((state) => value && state.name == value[1]) ?? null)
   } , [])
 
   return (

@@ -11,7 +11,7 @@ import {
 import AddAndEditMembers from "./AddAndEditMembers";
 import { useState } from "react";
 
-const MembersHeader = ({ centers } : { centers : CenterParams[] }) => {
+const MembersHeader = ({ centers , setMemberState } : { centers : CenterParams[] , setMemberState : any }) => {
   const [openState, setOpenState] = useState(false);
 
   return (
@@ -25,7 +25,7 @@ const MembersHeader = ({ centers } : { centers : CenterParams[] }) => {
         <DialogHeader>
           <DialogTitle>Add Members</DialogTitle>
         </DialogHeader>
-        <AddAndEditMembers setOpenState={setOpenState} centers={centers} />
+        <AddAndEditMembers setOpenState={setOpenState} centers={centers}  setMemberState={setMemberState} />
       </DialogContent>
     </Dialog>
   );

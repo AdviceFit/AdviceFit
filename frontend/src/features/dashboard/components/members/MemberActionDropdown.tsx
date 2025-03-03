@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import AddAndEditMembers from "./AddAndEditMembers";
 
-const MemberActionDropdown = ({ columnData , centers}: { columnData: Record<string , unknown> , centers : CenterParams[] }) => {
+const MemberActionDropdown = ({ columnData , centers , setMemberState }: { columnData: Record<string , unknown> , centers : CenterParams[] , setMemberState : any }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = (e: React.MouseEvent) => {
@@ -55,7 +55,7 @@ const MemberActionDropdown = ({ columnData , centers}: { columnData: Record<stri
                     <DialogHeader>
                         <DialogTitle>Edit Members</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditMembers centers={centers} columnData={columnData} setOpenState={setIsOpen}  />
+                    <AddAndEditMembers centers={centers} columnData={columnData} setOpenState={setIsOpen} setMemberState={setMemberState}  />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>
