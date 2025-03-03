@@ -83,7 +83,7 @@ const MessagesMain = () => {
       : [...selectedRecipients, value];
 
     setSelectedRecipients(updatedRecipients);
-    form.setValue("to", updatedRecipients);
+    form.setValue("to", updatedRecipients as never[]);
   };
 
   return (
@@ -138,16 +138,13 @@ const MessagesMain = () => {
                   <Select>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue>
-                          <div
-                            className="truncate max-w-[200px]"
-                            title={selectedRecipients.join(", ")}
-                          >
-                            {selectedRecipients.length > 0
+                        <SelectValue
+                          placeholder={
+                            selectedRecipients.length > 0
                               ? selectedRecipients.join(", ")
-                              : "Select Recipients"}
-                          </div>
-                        </SelectValue>
+                              : "Select Recipients"
+                          }
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="w-64">

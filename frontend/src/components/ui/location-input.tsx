@@ -93,7 +93,7 @@ const LocationSelector = ({
 
   // Filter states for selected country
   const availableStates = statesData.filter(
-    (state) => state.country_id === selectedCountry?.id,
+    (state) => state.country_id === selectedCountry?.id || (selectedCountry?.name ?? "").toLowerCase() === state.country_name.toLowerCase(),
   )
 
   const handleCountrySelect = (country: CountryProps | null) => {
@@ -109,8 +109,8 @@ const LocationSelector = ({
   }
 
   useEffect(() => {
-    setSelectedCountry(countriesData.find((country) => value && country.name == value[0]) ?? null)
-    setSelectedState(availableStates.find((state) => value && state.name == value[1]) ?? null)
+    setSelectedCountry(countriesData.find((country) => value && country.name == value[0]) ?? null);
+    setSelectedState(statesData.find((state) => value && state.name == value[1]) ?? null)
   } , [])
 
   return (

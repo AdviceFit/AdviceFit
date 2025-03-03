@@ -71,7 +71,7 @@ const formSchema = z.object({
     .max(50, { message: "Health condition must be at most 50 characters" }),
   addressLine1: z.string().nonempty({ message: "Address Line 1 is required" }),
   addressLine2: z.string().optional(),
-  name_4582541361: z.tuple([
+  address: z.tuple([
     z.string().nonempty({ message: "First value is required" }),
     z.string().optional(),
   ]),
@@ -129,7 +129,7 @@ const AddAndEditMembers = ({
     health_conditions: columnData?.health_conditions || "",
     addressLine1: columnData?.address?.addressLine1 || "",
     addressLine2: columnData?.address?.addressLine2 || "",
-    name_4582541361: [
+    address: [
       columnData?.address?.country,
       columnData?.address?.state,
     ] as any,
@@ -159,8 +159,8 @@ const AddAndEditMembers = ({
       address: {
         addressLine1: values.addressLine1 || "",
         addressLine2: values.addressLine2 || "",
-        country: values.name_4582541361[0],
-        state: values.name_4582541361[1],
+        country: values.address[0],
+        state: values.address[1],
         city: values.city || "",
         pincode: values.pincode || "",
       },
@@ -750,7 +750,7 @@ const AddAndEditMembers = ({
 
         <FormField
           control={form.control}
-          name="name_4582541361"
+          name="address"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Select Country</FormLabel>

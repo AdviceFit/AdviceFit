@@ -5,7 +5,6 @@ import MemberActionDropdown from "./MemberActionDropdown";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox"
-import { Dispatch, SetStateAction } from "react";
 
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -97,9 +96,10 @@ const columns: ColumnDef<MembersParams>[] = [
 ];
 
 const getColumns = (payload : Record<string , unknown>[] , centers : CenterParams[] , setMemberState : any) => {
-  let tempColumns = columns;
-  tempColumns[tempColumns.length - 1].cell = ({ row }) => {
-      const columnData = payload[row.index]      
+  
+  const tempColumns = [...columns];
+  tempColumns[tempColumns.length - 1].cell = ({ row }) => {    
+      const columnData = payload[row.index]
       return (
           <MemberActionDropdown centers={centers} columnData={columnData} setMemberState={setMemberState} />
       );

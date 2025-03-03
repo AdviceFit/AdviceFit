@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -15,6 +15,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import AddAndEditMembers from "./AddAndEditMembers";
+import { deleteMembers, getAllMembers } from '../../actions/members.action';
 
 const MemberActionDropdown = ({ columnData , centers , setMemberState }: { columnData: Record<string , unknown> , centers : CenterParams[] , setMemberState : any }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,12 @@ const MemberActionDropdown = ({ columnData , centers , setMemberState }: { colum
     const handleClose = () => {
         setIsOpen(false);
     };
+
+    const handleDeleteMember = async (id: string) => {
+        await deleteMembers(id)
+        const { members } = await getAllMembers();
+        setMemberState((prev : any) =>  ({ ...prev , members }))
+    }
 
 
     return (
@@ -42,7 +49,7 @@ const MemberActionDropdown = ({ columnData , centers , setMemberState }: { colum
                         </Button>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <Button variant="ghost">
+                        <Button variant="ghost" onClick={() => handleDeleteMember(columnData._id as string)}>
                             Delete members
                         </Button>
                     </DropdownMenuItem>
