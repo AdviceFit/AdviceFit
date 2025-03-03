@@ -74,8 +74,6 @@ const AdminRightsSetup: React.FC<AdminRightsSetupProps> = ({
         updatedRights[roleName][rightName].push(action);
       }
 
-      // console.log("Updated Selected Rights:", updatedRights);
-
       setUpdated(true);
       return updatedRights;
     });

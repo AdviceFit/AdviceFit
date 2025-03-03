@@ -4,7 +4,6 @@ module.exports = {
     const centers = await db.collection('centers').find({}, { projection: { _id: 1 } }).toArray();
     
     if (centers.length === 0) {
-      console.log("No centers found. Migration aborted.");
       return;
     }
 
@@ -24,13 +23,11 @@ module.exports = {
 
     if (bulkOperations.length > 0) {
       await db.collection('visitors').bulkWrite(bulkOperations);
-      console.log(`Updated ${bulkOperations.length} visitors.`);
     }
   },
 
   async down(db) {
     // Undo the changes by setting visiting_center to null
     await db.collection('visitors').updateMany({}, { $set: { visiting_center: null } });
-    console.log("Reverted visiting_center changes.");
   }
 };

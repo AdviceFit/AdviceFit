@@ -31,7 +31,6 @@ exports.signup = async (req, res) => {
       role: adminRole._id,
       ...rest,
     });
-    // console.log("🚀 ~ exports.signup= ~ newUser:", newUser)
 
     res
       .status(201)

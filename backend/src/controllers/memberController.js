@@ -28,7 +28,6 @@ exports.sendConfirmationEmail = async (
   try {
     // Send email
     await transporter.sendMail(mailOptions);
-    console.log("Confirmation email sent to " + memberEmail);
   } catch (error) {
     console.error("Error sending email:", error);
   }
@@ -38,7 +37,6 @@ exports.sendConfirmationEmail = async (
 exports.createMember = async (req, res) => {
   try {
     const memberData = req.body;
-    console.log("Member >>>>" , memberData);
 
     const checkMemberExistence = await MemberService.findMemberByFilter({
       email: memberData.email,

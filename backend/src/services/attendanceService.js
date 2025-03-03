@@ -10,13 +10,11 @@ exports.getAllAttendance = async () => {
 };
 
 exports.getAttendanceByUser = async (userId) => {
-    // console.log("🚀 ~ Fetching attendance records for user:", userId);
     
     // Fetch all members created by this user
     const members = await Member.find({ createdBy: userId});
 
     if (members.length === 0) {
-        console.log("No members linked to this user.");
         return []; // No members found, so no attendance records will exist
     }
 

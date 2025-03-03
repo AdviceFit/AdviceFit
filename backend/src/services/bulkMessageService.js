@@ -5,11 +5,9 @@ const Employee = require('../models/employeeModel');
 // const sendSMS = require('./smsService');
 // const sendWhatsApp = require('./whatsappService');
 
-exports.processBulkMessage = async (center, recipients, messageType, messageCategory, message) => {
-
+exports.processBulkMessage = async (center, recipients, messageType, messageCategory, message,userId) => {
     try {
         let recipientList = [];
-
         // Fetch recipients based on selected categories
         if (recipients.includes("visitors")) {
             const visitors = await Visitor.find({ visiting_center: center, isDeleted: false }, 'name mobile');
@@ -27,8 +25,6 @@ exports.processBulkMessage = async (center, recipients, messageType, messageCate
             recipientList.push(...employees.map(v => ({ name: v.name, phone: v.mobile })));
 
         }
-
-        console.log('recipientList', recipientList.length);
         if (recipientList.length === 0) {
             return { status: 400, data: { message: 'No recipients found' } };
         }
@@ -36,6 +32,7 @@ exports.processBulkMessage = async (center, recipients, messageType, messageCate
 
         // Store bulk message request
         let bulkMessage = new BulkMessage({
+            userId,
             center,
             recipients,
             messageType,
@@ -45,8 +42,7 @@ exports.processBulkMessage = async (center, recipients, messageType, messageCate
             status: 'Pending'
         });
 
-        // await bulkMessage.save();
-        console.log('bulkMessage', bulkMessage);
+        await bulkMessage.save();
 
         // // Send messages
         // let sendResult;
@@ -67,3 +63,9 @@ exports.processBulkMessage = async (center, recipients, messageType, messageCate
         return { status: 500, data: { message: 'Internal server error' } };
     }
 };
+
+
+
+exports.getBulkMessages =async () => {
+    return await BulkMessage.find().sort({ createdAt: -1 }); 
+  };
