@@ -25,7 +25,7 @@ export const getSubscriptions = async (): Promise<{
 // Update an existing Subscription (PUT request)
 export const updateSubscription = async (
   id: string,
-  data: Partial<MembersParams>
+  data: Partial<SubscriptionsParams>
 ) => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");

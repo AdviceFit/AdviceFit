@@ -7,8 +7,6 @@ exports.getAllSubscriptions = async (req, res) => {
     const subscriptions = await subscriptionsService.getAllSubscriptions(
       userId
     );
-    console.log(subscriptions);
-
     res.status(200).json({ subscriptions });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -40,6 +38,7 @@ exports.updateSubscription = async (req, res) => {
     updateData.updatedBy = req.user._id; // Assign logged-in user
 
     const updatedSubscription = await subscriptionsService.updateSubscription(
+      req.user._id,
       id,
       updateData
     );
@@ -62,12 +61,8 @@ exports.deleteSubscription = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedSubscription = await subscriptionsService.updateSubscription(
-      id,
-      {
-        isDeleted: true,
-        updatedBy: req.user._id,
-      }
+    const deletedSubscription = await subscriptionsService.deleteSubscription(
+      id
     );
 
     if (!deletedSubscription) {

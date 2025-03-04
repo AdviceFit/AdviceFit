@@ -25,7 +25,6 @@ import { format } from "date-fns";
 
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-// import { getCenters } from "../../actions/centers.action";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -96,8 +95,12 @@ export default function EditSubscription({
 
       try {
         const subscriptionData = await getSubscriptionById(id);
-        if (subscriptionData?.subscription) {
-          form.reset(formatSubscriptionData(subscriptionData.subscription));
+        if (subscriptionData?.subscription?.subscriptionDetails) {
+          form.reset(
+            formatSubscriptionData(
+              subscriptionData.subscription.subscriptionDetails
+            )
+          );
         } else {
           toast.error("subscription not found.");
         }
@@ -107,17 +110,17 @@ export default function EditSubscription({
     }
 
     fetchSubscriptionDetails();
-  }, [id]);
+  }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       let response;
       if (id) {
-        response = await updateSubscription(id, values as MembersParams);
-        if (response.visitor) {
+        response = await updateSubscription(id, values as SubscriptionsParams);
+        if (response.subscription) {
           toast.success("Subscription updated successfully!");
         } else {
-          toast.error("Failed to update visitor.");
+          toast.error("Failed to update subscription.");
         }
       }
       onClose?.();
@@ -127,17 +130,6 @@ export default function EditSubscription({
       router.replace("/dashboard/subscriptions");
     }
   }
-  // useEffect(() => {
-  //   async function fetchCenters() {
-  //     try {
-  //       const data = await getCenters();
-  //       setCenters(data?.centers || []);
-  //     } catch (error) {
-  //       toast.error("Failed to load centers.");
-  //     }
-  //   }
-  //   fetchCenters();
-  // }, []);
 
   return (
     <Form {...form}>
@@ -375,9 +367,11 @@ export default function EditSubscription({
             )}
           />
         </div>
-        <Button type="submit" className="w-full sm:w-auto">
-          Submit
-        </Button>
+        <div className="flex justify-end mt-4">
+          <Button type="submit" className="w-full sm:w-auto">
+            Submit
+          </Button>
+        </div>
       </form>
     </Form>
   );

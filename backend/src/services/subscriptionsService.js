@@ -4,6 +4,7 @@ exports.getAllSubscriptions = async (userId) => {
   return await Member.find({
     createdBy: userId,
     isDeleted: false,
+    "subscriptionDetails.isDeleted": { $ne: true },
     subscriptionDetails: { $exists: true, $ne: null },
   }).populate("center", "_id name");
 };
@@ -16,14 +17,20 @@ exports.findSubscriptionById = async (id) => {
 };
 
 // Update a subscription by ID
-exports.updateSubscription = async (id, updateData) => {
-  return await Member.findOneAndUpdate(
+exports.updateSubscription = async (userId, id, updateData) => {
+  const member = await Member.findOne({ "subscriptionDetails._id": id });
+
+  if (!member) {
+    throw new Error("No matching subscription found.");
+  }
+  const result = await Member.findOneAndUpdate(
     { "subscriptionDetails._id": id },
     {
-      $set: { "subscriptionDetails.$": updateData },
+      $set: { subscriptionDetails: updateData },
     },
-    { new: true } // Return the updated document
-  ).populate("center", "_id name");
+    { new: true }
+  );
+  return result;
 };
 
 // Delete a subscription by ID
@@ -31,7 +38,7 @@ exports.deleteSubscription = async (id) => {
   return await Member.findOneAndUpdate(
     { "subscriptionDetails._id": id },
     {
-      $set: { "subscriptionDetails.$.isDeleted": true },
+      $set: { "subscriptionDetails.isDeleted": true },
     },
     { new: true }
   );

@@ -40,6 +40,15 @@ const subscriptionSchema = new Schema({
     type: String,
     trim: true,
   },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = subscriptionSchema;

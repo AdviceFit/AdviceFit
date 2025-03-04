@@ -7,7 +7,6 @@ const SubscriptionsTable = ({
 }: {
   adviceFitSubscriptions: MembersParams[];
 }) => {
-  console.log(adviceFitSubscriptions);
   return (
     <div className="container mx-auto py-10">
       <DataTable columns={columns} data={adviceFitSubscriptions} />
