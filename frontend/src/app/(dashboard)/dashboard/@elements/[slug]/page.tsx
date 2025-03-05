@@ -6,6 +6,7 @@ import ExpensesMain from "@/features/dashboard/main/Expenses.main";
 import MembersMain from "@/features/dashboard/main/Members.main";
 import MessagesMain from "@/features/dashboard/main/Messages.main";
 import PackagesMain from "@/features/dashboard/main/Packages.main";
+import PaymentsMain from "@/features/dashboard/main/Payments.main";
 import ReportsMain from "@/features/dashboard/main/Reports.main";
 import SendEmailMain from "@/features/dashboard/main/SendEmail.main";
 import SessionsMain from "@/features/dashboard/main/Sessions.main";
@@ -38,6 +39,8 @@ const DashboardElementsRoute = async function ({
       return <ReportsMain />;
     case "subscriptions":
       return <SubscriptionsMain />;
+    case "payments":
+      return <PaymentsMain />;
     case "sessions":
       return <SessionsMain />;
     case "expenses":

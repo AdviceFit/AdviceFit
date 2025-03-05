@@ -11,6 +11,7 @@ type Routes = {
     visitors: string;
     reports: string;
     subscriptions: string;
+    payments: string;
     sessions: string;
     expenses: string;
     messages: string;
@@ -44,6 +45,7 @@ const APP_ROUTES: Routes = {
     "visitors",
     "reports",
     "subscriptions",
+    "payments",
     "sessions",
     "expenses",
     "send-bulk-message",
@@ -68,6 +70,7 @@ const APP_ROUTES: Routes = {
     visitors: `/dashboard/visitors`,
     reports: `/dashboard/reports`,
     subscriptions: `/dashboard/subscriptions`,
+    payments: `/dashboard/payments`,
     sessions: `/dashboard/sessions`,
     expenses: `/dashboard/expenses`,
     messages: `/dashboard/send-bulk-message`,
