@@ -17,6 +17,7 @@ type Routes = {
     setup: string;
     employee: string;
     packages: string;
+    emails: string;
   };
   memberScreen: {
     personalDetails: string;
@@ -45,7 +46,8 @@ const APP_ROUTES: Routes = {
     "subscriptions",
     "sessions",
     "expenses",
-    "message-center",
+    "send-bulk-message",
+    "send-bulk-emails",
     "setup",
     "employees",
     "packages",
@@ -68,7 +70,8 @@ const APP_ROUTES: Routes = {
     subscriptions: `/dashboard/subscriptions`,
     sessions: `/dashboard/sessions`,
     expenses: `/dashboard/expenses`,
-    messages: `/dashboard/message-center`,
+    messages: `/dashboard/send-bulk-message`,
+    emails: `/dashboard/send-bulk-emails`,
     setup: `/dashboard/setup`,
     employee: `/dashboard/employees`,
     packages: `/dashboard/packages`,

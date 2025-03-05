@@ -156,12 +156,12 @@ const SidebarLinks = () => {
           [
             {
               name: "Send Bulk Message",
-              path: "/dashboard/message-center",
+              path: "/dashboard/send-bulk-message",
               icon: <MessagesSquare />,
             },
             {
               name: "Send Bulk Email",
-              path: "/dashboard/send-bulk-email",
+              path: "/dashboard/send-bulk-emails",
               icon: <Mails />,
             },
             {

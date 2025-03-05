@@ -7,6 +7,7 @@ import MembersMain from "@/features/dashboard/main/Members.main";
 import MessagesMain from "@/features/dashboard/main/Messages.main";
 import PackagesMain from "@/features/dashboard/main/Packages.main";
 import ReportsMain from "@/features/dashboard/main/Reports.main";
+import SendEmailMain from "@/features/dashboard/main/SendEmail.main";
 import SessionsMain from "@/features/dashboard/main/Sessions.main";
 import SetupMain from "@/features/dashboard/main/Setup.main";
 import SubscriptionsMain from "@/features/dashboard/main/Subscriptions.main";
@@ -41,8 +42,10 @@ const DashboardElementsRoute = async function ({
       return <SessionsMain />;
     case "expenses":
       return <ExpensesMain />;
-    case "message-center":
+    case "send-bulk-message":
       return <MessagesMain />;
+    case "send-bulk-emails":
+      return <SendEmailMain />;
     case "setup":
       return <SetupMain />;
     case "employees":
