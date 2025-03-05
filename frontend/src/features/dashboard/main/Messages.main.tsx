@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectTrigger,
@@ -21,6 +21,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea"; // Importing the Textarea component
+import { getCenters } from "../actions/centers.action";
+import { getTemplates } from "../actions/template.action";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
   center: z.string().min(1, "Center is required"),
@@ -31,17 +35,14 @@ const formSchema = z.object({
   messageType: z.enum(["Transactional", "Promotional"], {
     required_error: "Message Type is required",
   }),
-  messageTemplate: z.enum(
-    [
-      "WOMENS_DAY",
-      "DISCOUNT_OFFER_ALERT",
-      "GANESH_CHATURTHI_DISCOUNT_OFFER",
-      "GANDHI_JAYANTI_DISCOUNT_OFFER",
-      "DUSSEHRA_DISCOUNT_OFFER",
-    ],
-    { required_error: "Message Template is required" }
+  messageTemplate: z.string(),
+  message: z.string().optional(),
+  variables: z.array(
+    z.object({
+      fieldName: z.string().nonempty("Field name is required"),
+      value: z.string().optional(),
+    })
   ),
-  message: z.string().optional(), // New field for the disabled textarea
 });
 
 const MessagesMain = () => {
@@ -52,12 +53,38 @@ const MessagesMain = () => {
       to: [],
       messageServiceType: "SMS",
       messageType: "Transactional",
-      messageTemplate: "WOMENS_DAY",
-      message: "", // Default value for message
+      messageTemplate: "",
+      message: "",
+      variables: [],
     },
   });
 
-  const centers = ["Center A", "Center B", "Center C", "Center D"];
+  const [centers, setCenters] = useState<{ label: string; value: string }[]>(
+    []
+  );
+
+  const [templates, setTemplates] = useState<TemplateDataParams[]>([]);
+
+  const fetchCenters = async () => {
+    const response = await getCenters();
+    setCenters(
+      response.centers.map((center) => ({
+        label: center.name,
+        value: center._id,
+      }))
+    );
+  };
+
+  const fetchTemplates = async () => {
+    const response = await getTemplates();
+    setTemplates(response.templates);
+  };
+
+  useEffect(() => {
+    fetchCenters();
+    fetchTemplates();
+  }, []);
+
   const recipientOptions = [
     "Employees",
     "Visitor",
@@ -66,13 +93,10 @@ const MessagesMain = () => {
     "Non Live Members",
   ];
   const messageServiceTypes = ["SMS", "Whatsapp"];
-  const messageTypes = ["Transactional", "Promotional"];
-  const messageTemplates = [
-    "WOMENS_DAY",
-    "DISCOUNT_OFFER_ALERT",
-    "GANESH_CHATURTHI_DISCOUNT_OFFER",
-    "GANDHI_JAYANTI_DISCOUNT_OFFER",
-    "DUSSEHRA_DISCOUNT_OFFER",
+
+  const messageTypes = [
+    { value: "transactional", label: "Transactional", type: ["SMS"] },
+    { value: "promotional", label: "Promotional", type: ["SMS", "Whatsapp"] },
   ];
 
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
@@ -116,9 +140,9 @@ const MessagesMain = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {centers.map((center) => (
-                        <SelectItem key={center} value={center}>
-                          {center}
+                      {centers.map((center, idx) => (
+                        <SelectItem key={idx + 1} value={center.value}>
+                          {center.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -182,8 +206,8 @@ const MessagesMain = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {messageServiceTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
+                      {messageServiceTypes.map((type, idx) => (
+                        <SelectItem key={idx + 1} value={type}>
                           {type}
                         </SelectItem>
                       ))}
@@ -208,11 +232,17 @@ const MessagesMain = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {messageTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
+                      {messageTypes
+                        .filter((msgType) =>
+                          msgType.type.includes(
+                            form.getValues("messageServiceType")
+                          )
+                        )
+                        .map((type, idx) => (
+                          <SelectItem key={idx + 1} value={type.label}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -227,24 +257,71 @@ const MessagesMain = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Message Template</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      form.setValue(
+                        "message",
+                        templates.find((template) => template.title == value)
+                          ?.description as string
+                      );
+                    }}
+                    value={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Message Template" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {messageTemplates.map((template) => (
-                        <SelectItem key={template} value={template}>
-                          {template}
-                        </SelectItem>
-                      ))}
+                      {templates
+                        .filter((template) => {
+                          return (
+                            template.type == form.watch("messageType") &&
+                            template.services.includes(
+                              form.watch("messageServiceType") as any
+                            )
+                          );
+                        })
+                        .map((template, idx) => (
+                          <SelectItem key={idx + 1} value={template.title}>
+                            {template.title}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="flex flex-row gap-4 py-4">
+            {templates
+              .find(
+                (template) => template.title == form.watch("messageTemplate")
+              )
+              ?.variables.map((variable, idx) => (
+                <div key={idx + 1} className="flex flex-col gap-2">
+                  <Label htmlFor={`variable${idx + 1}`} className="text-sm">
+                    Variable {idx + 1}
+                  </Label>
+                  <Input
+                    placeholder="Variable"
+                    defaultValue={variable}
+                    name={`variable${idx + 1}`}
+                    onChange={(e) => {
+                      const currentMessage = form.watch("message");
+                      const updatedMessage = currentMessage.replace(
+                        new RegExp(variable, "g"),
+                        e.target.value
+                      );
+                      form.setValue("message", updatedMessage);
+                    }}
+                    type="text"
+                  />
+                </div>
+              ))}
           </div>
 
           {/* Message Field (Full Row, Disabled) */}
@@ -259,6 +336,7 @@ const MessagesMain = () => {
                     {...field}
                     placeholder="Message will be shown here..."
                     disabled
+                    value={field.value}
                     className="w-full h-20 bg-gray-100 cursor-not-allowed resize-y"
                   />
                 </FormControl>

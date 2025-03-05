@@ -32,6 +32,6 @@ exports.authenticate = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Authentication error:", error);
-    res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Invalid token" });
   }
 };

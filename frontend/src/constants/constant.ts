@@ -39,3 +39,13 @@ export const OCCUPATIONS = [
   { label: "Test Occu", value: "testOccu" },
   { label: "Others", value: "others" },
 ];
+
+
+export const PAYMENT_METHODS = [
+  "Cash",
+  "Card",
+  "Cheque",
+  "Paytm",
+  "Bank Transfer",
+  "UPI",
+];

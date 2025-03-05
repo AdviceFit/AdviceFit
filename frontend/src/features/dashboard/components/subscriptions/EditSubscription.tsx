@@ -31,6 +31,14 @@ import {
   getSubscriptionById,
   updateSubscription,
 } from "../../actions/subscriptions.action";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PAYMENT_METHODS } from "@/constants/constant";
 
 const formSchema = z.object({
   _id: z.string().optional(),
@@ -296,6 +304,31 @@ export default function EditSubscription({
         </div>
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
           <div>
+            <FormField
+              control={form.control}
+              name="paymentMode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Mode</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Payment Mode" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {PAYMENT_METHODS.map((method, idx) => (
+                        <SelectItem key={idx + 1} value={method}>
+                          {method}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="paymentMode"

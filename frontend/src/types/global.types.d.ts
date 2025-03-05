@@ -215,3 +215,16 @@ type ExpenseParams = {
 type ExpenseDataParams = {
   expense: ExpenseParams[];
 };
+
+
+type TemplateDataParams = {
+    _id : string;
+    title: string;
+    variables: string[];
+    description: string;
+    type: "Transactional" | "Promotional";
+    services: ("SMS" | "Whatsapp")[];
+    isDeleted?: boolean;
+    createdAt?: Date;    
+    updatedAt?: Date;      
+}

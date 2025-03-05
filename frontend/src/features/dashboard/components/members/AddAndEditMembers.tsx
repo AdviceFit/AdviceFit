@@ -34,80 +34,37 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import LocationSelector from "@/components/ui/location-input";
-import { addMembers, editMember, getAllMembers } from "../../actions/members.action";
+import {
+  addMembers,
+  editMember,
+  getAllMembers,
+} from "../../actions/members.action";
 import {
   MEMBERS_SOURCES,
   OCCUPATIONS,
+  PAYMENT_METHODS,
   TOAST_MESSAGES,
 } from "@/constants/constant";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Name must be at least 2 characters" })
-    .max(50, { message: "Name must be at most 50 characters" }),
-  mobile: z.coerce
-    .number()
-    .refine((value) => /^\d{10}$/.test(value.toString()), {
-      message: "Mobile number must be 10 digits",
-    }),
-  gym_member_code: z.string().optional(),
-  joining_date: z.coerce.date({ required_error: "Joining date is required" }),
-  email: z
-    .string()
-    .email({ message: "Invalid email format" })
-    .refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
-      message: "Invalid email format",
-    }),
-  center: z.string().nonempty({ message: "Center is required" }),
-  source: z.string().optional(),
-  occupation: z.string().optional(),
-  dob: z.coerce.date({ required_error: "Date of birth is required" }),
-  health_conditions: z
-    .string()
-    .min(2, { message: "Health condition must be at least 2 characters" })
-    .max(50, { message: "Health condition must be at most 50 characters" }),
-  addressLine1: z.string().nonempty({ message: "Address Line 1 is required" }),
-  addressLine2: z.string().optional(),
-  address: z.tuple([
-    z.string().nonempty({ message: "First value is required" }),
-    z.string().optional(),
-  ]),
-  city: z.string().nonempty({ message: "City is required" }),
-  pincode: z.coerce.number({ required_error: "Pincode is required" }),
-  gender: z.enum(["Male", "Female", "Other"], {
-    message: "Gender must be Male, Female, or Other",
-  }),
-  marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"], {
-    message: "Marital Status must be Single, Married, or Divorce , Widowed",
-  }),
-  // package: z.string().min(2).max(50),
-  // promoCoupon: z.string().optional(),
-  // offerAmount: z.coerce
-  //   .number()
-  //   .min(0, { message: "Offer Amount must be a positive number" }),
-  // paymentDate: z.coerce.date(),
-  // startDate: z.coerce.date(),
-  // paidAmount: z.coerce
-  //   .number()
-  //   .min(0, { message: "Paid Amount must be a positive number" }),
-  // paymentMode: z.string().min(2).max(50),
-  // paymentDueDate: z.coerce.date(),
-  // comments: z.string().optional(),
-});
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const AddAndEditMembers = ({
   setOpenState,
   centers = [],
   columnData,
-  setMemberState
+  setMemberState,
 }: {
   setOpenState: Dispatch<SetStateAction<boolean>>;
   centers: CenterParams[];
   columnData?: Record<string, any>;
-  setMemberState? : any
+  setMemberState?: any;
 }) => {
   const [stateName, setStateName] = useState<string>("");
   const [showSubscription, setShowSubscription] = useState(false);
@@ -129,24 +86,88 @@ const AddAndEditMembers = ({
     health_conditions: columnData?.health_conditions || "",
     addressLine1: columnData?.address?.addressLine1 || "",
     addressLine2: columnData?.address?.addressLine2 || "",
-    address: [
-      columnData?.address?.country,
-      columnData?.address?.state,
-    ] as any,
+    address: [columnData?.address?.country, columnData?.address?.state] as any,
     city: columnData?.address?.city || "",
     pincode: columnData?.address?.pincode || "",
-    // package: columnData?.subscriptionDetails?.package || "",
-    // promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-    // offerAmount: columnData?.subscriptionDetails?.offerAmount,
-    // paymentDate: columnData?.subscriptionDetails?.paymentDate
-    //   ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-    //   : new Date(),
-    // startDate: columnData?.subscriptionDetails?.startDate || "",
-    // paidAmount: columnData?.subscriptionDetails?.paidAmount,
-    // paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-    // paymentDueDate: columnData?.subscriptionDetails?.paymentDueDate || "",
-    // comments: columnData?.subscriptionDetails?.comments || "",
+    package: columnData?.subscriptionDetails?.package || "",
+    promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+    offerAmount: columnData?.subscriptionDetails?.offerAmount,
+    paymentDate: columnData?.subscriptionDetails?.paymentDate
+      ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+      : new Date(),
+    startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+    paidAmount: columnData?.subscriptionDetails?.paidAmount,
+    paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+    paymentDueDate:
+      columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+    comments: columnData?.subscriptionDetails?.comments || "",
   };
+
+  const formSchema = z.object({
+    name: z
+      .string()
+      .min(2, { message: "Name must be at least 2 characters" })
+      .max(50, { message: "Name must be at most 50 characters" }),
+    mobile: z.coerce
+      .number()
+      .refine((value) => /^\d{10}$/.test(value.toString()), {
+        message: "Mobile number must be 10 digits",
+      }),
+    gym_member_code: z.string().optional(),
+    joining_date: z.coerce.date({ required_error: "Joining date is required" }),
+    email: z
+      .string()
+      .email({ message: "Invalid email format" })
+      .refine((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), {
+        message: "Invalid email format",
+      }),
+    center: z.string().nonempty({ message: "Center is required" }),
+    source: z.string().optional(),
+    occupation: z.string().optional(),
+    dob: z.coerce.date({ required_error: "Date of birth is required" }),
+    health_conditions: z
+      .string()
+      .min(2, { message: "Health condition must be at least 2 characters" })
+      .max(50, { message: "Health condition must be at most 50 characters" }),
+    addressLine1: z
+      .string()
+      .nonempty({ message: "Address Line 1 is required" }),
+    addressLine2: z.string().optional(),
+    address: z.tuple([
+      z.string().nonempty({ message: "First value is required" }),
+      z.string().optional(),
+    ]),
+    city: z.string().nonempty({ message: "City is required" }),
+    pincode: z.coerce.number({ required_error: "Pincode is required" }),
+    gender: z.enum(["Male", "Female", "Other"], {
+      message: "Gender must be Male, Female, or Other",
+    }),
+    marital_status: z.enum(["Single", "Married", "Divorced", "Widowed"], {
+      message: "Marital Status must be Single, Married, or Divorce , Widowed",
+    }),
+    subscription: !showSubscription
+      ? z.undefined()
+      : z.object({
+          package: z.string().min(2, { message: "Package is required" }),
+          promoCoupon: z.string().optional(),
+          offerAmount: z.coerce
+            .number()
+            .min(0, { message: "Offer Amount must be positive" }),
+          paymentDate: z.coerce.date().optional(),
+          startDate: z.coerce.date().optional(),
+          paidAmount: z.coerce
+            .number()
+            .min(0, { message: "Paid Amount must be positive" }),
+          paymentMode: z.enum(
+            ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
+            {
+              message: "Marital Status must be valid  method",
+            }
+          ),
+          paymentDueDate: z.coerce.date().optional(),
+          comments: z.string().optional(),
+        }),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -164,17 +185,7 @@ const AddAndEditMembers = ({
         city: values.city || "",
         pincode: values.pincode || "",
       },
-      // subscriptionDetails: {
-      //   package: values.package || "",
-      //   promoCoupon: values.promoCoupon || "",
-      //   offerAmount: values.offerAmount || 0,
-      //   paymentDate: values.paymentDate || "",
-      //   startDate: values.startDate || "",
-      //   paidAmount: values.paidAmount || 0,
-      //   paymentMode: values.paymentMode || "",
-      //   paymentDueDate: values.paymentDueDate || "",
-      //   comments: values.comments || "",
-      // },
+      subscriptionDetails: values.subscription,
     };
 
     if (columnData) {
@@ -193,7 +204,7 @@ const AddAndEditMembers = ({
       toast.success(TOAST_MESSAGES.memberAdded);
     }
     const { members } = await getAllMembers();
-    setMemberState((prev : any) =>  ({ ...prev , members }))
+    setMemberState((prev: any) => ({ ...prev, members }));
     setOpenState(false);
   }
 
@@ -832,13 +843,13 @@ const AddAndEditMembers = ({
             </label>
           </div>
         )}
-        {/* {showSubscription && (
+        {showSubscription && (
           <>
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
               <div>
                 <FormField
                   control={form.control}
-                  name="package"
+                  name="subscription.package"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Package</FormLabel>
@@ -854,7 +865,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="promoCoupon"
+                  name="subscription.promoCoupon"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Promo / Coupon</FormLabel>
@@ -875,7 +886,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="offerAmount"
+                  name="subscription.offerAmount"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Offer Amount</FormLabel>
@@ -895,7 +906,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="paymentDate"
+                  name="subscription.paymentDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Payment Date</FormLabel>
@@ -921,7 +932,7 @@ const AddAndEditMembers = ({
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={field.value}
+                            selected={new Date(field.value?.toString() ?? "")}
                             onSelect={field.onChange}
                             initialFocus
                           />
@@ -937,7 +948,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="startDate"
+                  name="subscription.startDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Start Date</FormLabel>
@@ -963,7 +974,7 @@ const AddAndEditMembers = ({
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={field.value}
+                            selected={new Date(field.value?.toString() ?? "")}
                             onSelect={field.onChange}
                             initialFocus
                           />
@@ -978,7 +989,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="paidAmount"
+                  name="subscription.paidAmount"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Paid Amount</FormLabel>
@@ -999,17 +1010,27 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="paymentMode"
+                  name="subscription.paymentMode"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Payment Mode</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Payment Mode"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Payment Mode" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PAYMENT_METHODS.map((method, idx) => (
+                            <SelectItem key={idx + 1} value={method}>
+                              {method}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -1019,7 +1040,7 @@ const AddAndEditMembers = ({
               <div>
                 <FormField
                   control={form.control}
-                  name="paymentDueDate"
+                  name="subscription.paymentDueDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Payment Due Date</FormLabel>
@@ -1045,7 +1066,7 @@ const AddAndEditMembers = ({
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
                             mode="single"
-                            selected={field.value}
+                            selected={new Date(field.value?.toString() ?? "")}
                             onSelect={field.onChange}
                             initialFocus
                           />
@@ -1060,7 +1081,7 @@ const AddAndEditMembers = ({
             <div>
               <FormField
                 control={form.control}
-                name="comments"
+                name="subscription.comments"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Comments</FormLabel>
@@ -1073,7 +1094,7 @@ const AddAndEditMembers = ({
               />
             </div>
           </>
-        )} */}
+        )}
         <Button type="submit" className="w-full sm:w-auto">
           Submit
         </Button>
