@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { updateAdminRights } from "../../actions/adminRIghts.action";
+import { updateAdminRights } from "../../actions/adminRights.action";
 
 interface Role {
   _id: string;
