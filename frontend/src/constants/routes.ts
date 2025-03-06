@@ -15,6 +15,7 @@ type Routes = {
     sessions: string;
     expenses: string;
     messages: string;
+    messagesHistory: string;
     setup: string;
     employee: string;
     packages: string;
@@ -50,6 +51,7 @@ const APP_ROUTES: Routes = {
     "expenses",
     "send-bulk-message",
     "send-bulk-emails",
+    "message-history",
     "setup",
     "employees",
     "packages",
@@ -75,6 +77,7 @@ const APP_ROUTES: Routes = {
     expenses: `/dashboard/expenses`,
     messages: `/dashboard/send-bulk-message`,
     emails: `/dashboard/send-bulk-emails`,
+    messagesHistory: `/dashboard/message-history`,
     setup: `/dashboard/setup`,
     employee: `/dashboard/employees`,
     packages: `/dashboard/packages`,

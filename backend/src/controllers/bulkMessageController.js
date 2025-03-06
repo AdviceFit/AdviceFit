@@ -21,8 +21,8 @@ exports.sendBulkMessage = async (req, res) => {
     
 exports.getBulkMessages =  async (req, res) => {
     try {
-      const messages = await BulkMessageService.getBulkMessages();
-      res.status(200).json(messages);
+      const getAllMessages = await BulkMessageService.getBulkMessages();
+      res.status(200).json({messages:getAllMessages});
     } catch (error) {
       res.status(500).json({ message: "Error fetching bulk message history", error: error.message });
     }

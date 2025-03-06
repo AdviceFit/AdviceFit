@@ -150,7 +150,7 @@ const SendEmailForm = () => {
                         />
                     </div>
                 {/* Submit Button */}
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-24">
                     Send Email
                 </Button>
             </form>

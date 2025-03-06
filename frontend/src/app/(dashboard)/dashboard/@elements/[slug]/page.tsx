@@ -8,12 +8,13 @@ import MessagesMain from "@/features/dashboard/main/Messages.main";
 import PackagesMain from "@/features/dashboard/main/Packages.main";
 import PaymentsMain from "@/features/dashboard/main/Payments.main";
 import ReportsMain from "@/features/dashboard/main/Reports.main";
-import SendEmailMain from "@/features/dashboard/main/SendEmail.main";
+import SendEmailMain from "@/features/dashboard/main/Email.main";
 import SessionsMain from "@/features/dashboard/main/Sessions.main";
 import SetupMain from "@/features/dashboard/main/Setup.main";
 import SubscriptionsMain from "@/features/dashboard/main/Subscriptions.main";
 import VisitorsMain from "@/features/dashboard/main/Visitors.main";
 import { redirect } from "next/navigation";
+import MessageHistoryMain from "@/features/dashboard/main/MessegesHistory.main";
 
 const DashboardElementsRoute = async function ({
   params,
@@ -49,6 +50,8 @@ const DashboardElementsRoute = async function ({
       return <MessagesMain />;
     case "send-bulk-emails":
       return <SendEmailMain />;
+    case "message-history":
+      return <MessageHistoryMain />;
     case "setup":
       return <SetupMain />;
     case "employees":

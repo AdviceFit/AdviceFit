@@ -66,6 +66,16 @@ exports.processBulkMessage = async (center, recipients, messageType, messageCate
 
 
 
-exports.getBulkMessages =async () => {
-    return await BulkMessage.find().sort({ createdAt: -1 }); 
-  };
+exports.getBulkMessages = async () => {
+    return await BulkMessage.find()
+        .sort({ createdAt: -1 })
+        .populate({
+            path: "center",
+            select: "name _id" // Populating center with name and ID
+        })
+        .populate({
+            path: "userId",
+            select: "name _id email gym_owner_name" // Populating user with name, ID, and email
+        });
+};
+

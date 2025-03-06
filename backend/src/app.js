@@ -45,7 +45,7 @@ app.use("/sessions", sessionsRoutes);
 app.use("/expenses", expensesRoutes);
 app.use("/subscriptions", subscriptionsRoutes);
 app.use("/admin-rights", adminRightsRoutes);
-app.use("/bulk-message", bulkMessageRoutes);
+app.use("/messages", bulkMessageRoutes);
 app.use("/templates" , templateRoutes)
 
 // Error Handling Middleware
