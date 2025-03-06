@@ -74,8 +74,8 @@ const AddAndEditMembers = ({
       ? new Date(columnData.joining_date.toString())
       : new Date(),
     dob: columnData?.dob ? new Date(columnData.dob.toString()) : new Date(),
-    marital_status: columnData?.marital_status || "Single",
-    gender: columnData?.gender || "Male",
+    marital_status: columnData?.marital_status || "",
+    gender: columnData?.gender || "",
     name: columnData?.name || "",
     mobile: columnData?.mobile || "",
     gym_member_code: columnData?.gym_member_code || "",
@@ -214,7 +214,7 @@ const AddAndEditMembers = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6 w-full mx-auto pt-4 pb-4"
       >
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 py-1 items-end">
           <div>
             <FormField
               control={form.control}
@@ -248,7 +248,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <FormField
             control={form.control}
             name="gender"
@@ -318,7 +318,7 @@ const AddAndEditMembers = ({
           />
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <div>
             <FormField
               control={form.control}
@@ -367,6 +367,7 @@ const AddAndEditMembers = ({
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
+                      {/* <DatePicker selected={field.value} setSelected={field.onChange} /> */}
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -383,7 +384,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <div>
             <FormField
               control={form.control}
@@ -474,7 +475,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <div>
             <FormField
               control={form.control}
@@ -604,7 +605,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <div>
             <FormField
               control={form.control}
@@ -730,7 +731,7 @@ const AddAndEditMembers = ({
           )}
         /> */}
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <FormField
             control={form.control}
             name="addressLine1"
@@ -793,7 +794,7 @@ const AddAndEditMembers = ({
           )}
         />
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
           <div>
             <FormField
               control={form.control}
@@ -845,7 +846,7 @@ const AddAndEditMembers = ({
         )}
         {showSubscription && (
           <>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
               <div>
                 <FormField
                   control={form.control}
@@ -882,7 +883,7 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
               <div>
                 <FormField
                   control={form.control}
@@ -944,7 +945,7 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
               <div>
                 <FormField
                   control={form.control}
@@ -1006,7 +1007,7 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
               <div>
                 <FormField
                   control={form.control}
