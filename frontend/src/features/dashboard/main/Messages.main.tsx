@@ -59,9 +59,7 @@ const MessagesMain = () => {
     },
   });
 
-  const [centers, setCenters] = useState<{ label: string; value: string }[]>(
-    []
-  );
+  const [centers, setCenters] = useState<{ label: string; value: string }[]>([]);
 
   const [templates, setTemplates] = useState<TemplateDataParams[]>([]);
 
@@ -108,6 +106,43 @@ const MessagesMain = () => {
 
     setSelectedRecipients(updatedRecipients);
     form.setValue("to", updatedRecipients as never[]);
+  };
+
+  const [originalMessage, setOriginalMessage] = React.useState(""); // Store the original message
+  const [variablesMap, setVariablesMap] = React.useState({}); // Track variable updates
+
+  React.useEffect(() => {
+    // Initialize the original message and variables when the template changes
+    const selectedTemplate = templates.find(
+      (template) => template.title === form.watch("messageTemplate")
+    );
+    if (selectedTemplate) {
+      setOriginalMessage(selectedTemplate.description); // Save the original template message
+      const initialVariablesMap = selectedTemplate.variables.reduce(
+        (map, variable) => ({ ...map, [variable]: variable }), // Default to the variable as its value
+        {}
+      );
+      setVariablesMap(initialVariablesMap); // Set the initial variables map
+      form.setValue("message", selectedTemplate.description); // Set the initial form message
+    }
+  }, [form.watch("messageTemplate")]);
+
+  const handleVariableChange = (variable: string, newValue: string) => {
+    // Update the variable map with the new value
+    const updatedVariablesMap = { ...variablesMap, [variable]: newValue };
+    setVariablesMap(updatedVariablesMap);
+
+    // Generate the updated message by replacing all placeholders in the original message
+    const updatedMessage = Object.entries(updatedVariablesMap).reduce(
+      (message, [key, value]) =>
+        message.replace(
+          new RegExp(key.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "g"),
+          value as string
+        ),
+      originalMessage
+    );
+
+    form.setValue("message", updatedMessage);
   };
 
   return (
@@ -295,7 +330,6 @@ const MessagesMain = () => {
               )}
             />
           </div>
-
           <div className="flex flex-row gap-4 py-4">
             {templates
               .find(
@@ -310,20 +344,14 @@ const MessagesMain = () => {
                     placeholder="Variable"
                     defaultValue={variable}
                     name={`variable${idx + 1}`}
-                    onChange={(e) => {
-                      const currentMessage = form.watch("message");
-                      const updatedMessage = currentMessage.replace(
-                        new RegExp(variable, "g"),
-                        e.target.value
-                      );
-                      form.setValue("message", updatedMessage);
-                    }}
+                    onChange={(e) =>
+                      handleVariableChange(variable, e.target.value)
+                    }
                     type="text"
                   />
                 </div>
               ))}
           </div>
-
           {/* Message Field (Full Row, Disabled) */}
           <FormField
             control={form.control}
@@ -344,8 +372,7 @@ const MessagesMain = () => {
               </FormItem>
             )}
           />
-
-          {/* Submit Button */}
+          ;{/* Submit Button */}
           <div className="flex justify-end mt-4">
             <button
               type="submit"
