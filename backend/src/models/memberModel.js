@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const addressSchema = require("./addressModel");
-const subscriptionSchema = require("./subscriptionModel");
 
 const memberSchema = new mongoose.Schema(
   {
@@ -93,10 +92,6 @@ const memberSchema = new mongoose.Schema(
     },
     address: {
       type: addressSchema,
-      required: false,
-    },
-    subscriptionDetails: {
-      type: subscriptionSchema,
       required: false,
     },
     createdBy: {

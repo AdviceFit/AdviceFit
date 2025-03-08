@@ -1,33 +1,52 @@
-const Member = require("../models/memberModel");
+const Subscription = require("../models/subscriptionModel");
+
+// Create a new subscription
+exports.createSubscription = async (subscriptionData) => {
+  const subscription = new Subscription(subscriptionData);
+  return await subscription.save();
+};
 
 exports.getAllSubscriptions = async (userId) => {
-  return await Member.find({
+  return await Subscription.find({
     createdBy: userId,
     isDeleted: false,
-    "subscriptionDetails.isDeleted": { $ne: true },
-    subscriptionDetails: { $exists: true, $ne: null },
-  }).populate("center", "_id name");
+  }).populate({
+    path: "memberId",
+    populate: {
+      path: "center",
+      select: "_id name",
+    },
+  });
 };
 
 // Get a subscription by ID
 exports.findSubscriptionById = async (id) => {
-  return await Member.findOne({
-    "subscriptionDetails._id": id,
-  }).select("subscriptionDetails");
+  return await Subscription.findOne({
+    _id: id,
+    isDeleted: false,
+  }).populate({
+    path: "memberId",
+    populate: {
+      path: "center",
+      select: "_id name",
+    },
+  });
 };
 
 // Update a subscription by ID
 exports.updateSubscription = async (userId, id, updateData) => {
-  const member = await Member.findOne({ "subscriptionDetails._id": id });
+  const subscription = await Subscription.findOne({
+    _id: id,
+    isDeleted: false,
+    createdBy: userId,
+  });
 
-  if (!member) {
+  if (!subscription) {
     throw new Error("No matching subscription found.");
   }
-  const result = await Member.findOneAndUpdate(
-    { "subscriptionDetails._id": id },
-    {
-      $set: { subscriptionDetails: updateData },
-    },
+  const result = await Subscription.findOneAndUpdate(
+    { _id: id },
+    { $set: updateData },
     { new: true }
   );
   return result;
@@ -35,10 +54,10 @@ exports.updateSubscription = async (userId, id, updateData) => {
 
 // Delete a subscription by ID
 exports.deleteSubscription = async (id) => {
-  return await Member.findOneAndUpdate(
-    { "subscriptionDetails._id": id },
+  return await Subscription.findOneAndUpdate(
+    { _id: id },
     {
-      $set: { "subscriptionDetails.isDeleted": true },
+      $set: { isDeleted: true },
     },
     { new: true }
   );

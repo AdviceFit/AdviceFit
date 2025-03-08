@@ -185,7 +185,6 @@ const AddAndEditMembers = ({
         city: values.city || "",
         pincode: values.pincode || "",
       },
-      subscriptionDetails: values.subscription,
     };
 
     if (columnData) {

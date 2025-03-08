@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:5000";
+export const BASE_URL = "http://localhost:9000";
 
 export const TOAST_MESSAGES = {
   memberAdded: "Member added successfully ..",
@@ -39,7 +39,6 @@ export const OCCUPATIONS = [
   { label: "Test Occu", value: "testOccu" },
   { label: "Others", value: "others" },
 ];
-
 
 export const PAYMENT_METHODS = [
   "Cash",

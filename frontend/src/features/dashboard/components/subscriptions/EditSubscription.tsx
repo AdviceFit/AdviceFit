@@ -103,12 +103,8 @@ export default function EditSubscription({
 
       try {
         const subscriptionData = await getSubscriptionById(id);
-        if (subscriptionData?.subscription?.subscriptionDetails) {
-          form.reset(
-            formatSubscriptionData(
-              subscriptionData.subscription.subscriptionDetails
-            )
-          );
+        if (subscriptionData?.subscription) {
+          form.reset(formatSubscriptionData(subscriptionData.subscription));
         } else {
           toast.error("subscription not found.");
         }
@@ -324,20 +320,6 @@ export default function EditSubscription({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="paymentMode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Payment Mode</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Payment Mode" type="text" {...field} />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

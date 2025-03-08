@@ -15,8 +15,8 @@ const expensesRoutes = require("./routes/expenseRoutes");
 const subscriptionsRoutes = require("./routes/subscriptionsRoutes");
 const adminRightsRoutes = require("./routes/adminRightsRoutes");
 const bulkMessageRoutes = require("./routes/bulkMessageRoutes");
-const emailRoutes = require('./routes/emailRoutes');
-const templateRoutes = require("./routes/templateRoutes"); 
+const emailRoutes = require("./routes/emailRoutes");
+const templateRoutes = require("./routes/templateRoutes");
 
 const app = express();
 
@@ -48,15 +48,14 @@ app.use("/subscriptions", subscriptionsRoutes);
 app.use("/admin-rights", adminRightsRoutes);
 app.use("/messages", bulkMessageRoutes);
 app.use("/emails", emailRoutes);
-app.use("/templates" , templateRoutes)
-
+app.use("/templates", templateRoutes);
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');
 // app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

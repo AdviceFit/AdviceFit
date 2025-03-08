@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const API_URL = `${BASE_URL}/subscriptions`;
 
 export const getSubscriptions = async (): Promise<{
-  subscriptions: MembersParams[];
+  subscriptions: SubscriptionsParams[];
 }> => {
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");

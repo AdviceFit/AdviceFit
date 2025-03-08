@@ -1,4 +1,5 @@
 const MemberService = require("../services/memberService");
+const SubscriptionService = require("../services/subscriptionsService");
 const nodemailer = require("nodemailer");
 const Role = require("../models/rolesModel");
 
@@ -36,14 +37,15 @@ exports.sendConfirmationEmail = async (
 // Create Member
 exports.createMember = async (req, res) => {
   try {
+    const userId = req.user._id;
     const memberData = req.body;
 
     const checkMemberExistence = await MemberService.findMemberByFilter({
       email: memberData.email,
     });
-    
+
     if (checkMemberExistence) {
-      return res.status(400).json({ error : "Member already exists" });
+      return res.status(400).json({ error: "Member already exists" });
     }
 
     const memberRole = await Role.findOne({ name: "Member" });
@@ -52,7 +54,7 @@ exports.createMember = async (req, res) => {
     }
     memberData.role = memberRole._id;
     // Add the createdBy field from the logged-in user's ID
-    memberData.createdBy = req.user._id;
+    memberData.createdBy = userId;
 
     const newMember = await MemberService.createMember(memberData);
 
@@ -61,6 +63,15 @@ exports.createMember = async (req, res) => {
 
     await MemberService.updateMember(newMember?._id, updateData);
 
+    if (memberData?.subscription) {
+      const subscriptionData = {
+        ...memberData?.subscription,
+        memberId: newMember?._id,
+        createdBy: userId,
+        updatedBy: userId,
+      };
+      await SubscriptionService.createSubscription(subscriptionData);
+    }
     await this.sendConfirmationEmail(
       newMember?.email,
       newMember?.name,

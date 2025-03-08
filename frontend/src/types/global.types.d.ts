@@ -12,7 +12,6 @@ type MembersParams = {
   dob: string;
   health_conditions: string;
   marital_status: "Single" | "Married" | "Widowed";
-  subscriptionDetails: SubscriptionsParams;
 };
 
 type MembersDataParams = {
@@ -99,6 +98,7 @@ type VisitorsDataParams = {
 
 type SubscriptionsParams = {
   _id: string;
+  memberId: MembersParams;
   package: string;
   promoCoupon: string;
   offerAmount: number;
@@ -110,9 +110,9 @@ type SubscriptionsParams = {
   comments: string;
 };
 
-// type SubscriptionsDataParams = {
-//   subscriptions: SubscriptMemionsParams[];
-// };
+type SubscriptionsDataParams = {
+  subscriptions: SubscriptionsParams[];
+};
 
 type EmployeeParams = {
   _id: string;
@@ -216,15 +216,14 @@ type ExpenseDataParams = {
   expense: ExpenseParams[];
 };
 
-
 type TemplateDataParams = {
-    _id : string;
-    title: string;
-    variables: string[];
-    description: string;
-    type: "Transactional" | "Promotional";
-    services: ("SMS" | "Whatsapp")[];
-    isDeleted?: boolean;
-    createdAt?: Date;    
-    updatedAt?: Date;      
-}
+  _id: string;
+  title: string;
+  variables: string[];
+  description: string;
+  type: "Transactional" | "Promotional";
+  services: ("SMS" | "Whatsapp")[];
+  isDeleted?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
