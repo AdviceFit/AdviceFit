@@ -27,4 +27,6 @@ router.get("/roles", authMiddleware.authenticate, userController.getAllRoles);
 // Get All Rights
 router.get("/rights", authMiddleware.authenticate, userController.getAllRights);
 
+router.get("/history", authMiddleware.authenticate, userController.getLoginHistory);
+
 module.exports = router;

@@ -1,3 +1,4 @@
+const LoginHistory = require('../models/loginHistory');
 const Member = require('../models/memberModel');
 const User = require('../models/userModel');
 
@@ -15,4 +16,8 @@ exports.findMemberByEmail = async (email) => {
 exports.createUser = async (userData) => {
     const user = new User(userData);
     return await user.save();
+};
+
+exports.getHistory = async () => {
+    return await LoginHistory.find({ isDeleted: false }).populate('userId', 'email gym_owner_name');
 };

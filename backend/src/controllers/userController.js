@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Role = require("../models/rolesModel");
 const Right = require("../models/rightModel");
+const LoginHistory = require("../models/loginHistory");
+const { create } = require("../models/userModel");
 
 // Signup Controller
 exports.signup = async (req, res) => {
@@ -66,22 +68,24 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role },
-      process.env.JWT_SECRET,
-      { expiresIn: "5h" }
-    );
+    // Generate a Tokens
+    const  { accessToken , refreshToken, expires } = await user.generateTokens(role);
+    user.refreshTokens.push({ token: refreshToken, expires });
+    await user.save();
 
-    res.cookie("authToken", token, {
+    // Add login history
+    const loginHistory = new LoginHistory({ userId: user._id , createdAt: new Date() });
+    await loginHistory.addLoginHistory();
+
+    res.cookie("authToken", accessToken, {
       httpOnly: true,
       // secure: process.env.NODE_ENV === 'production',
-      maxAge: 86400000, // 24 hours in milliseconds
+      maxAge: 86400000,
       sameSite: "lax",
       path: "/",
     });
 
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({ message: "Login successful" , token : accessToken });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -186,5 +190,14 @@ exports.getAllRights = async (req, res) => {
     res.status(200).json(rights);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getLoginHistory = async (req, res) => {
+  try {
+      const history = await UserService.getHistory();
+      res.status(201).json({ success: true, history });
+  } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
   }
 };

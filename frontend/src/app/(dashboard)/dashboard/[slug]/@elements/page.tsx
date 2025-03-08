@@ -15,6 +15,7 @@ import SubscriptionsMain from "@/features/dashboard/main/Subscriptions.main";
 import VisitorsMain from "@/features/dashboard/main/Visitors.main";
 import { redirect } from "next/navigation";
 import MessageHistoryMain from "@/features/dashboard/main/MessegesHistory.main";
+import LoginHistoryMain from "@/features/dashboard/main/LoginHistory.main";
 
 const DashboardElementsRoute = async function ({
   params,
@@ -58,6 +59,8 @@ const DashboardElementsRoute = async function ({
       return <EmployeeMain />;
     case "packages":
       return <PackagesMain />;
+    case "login-reports":
+      return <LoginHistoryMain />;
     default:
       break;
   }

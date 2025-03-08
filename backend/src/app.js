@@ -48,6 +48,7 @@ app.use("/admin-rights", adminRightsRoutes);
 app.use("/messages", bulkMessageRoutes);
 app.use("/templates" , templateRoutes)
 
+
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');
 // app.use(errorHandler);

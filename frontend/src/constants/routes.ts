@@ -20,6 +20,7 @@ type Routes = {
     employee: string;
     packages: string;
     emails: string;
+    loginReports: string;
   };
   memberScreen: {
     personalDetails: string;
@@ -63,6 +64,7 @@ const APP_ROUTES: Routes = {
     "fitness-data",
     "my-review",
     "attendance",
+    "login-reports"
   ],
   dashboardPath: dashboardPath,
   dasboard: {
@@ -81,6 +83,7 @@ const APP_ROUTES: Routes = {
     setup: `/dashboard/setup`,
     employee: `/dashboard/employees`,
     packages: `/dashboard/packages`,
+    loginReports: `/dashboard/login-reports`
   },
   memberScreen: {
     personalDetails: `/personal-details`,

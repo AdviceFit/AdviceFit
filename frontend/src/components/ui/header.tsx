@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import LogoIcon from "../../../public/favicon-32x32.png";
 import { toast } from "sonner";
-import { BASE_URL } from "@/constants/constant";
 
 const Header: React.FC = () => {
   const router = useRouter();

@@ -131,7 +131,7 @@ body {
 @layer components {
 
   .wrapper{
-    @apply min-h-[calc(100vh-8rem)] w-full
+    @apply min-h-screen w-full
   }
   .box {
     @apply container mx-auto px-4

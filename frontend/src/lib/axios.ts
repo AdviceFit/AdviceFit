@@ -1,15 +1,16 @@
-// axiosInstance.js
-import { BASE_URL } from '@/constants/constant';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
 // Create an Axios instance
-const api = axios.create({
-  baseURL: BASE_URL,
+const apiClient = axios.create({
+  headers: {
+    "Cache-Control": "no-cache",
+  },
+  withCredentials: true
 });
 
 // Create an Axios interceptor for request
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
   (config) => {
     return config;
   },
@@ -19,7 +20,7 @@ api.interceptors.request.use(
 );
 
 // Create an Axios interceptor for response
-api.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -32,4 +33,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default apiClient;
