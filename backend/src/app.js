@@ -15,6 +15,7 @@ const expensesRoutes = require("./routes/expenseRoutes");
 const subscriptionsRoutes = require("./routes/subscriptionsRoutes");
 const adminRightsRoutes = require("./routes/adminRightsRoutes");
 const bulkMessageRoutes = require("./routes/bulkMessageRoutes");
+const emailRoutes = require('./routes/emailRoutes');
 const templateRoutes = require("./routes/templateRoutes"); 
 
 const app = express();
@@ -46,6 +47,7 @@ app.use("/expenses", expensesRoutes);
 app.use("/subscriptions", subscriptionsRoutes);
 app.use("/admin-rights", adminRightsRoutes);
 app.use("/messages", bulkMessageRoutes);
+app.use("/emails", emailRoutes);
 app.use("/templates" , templateRoutes)
 
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const BulkMessageSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', },
     center: { type: mongoose.Schema.Types.ObjectId, ref: 'Center', required: true },
     recipients: [{ type: String, enum: ['visitors', 'members', 'employees', 'liveMember', 'nonLiveMember'], required: true }],
     messageType: { type: String, enum: ['SMS', 'WhatsApp'], required: true },
