@@ -5,7 +5,7 @@ import { columns } from "./coulmns";
 const PaymentsTable = ({
   adviceFitPayments,
 }: {
-  adviceFitPayments: MembersParams[];
+  adviceFitPayments: PaymentsParams[];
 }) => {
   return (
     <div className="container mx-auto py-10">

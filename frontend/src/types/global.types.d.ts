@@ -114,6 +114,23 @@ type SubscriptionsDataParams = {
   subscriptions: SubscriptionsParams[];
 };
 
+type PaymentsParams = {
+  _id: string;
+  memberId: MembersParams;
+  subscriptionId: SubscriptionsParams;
+  offerAmount: number;
+  paidAmount: number;
+  dueAmount: number;
+  paymentDate: string;
+  paymentDueDate: string;
+  paymentMode: string;
+  comments: string;
+};
+
+type PaymentsDataParams = {
+  payments: PaymentsParams[];
+};
+
 type EmployeeParams = {
   _id: string;
   name: string;

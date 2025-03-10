@@ -1,5 +1,6 @@
 const MemberService = require("../services/memberService");
 const SubscriptionService = require("../services/subscriptionsService");
+const PaymentService = require("../services/paymentsService");
 const nodemailer = require("nodemailer");
 const Role = require("../models/rolesModel");
 
@@ -70,7 +71,40 @@ exports.createMember = async (req, res) => {
         createdBy: userId,
         updatedBy: userId,
       };
-      await SubscriptionService.createSubscription(subscriptionData);
+      const newSubscription = await SubscriptionService.createSubscription(
+        subscriptionData
+      );
+
+      const {
+        offerAmount,
+        paidAmount,
+        paymentDate,
+        paymentDueDate,
+        paymentMode,
+        comments,
+      } = memberData?.subscription || {};
+
+      const dueAmount = Math.max(offerAmount - paidAmount, 0);
+
+      const paymentData = {
+        offerAmount,
+        paidAmount,
+        dueAmount,
+        paymentDate,
+        paymentDueDate,
+        paymentMode,
+        comments,
+        memberId: newMember?._id,
+        subscriptionId: newSubscription?._id,
+        createdBy: userId,
+        updatedBy: userId,
+      };
+      const newPayment = await PaymentService.createPayment(paymentData);
+      await SubscriptionService.updateSubscription(
+        userId,
+        newSubscription?._id,
+        { payments: [newPayment?._id] }
+      );
     }
     await this.sendConfirmationEmail(
       newMember?.email,

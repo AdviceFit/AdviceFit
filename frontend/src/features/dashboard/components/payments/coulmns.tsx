@@ -8,33 +8,33 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString();
 };
 
-const columns: ColumnDef<MembersParams>[] = [
+const columns: ColumnDef<PaymentsParams>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => {
+      return <span>{row.original.memberId.name || ""}</span>;
+    },
   },
   {
     accessorKey: "paidAmount",
     header: "Amount",
     cell: ({ row }) => {
-      return <span>{row.original.subscriptionDetails.paidAmount || 0}</span>;
+      return <span>{row.original.paidAmount || 0}</span>;
     },
   },
   {
     accessorKey: "dueAmount",
     header: "Due Amount",
     cell: ({ row }) => {
-      const offerAmount = row.original.subscriptionDetails?.offerAmount || 0;
-      const paidAmount = row.original.subscriptionDetails?.paidAmount || 0;
-      const dueAmount = offerAmount - paidAmount;
-      return <span>{dueAmount}</span>;
+      return <span>{row.original.dueAmount || 0}</span>;
     },
   },
   {
     accessorKey: "gymName",
     header: "Gym Name",
     cell: ({ row }) => {
-      const coupon = row.original.center.name || "";
+      const coupon = row.original.memberId.center.name || "";
       return <span>{coupon}</span>;
     },
   },
@@ -42,33 +42,28 @@ const columns: ColumnDef<MembersParams>[] = [
     accessorKey: "paymentDate",
     header: "Payment Date",
     cell: ({ row }) => {
-      return (
-        <span>
-          {formatDate(row.original.subscriptionDetails.paymentDate) || ""}
-        </span>
-      );
+      return <span>{formatDate(row.original.paymentDate) || ""}</span>;
     },
   },
   {
     accessorKey: "collectedBy",
     header: "Collected By",
     cell: ({ row }) => {
-      return <span>{row.original.name || ""}</span>;
+      return <span>{row.original.memberId.name || ""}</span>;
     },
   },
   {
     accessorKey: "paymentMode",
     header: "Payment Mode",
     cell: ({ row }) => {
-      return <span>{row.original.subscriptionDetails.paymentMode || ""}</span>;
+      return <span>{row.original.paymentMode || ""}</span>;
     },
   },
   {
     accessorKey: "comments",
     header: "Comments",
     cell: ({ row }) => {
-      const comments =
-        row.original.subscriptionDetails.comments || "No comments";
+      const comments = row.original.comments || "No comments";
       return <span>{comments}</span>;
     },
   },
@@ -76,7 +71,7 @@ const columns: ColumnDef<MembersParams>[] = [
     accessorKey: "action",
     header: "Action",
     cell: ({ row }) => {
-      const id = row.original.subscriptionDetails._id;
+      const id = row.original._id;
       return <PaymentActionDropdown id={id} />;
     },
   },

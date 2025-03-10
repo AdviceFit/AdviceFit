@@ -8,6 +8,12 @@ const subscriptionSchema = new Schema(
       ref: "Member",
       required: true,
     },
+    payments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Payment",
+      },
+    ],
     package: {
       type: String,
       required: true,

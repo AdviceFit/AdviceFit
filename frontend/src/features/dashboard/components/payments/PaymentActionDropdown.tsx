@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { deleteSubscription } from "../../actions/subscriptions.action";
+import { deletePayment } from "../../actions/payments.action";
 
 const PaymentActionDropdown = ({ id }: { id: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -19,11 +19,11 @@ const PaymentActionDropdown = ({ id }: { id: string }) => {
   const handleDelete = async (e: React.MouseEvent) => {
     setIsDeleting(true);
     try {
-      await deleteSubscription(id);
-      toast.success("Subscription deleted successfully!");
-      router.push("/dashboard/subscriptions");
+      await deletePayment(id);
+      toast.success("Payment deleted successfully!");
+      router.push("/dashboard/payments");
     } catch (error) {
-      toast.error("Failed to delete subscription.");
+      toast.error("Failed to delete payment.");
     } finally {
       setIsDeleting(false);
     }
@@ -40,8 +40,7 @@ const PaymentActionDropdown = ({ id }: { id: string }) => {
             <Button
               variant="ghost"
               onClick={handleDelete}
-              // disabled={isDeleting}
-              disabled
+              disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
