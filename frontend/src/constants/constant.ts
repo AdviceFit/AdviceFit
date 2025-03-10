@@ -48,3 +48,31 @@ export const PAYMENT_METHODS = [
   "Bank Transfer",
   "UPI",
 ];
+
+export const REPORT_TYPES = [
+  { label: "Membership Report", value: "membership_report" },
+  { label: "Member Report", value: "member_report" },
+  { label: "Expired Membership Report", value: "expired_membership_report" },
+  { label: "Payment Due Report", value: "payment_due_report" },
+  { label: "Birthday Report", value: "birthday_report" },
+  { label: "Anniversary Report", value: "anniversary_report" },
+  { label: "Expense Report", value: "expense_report" },
+  { label: "Collection Report", value: "collection_report" },
+  { label: "Visitor Report", value: "visitor_report" },
+  { label: "Renewal Report", value: "renewal_report" },
+  { label: "Employee Attendance Report", value: "employee_attendance_report" },
+  { label: "Invoice Report", value: "invoice_report" },
+  { label: "Package Report", value: "package_report" },
+  { label: "Receipt Report", value: "receipt_report" },
+];
+
+export const REPORT_FORMATS = [
+  {
+    label: "PDF",
+    value: "pdf",
+  },
+  {
+    label: "Excel",
+    value: "excel",
+  },
+];
