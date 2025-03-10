@@ -2,7 +2,7 @@ const EmailService = require('../services/emailService');
 
 exports.sendEmail = async (req, res) => {
     try {
-        const userId = req.user._id;
+        const userId = '678beef0718b36bd16f495b2'
         const { center, to, message } = req.body;
         console.log(req.body)
         if (!center || !to || to.length === 0 || !message) {

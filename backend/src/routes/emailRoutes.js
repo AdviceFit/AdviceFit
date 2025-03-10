@@ -3,7 +3,9 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const emailController = require('../controllers/emailController');
 
-router.post('/', authMiddleware.authenticate, emailController.sendEmail);
-router.get('/', authMiddleware.authenticate, emailController.getEmails);
+
+//add-JWT for auth  (remove temporaryly)
+router.post('/', emailController.sendEmail);
+router.get('/', emailController.getEmails);
 
 module.exports = router;
