@@ -28,13 +28,17 @@ exports.findPaymentById = async (id) => {
   return await Payment.findOne({
     _id: id,
     isDeleted: false,
-  }).populate({
-    path: "memberId",
-    populate: {
-      path: "center",
-      select: "_id name",
-    },
-  });
+  })
+    .populate({
+      path: "memberId",
+      populate: {
+        path: "center",
+        select: "_id name",
+      },
+    })
+    .populate({
+      path: "subscriptionId",
+    });
 };
 
 // Update a payment by ID

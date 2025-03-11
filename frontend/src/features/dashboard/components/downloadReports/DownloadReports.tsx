@@ -24,7 +24,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { getReport } from "../../actions/report.action";
+import { downloadReport } from "../../actions/reports.action";
 
 type Props = {
   centers: CenterParams[];
@@ -67,11 +67,38 @@ const DownloadReports = (props: Props) => {
     },
   });
 
+  const handleFileDownload = (
+    blob: Blob,
+    payload: Record<string, string | unknown>
+  ) => {
+    const fileType =
+      payload.format === "pdf"
+        ? "application/pdf"
+        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+    const fileBlob = new Blob([blob], { type: fileType });
+    const fileLink = document.createElement("a");
+    const fileURL = window.URL.createObjectURL(fileBlob);
+
+    fileLink.href = fileURL;
+    fileLink.setAttribute(
+      "download",
+      `${payload.reportName}.${payload.format === "pdf" ? "pdf" : "xlsx"}`
+    );
+    document.body.appendChild(fileLink);
+    fileLink.click();
+    fileLink.remove();
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    await getReport(values);
-    setIsLoading(false);
-    console.log(values);
+    try {
+      setIsLoading(true);
+      const response = await downloadReport(values);
+      handleFileDownload(response, values);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
