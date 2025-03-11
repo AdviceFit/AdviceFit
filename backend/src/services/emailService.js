@@ -1,80 +1,87 @@
+const nodemailer = require('nodemailer');
 const Email = require('../models/emailModel');
 const Visitor = require('../models/visitorModel');
 const Member = require('../models/memberModel');
 const Employee = require('../models/employeeModel');
-const nodemailer = require('nodemailer');
 
 exports.processEmail = async (userId, center, to, message) => {
     try {
         if (!to || to.length === 0) {
-            return { status: 400, data: { message: 'No recipients provided' } };
+            return { status: 400, data: { message: 'No recipient categories provided' } };
         }
 
         let recipientEmails = [];
-
+        
         // Fetch recipients based on selected categories
         if (to.includes("Visitor")) {
             const visitors = await Visitor.find({ visiting_center: center, isDeleted: false }, 'email');
             recipientEmails.push(...visitors.map(v => v.email));
         }
-
         if (to.includes('Members')) {
             const members = await Member.find({ center, isDeleted: false }, 'email');
             recipientEmails.push(...members.map(m => m.email));
         }
-
         if (to.includes('Employees')) {
             const employees = await Employee.find({ center, isDeleted: false }, 'email');
             recipientEmails.push(...employees.map(e => e.email));
         }
 
+        // Remove duplicates & filter invalid emails
+        recipientEmails = [...new Set(recipientEmails)].filter(email => email && email.includes('@'));
+        
         if (recipientEmails.length === 0) {
-            return { status: 400, data: { message: 'No recipients found' } };
+            return { status: 400, data: { message: 'No valid recipients found' } };
         }
 
+        // Setup Email Transporter
         const transporter = nodemailer.createTransport({
-            service: 'gmail', 
+            service: 'gmail',
             auth: {
-                user: process.env.EMAIL_USER, 
-                pass: process.env.EMAIL_PASS  
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
         let successEmails = [];
         let failedEmails = [];
 
-        // Send emails one by one
-        for (const email of recipientEmails) {
-            try {
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: email,
-                    subject: "📢 Quick Update from Advice Fit",
-                    text: message
-                };
+        // Attempt BCC Bulk Send
+        try {
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                bcc: recipientEmails,
+                subject: "📢 Quick Update from Advice Fit",
+                text: message
+            });
+            successEmails = recipientEmails;
+        } catch (bulkError) {
+            console.error('⚠ Bulk email sending failed:', bulkError.message);
 
-                let sendResult = await transporter.sendMail(mailOptions);
-                
-                if (sendResult.accepted.includes(email)) {
+            for (let email of recipientEmails) {
+                try {
+                    await transporter.sendMail({
+                        from: process.env.EMAIL_USER,
+                        to: email,
+                        subject: "📢 Quick Update from Advice Fit",
+                        text: message
+                    });
                     successEmails.push(email);
-                } else {
-                    failedEmails.push({ email, reason: "Undeliverable" });
+                } catch (individualError) {
+                    console.error(`Failed to send email to ${email}:`, individualError.message);
+                    failedEmails.push({ email, reason: individualError.message });
                 }
-            } catch (error) {
-                console.error(`Failed to send email to ${email}:`, error.message);
-                failedEmails.push({ email, reason: error.message });
             }
         }
 
-        // Determine final status
+        // Determine final email status
         let finalStatus = successEmails.length === recipientEmails.length
             ? 'Sent'
             : successEmails.length > 0
             ? 'Partial Success'
             : 'Failed';
 
-        // Store email in DB
-        let emailRecord = new Email({
+        // Store email record in DB
+        await new Email({
             userId,
             center,
             to,
@@ -83,9 +90,7 @@ exports.processEmail = async (userId, center, to, message) => {
             failedRecipients: failedEmails,
             status: finalStatus,
             sentAt: successEmails.length > 0 ? new Date() : null
-        });
-
-        await emailRecord.save();
+        }).save();
 
         return {
             status: 200,
@@ -97,10 +102,11 @@ exports.processEmail = async (userId, center, to, message) => {
             }
         };
     } catch (error) {
-        console.error('Error processing bulk email:', error);
-        return { status: 500, data: { message: 'Internal server error' } };
+        console.error(' Error processing bulk email:', error.message);
+        return { status: 500, data: { message: 'Internal server error', error: error.message } };
     }
 };
+
 
 
 
