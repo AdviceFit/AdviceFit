@@ -12,7 +12,7 @@ const CentersHeader = () => {
   return (
     <Dialog>
     <DialogTrigger asChild>
-      <Button variant="default">Add Center</Button>
+      <Button variant="default" className="w-28">Add Center</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
       <DialogHeader>

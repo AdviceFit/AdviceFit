@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const HomepageRoute = () => {
     return (
@@ -7,12 +8,14 @@ const HomepageRoute = () => {
                 <h1>Welcome to AdviceFit</h1>
                 <p>Your personal guide to fitness and self-improvement.</p>
                 <div className="space-x-4 mt-2 text-blue-600">
-                    <Button variant="outline">Get Started</Button>
+                    <Link href="/dashboard/attendance">
+                        <Button variant="outline">Get Started</Button>
+                    </Link>
                     <Button variant="outline">Learn More</Button>
                 </div>
             </section>
         </main>
-    )
-}
+    );
+};
 
-export default HomepageRoute
+export default HomepageRoute;

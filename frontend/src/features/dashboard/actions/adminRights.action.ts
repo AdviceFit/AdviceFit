@@ -7,9 +7,6 @@ export const updateAdminRights = async (adminRightsData: any) => {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("authToken");
-
-    console.log(adminRightsData);
-
     const response = await fetch(`${BASE_URL}/admin-rights`, {
       method: "POST",
       headers: {

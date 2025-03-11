@@ -21,7 +21,7 @@ exports.sendEmail = async (req, res) => {
 exports.getEmails = async (req, res) => {
     try {
         const emails = await EmailService.getEmails();
-        res.status(200).json({ emails });
+        res.status(200).json({ messagesHistory:emails} );
     } catch (error) {
         res.status(500).json({ message: "Error fetching email history", error: error.message });
     }

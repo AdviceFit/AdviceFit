@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getCenters } from "../../actions/centers.action";
 import { toast } from "sonner";
+import { sendEmail } from "../../actions/email.action";
 
 const formSchema = z.object({
     center: z.string().min(1, "Center is required"),
@@ -17,7 +18,7 @@ const formSchema = z.object({
     message: z.string().optional(),
 });
 
-const recipientOptions = ["Employees", "Visitor", "Members", "Live Members", "Non Live Members"];
+const recipientOptions = ["Employees", "Visitor", "Members"];
 
 const SendEmailForm = () => {
     const [centers, setCenters] = useState<CenterParams[]>([]);
@@ -42,15 +43,30 @@ const SendEmailForm = () => {
     }, []);
 
     const toggleRecipient = (recipient: string) => {
-        setSelectedRecipients((prev) =>
-            prev.includes(recipient) ? prev.filter((r) => r !== recipient) : [...prev, recipient]
-        );
-        form.setValue("to", selectedRecipients);
+        setSelectedRecipients((prev) => {
+            const updatedRecipients = prev.includes(recipient)
+                ? prev.filter((r) => r !== recipient)
+                : [...prev, recipient];
+
+            form.setValue("to", updatedRecipients); // Update the form value
+            return updatedRecipients;
+        });
     };
 
-    const onSubmit = (values: any) => {
-        console.log("Form Submitted:", values);
-        toast.success("Email Sent Successfully!");
+
+    const onSubmit = async (values: any) => {
+        try {
+            const response = await sendEmail(values);
+            if (response.error) {
+                toast.error(response.error);
+            } else {
+                toast.success("Email Sent Successfully!");
+                form.reset();
+                setSelectedRecipients([]);
+            }
+        } catch (error) {
+            toast.error("Failed to send email.");
+        }
     };
     return (
         <Form {...form}>
@@ -101,13 +117,7 @@ const SendEmailForm = () => {
                                         <Select>
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue
-                                                        placeholder={
-                                                            selectedRecipients.length > 0
-                                                                ? selectedRecipients.join(", ")
-                                                                : "Select Recipients"
-                                                        }
-                                                    />
+                                                    <SelectValue placeholder={selectedRecipients.length > 0 ? selectedRecipients.join(", ") : "Select Recipients"} />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className="w-64">
@@ -132,23 +142,23 @@ const SendEmailForm = () => {
                             />
                         )}
                     </div>
-                    </div>
-                    {/* Email Body */}
-                    <div className="col-span-12">
-                        <FormField
-                            control={form.control}
-                            name="message"
-                            render={({ field }) => (
-                                <FormItem className="col-span-2">
-                                    <FormLabel>Message</FormLabel>
-                                    <FormControl>
-                                        <Textarea placeholder="Enter your email message..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
+                </div>
+                {/* Email Body */}
+                <div className="col-span-12">
+                    <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                            <FormItem className="col-span-2">
+                                <FormLabel>Message</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="Enter your email message..." {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
                 {/* Submit Button */}
                 <Button type="submit" className="w-24">
                     Send Email

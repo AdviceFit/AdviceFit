@@ -45,19 +45,6 @@ const DashboardNavbar: React.FC = () => {
           </span>
         </Link>
 
-        {/* Center: Navigation Links */}
-        <div className="hidden md:flex space-x-6">
-          {["Home", "About", "Services", "Pricing", "Contact"].map((item, index) => (
-            <Link
-              key={index}
-              href={`/${item.toLowerCase()}`}
-              className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition"
-            >
-              {item}
-            </Link>
-          ))}
-        </div>
-
         {/* Right: User Menu */}
         <div className="flex items-center space-x-3">
           {/* Dropdown Menu */}

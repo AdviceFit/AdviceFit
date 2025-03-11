@@ -1,15 +1,29 @@
-import DashboardNavbar from "@/features/dashboard/components/DashboardNavbar"
+import DashboardNavbar from "@/features/dashboard/components/DashboardNavbar";
 
-const DashboardLayout = ({ elements, sidebar }: { elements: React.ReactNode, sidebar: React.ReactNode }) => {
+const DashboardLayout = ({
+  elements,
+  sidebar,
+}: {
+  elements: React.ReactNode;
+  sidebar: React.ReactNode;
+}) => {
   return (
-    <main className="h-screen">
+    <main className="h-screen flex flex-col max-w-[1920px] mx-auto">
+      {/* Navbar */}
       <DashboardNavbar />
-      <div className="h-[calc(100vh-4rem)] grid grid-cols-12">
-        <section className="col-span-2">{sidebar}</section>
-        <section className="col-span-10 p-6 flex flex-col justify-start items-start">{elements}</section>
+
+      {/* Main Layout */}
+      <div className="h-[calc(100vh-4rem)] grid grid-cols-12 overflow-hidden">
+        {/* Sidebar with independent scrolling */}
+        <section className="col-span-2 h-full overflow-y-auto border-r">{sidebar}</section>
+
+        {/* Content area with independent scrolling */}
+        <section className="col-span-10 h-full overflow-y-auto p-6 flex flex-col">
+          {elements}
+        </section>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;

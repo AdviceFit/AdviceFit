@@ -35,7 +35,7 @@ const MembersHeader = ({
       <Dialog open={openState} onOpenChange={handleClose}>
         <Button
           variant="default"
-          className="relative left-4"
+          className="relative left-4 w-28" 
           onClick={() => setOpenState(true)}
         >
           Add members

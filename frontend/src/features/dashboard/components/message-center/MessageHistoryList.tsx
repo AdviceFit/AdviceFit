@@ -6,15 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const MessageHistoryList = ({ messages }: { messages: any[] }) => {
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Message History</h2>
-      {messages.length === 0 ? (
-        <p>No messages found.</p>
+      <h2 className="text-xl font-semibold">Email History</h2>
+      {messages?.length === 0 ? (
+        <p>No email history found.</p>
       ) : (
-        messages.map((msg) => (
+        messages?.map((msg) => (
           <Card key={msg._id} className="border rounded-lg shadow-sm p-4">
             <CardHeader>
               <CardTitle className="text-lg">
-                Sent by: <span className="font-medium">{msg.userId.gym_owner_name }</span>
+                Sent by: <span className="font-medium">{msg.userId.email}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -22,15 +22,10 @@ const MessageHistoryList = ({ messages }: { messages: any[] }) => {
                 <strong>Center:</strong> {msg.center.name}
               </p>
               <p>
-                <strong>Recipients:</strong> {msg.recipients.join(", ")}
+                <strong>Recipients:</strong> {msg.to.join(", ")}
               </p>
               <p>
-                <strong>Message Type:</strong>{" "}
-                <Badge variant="outline">{msg.messageType}</Badge>
-              </p>
-              <p>
-                <strong>Category:</strong>{" "}
-                <Badge variant="secondary">{msg.messageCategory}</Badge>
+                <strong>Sent To:</strong> {msg.sentTo.join(", ")}
               </p>
               <p className="mt-2">
                 <strong>Message:</strong> {msg.message}
@@ -48,7 +43,7 @@ const MessageHistoryList = ({ messages }: { messages: any[] }) => {
                 </Badge>
               </p>
               <p className="text-xs text-gray-500 mt-2">
-                Sent on: {new Date(msg.createdAt).toLocaleString()}
+                Sent on: {new Date(msg.sentAt).toLocaleString()}
               </p>
             </CardContent>
           </Card>

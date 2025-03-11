@@ -12,7 +12,7 @@ const AttendanceHeader = () => {
   return (
     <Dialog>
     <DialogTrigger asChild>
-      <Button variant="default">Add Attendance</Button>
+      <Button className="w-32" variant="default">Add Attendance</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
       <DialogHeader>

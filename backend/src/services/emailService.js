@@ -11,7 +11,7 @@ exports.processEmail = async (userId, center, to, message) => {
         }
 
         let recipientEmails = [];
-        
+
         // Fetch recipients based on selected categories
         if (to.includes("Visitor")) {
             const visitors = await Visitor.find({ visiting_center: center, isDeleted: false }, 'email');
@@ -28,11 +28,11 @@ exports.processEmail = async (userId, center, to, message) => {
 
         // Remove duplicates & filter invalid emails
         recipientEmails = [...new Set(recipientEmails)].filter(email => email && email.includes('@'));
-        
+
         if (recipientEmails.length === 0) {
             return { status: 400, data: { message: 'No valid recipients found' } };
         }
-
+        // console.log('recipientEmails', recipientEmails)
         // Setup Email Transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -57,28 +57,30 @@ exports.processEmail = async (userId, center, to, message) => {
         } catch (bulkError) {
             console.error('⚠ Bulk email sending failed:', bulkError.message);
 
-            for (let email of recipientEmails) {
-                try {
-                    await transporter.sendMail({
-                        from: process.env.EMAIL_USER,
-                        to: email,
-                        subject: "📢 Quick Update from Advice Fit",
-                        text: message
-                    });
-                    successEmails.push(email);
-                } catch (individualError) {
-                    console.error(`Failed to send email to ${email}:`, individualError.message);
-                    failedEmails.push({ email, reason: individualError.message });
-                }
-            }
+
+            // TO-DO for Error handling
+            // for (let email of recipientEmails) {
+            //     try {
+            //         await transporter.sendMail({
+            //             from: process.env.EMAIL_USER,
+            //             to: email,
+            //             subject: "📢 Quick Update from Advice Fit",
+            //             text: message
+            //         });
+            //         successEmails.push(email);
+            //     } catch (individualError) {
+            //         console.error(`Failed to send email to ${email}:`, individualError.message);
+            //         failedEmails.push({ email, reason: individualError.message });
+            //     }
+            // }
         }
 
         // Determine final email status
         let finalStatus = successEmails.length === recipientEmails.length
             ? 'Sent'
             : successEmails.length > 0
-            ? 'Partial Success'
-            : 'Failed';
+                ? 'Partial Success'
+                : 'Failed';
 
         // Store email record in DB
         await new Email({

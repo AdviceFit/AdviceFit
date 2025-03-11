@@ -50,7 +50,7 @@ app.use("/subscriptions", subscriptionsRoutes);
 app.use("/payments", paymentsRoutes);
 app.use("/admin-rights", adminRightsRoutes);
 app.use("/messages", bulkMessageRoutes);
-app.use("/emails", emailRoutes);
+app.use("/email", emailRoutes);
 app.use("/templates", templateRoutes);
 app.use("/reports", reportRoutes);
 
