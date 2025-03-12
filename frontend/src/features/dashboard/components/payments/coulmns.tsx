@@ -34,7 +34,7 @@ const columns: ColumnDef<PaymentsParams>[] = [
     accessorKey: "gymName",
     header: "Gym Name",
     cell: ({ row }) => {
-      const coupon = row.original.memberId.center.name || "";
+      const coupon = (row.original.memberId.center as EmployeeCenter).name || "";
       return <span>{coupon}</span>;
     },
   },

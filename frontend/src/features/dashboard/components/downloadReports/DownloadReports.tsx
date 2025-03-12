@@ -17,7 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { REPORT_FORMATS, REPORT_TYPES } from "@/constants/constant";
-import { cn } from "@/lib/utils";
+import { cn, handleFileDownload } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
 import React from "react";
@@ -67,35 +67,11 @@ const DownloadReports = (props: Props) => {
     },
   });
 
-  const handleFileDownload = (
-    blob: Blob,
-    payload: Record<string, string | unknown>
-  ) => {
-    const fileType =
-      payload.format === "pdf"
-        ? "application/pdf"
-        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-
-    const fileBlob = new Blob([blob], { type: fileType });
-    const fileLink = document.createElement("a");
-    const fileURL = window.URL.createObjectURL(fileBlob);
-
-    fileLink.href = fileURL;
-    fileLink.setAttribute(
-      "download",
-      `${payload.reportName}.${payload.format === "pdf" ? "pdf" : "xlsx"}`
-    );
-    document.body.appendChild(fileLink);
-    fileLink.click();
-    fileLink.remove();
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
       const response = await downloadReport(values);
       handleFileDownload(response, values);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +133,7 @@ const DownloadReports = (props: Props) => {
           label="Center"
           fieldName={"center"}
           form={form}
-          options={props.centers.map((center) => ({
+          options={props.centers?.map((center) => ({
             label: center.name,
             value: center.name,
           }))}

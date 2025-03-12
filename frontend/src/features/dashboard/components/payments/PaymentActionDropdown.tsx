@@ -11,22 +11,33 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { deletePayment } from "../../actions/payments.action";
+import { handleFileDownload } from "@/lib/utils";
+import { getInvoice } from "../../actions/report.action";
 
 const PaymentActionDropdown = ({ id }: { id: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+
   const router = useRouter();
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDelete = async () => {
     setIsDeleting(true);
     try {
       await deletePayment(id);
       toast.success("Payment deleted successfully!");
       router.push("/dashboard/payments");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete payment.");
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleDownloadInvoice = async () => {
+    const response = await getInvoice();
+    handleFileDownload(response, {
+      reportName: "Payment Invoice",
+      format: "pdf",
+    });
   };
 
   return (
@@ -43,6 +54,11 @@ const PaymentActionDropdown = ({ id }: { id: string }) => {
               disabled={isDeleting}
             >
               {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Button variant="ghost" onClick={handleDownloadInvoice}>
+              Download Invoice
             </Button>
           </DropdownMenuItem>
         </DropdownMenuGroup>

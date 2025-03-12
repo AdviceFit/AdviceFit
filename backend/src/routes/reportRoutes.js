@@ -10,4 +10,9 @@ router.post(
   ReportController.getReport
 );
 
+router.get("/get-invoice", 
+  authMiddleware.authenticate,
+  ReportController.getInvoice
+)
+
 module.exports = router;

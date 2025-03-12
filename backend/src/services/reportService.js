@@ -1,6 +1,8 @@
+const { getInvoiceHTML } = require("../utils/invoice");
 const { generatePDF } = require("./../utils/generatePdf");
 const { generateExcel } = require("./../utils/generateXlsx");
 const { findPaymentById } = require("./paymentsService");
+const puppeteer = require("puppeteer");
 
 const generateReport = async (req, res) => {
   const { reportName, format } = req.body;  
@@ -186,4 +188,34 @@ const getReportData = async (reportName) => {
   }
 };
 
-module.exports = { generateReport };
+const getInvoice = async (_req, res) => {
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    const sampleHtml = getInvoiceHTML()
+    // Set the HTML content
+    await page.setContent(sampleHtml, { waitUntil: "domcontentloaded" });
+
+    // Generate the PDF as a Buffer
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    // Set response headers explicitly for PDF
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"'); // Change 'inline' to 'attachment' for download
+    res.setHeader("Content-Length", pdfBuffer.length);
+
+    // Send the PDF buffer as the response
+    res.end(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).send("An error occurred while generating the PDF.");
+  }
+}
+
+module.exports = { generateReport , getInvoice };
