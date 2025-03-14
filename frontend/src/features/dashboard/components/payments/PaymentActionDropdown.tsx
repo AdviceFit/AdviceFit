@@ -61,6 +61,11 @@ const PaymentActionDropdown = ({ id }: { id: string }) => {
               Download Invoice
             </Button>
           </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Button variant="ghost" onClick={handleDownloadInvoice}>
+              Download Receipt
+            </Button>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

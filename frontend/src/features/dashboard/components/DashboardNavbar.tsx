@@ -3,12 +3,17 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
-import { Popover, PopoverTrigger, PopoverContent } from "../../../components/ui/popover";
-import LogoIcon from "../../../../public/favicon-32x32.png";
+import { useRouter } from "next/navigation";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "../../../components/ui/popover";
+import LogoIcon from "../../../../public/af-logo.jpg";
 import { toast } from "sonner";
 import { useLocalStorageHook } from "@/hooks/useLocalStorageHook";
 import { BASE_URL } from "@/constants/constant";
+import { CircleUser } from "lucide-react";
 
 const DashboardNavbar: React.FC = () => {
   const router = useRouter();
@@ -25,22 +30,25 @@ const DashboardNavbar: React.FC = () => {
       credentials: "include",
     });
 
-    if(!response.ok) {
+    if (!response.ok) {
       toast.error("Failed to logout!");
-      return
+      return;
     }
 
     localStorageHook.clearLocalStorage();
-    router.push('/sign-in');
+    router.push("/sign-in");
     toast.success("Logout successful!");
   };
   return (
     <nav className="bg-white dark:bg-gray-900 h-16 shadow-md border-b border-gray-200 z-10">
       <div className="mx-auto flex items-center justify-between p-4">
         {/* Left: Logo */}
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Image src={LogoIcon} alt="AdviceFit Logo" width={32} height={32} />
-          <span className="text-2xl font-semibold text-gray-900 dark:text-white">
+        <Link
+          href="/"
+          className="flex items-center space-x-1 rtl:space-x-reverse"
+        >
+          <Image src={LogoIcon} alt="AdviceFit Logo" className="w-8 h-8" />
+          <span className="text-xl font-semibold text-gray-900 dark:text-white font-mono">
             AdviceFit
           </span>
         </Link>
@@ -52,25 +60,19 @@ const DashboardNavbar: React.FC = () => {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-300 hover:bg-gray-700 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600"
+                className="relative flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600"
               >
-                <Image
-                  src={LogoIcon} // Replace with the user's avatar
-                  alt="User Avatar"
-                  className="rounded-full"
-                  width={32}
-                  height={32}
-                />
+                <CircleUser height={32} width={32} />
                 <span className="sr-only">Open user menu</span>
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-48">
               <div className="p-4 border-b dark:border-gray-700">
                 <span className="block text-sm font-medium text-gray-800 dark:text-white">
-                   {userDetails?.gym_owner_name || ''}
+                  {userDetails?.gym_owner_name || ""}
                 </span>
                 <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                   {userDetails?.email || ''} 
+                  {userDetails?.email || ""}
                 </span>
               </div>
               <ul className="py-2 text-sm text-gray-700 dark:text-gray-300">
