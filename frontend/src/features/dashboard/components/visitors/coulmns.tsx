@@ -2,11 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import VisitorActionDropdown from "./VisitorActionDropdown";
-
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-};
+import { formatDate } from "@/lib/utils";
 
 const columns: ColumnDef<VisitorParams>[] = [
     {

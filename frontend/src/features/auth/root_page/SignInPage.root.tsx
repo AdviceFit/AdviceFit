@@ -66,6 +66,7 @@ export default function MyForm() {
       if (userData.user) {
         localStorage.setItem("user", JSON.stringify(userData.user));
       }
+      
       toast.success("Login successful!"); // Show success message
 
       if (userData.user.role.name === "Admin") {

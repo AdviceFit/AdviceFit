@@ -21,7 +21,6 @@ const getVisitor = async (): Promise<VisitorsDataParams> => {
 };
 
 const visitorsMain = async () => {
-
   const adviceFitVisitors = await getVisitor();
 
   return (

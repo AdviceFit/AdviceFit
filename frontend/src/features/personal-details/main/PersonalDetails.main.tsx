@@ -22,9 +22,6 @@ import PersonalDetailsSection from "../components/personal-details/PersonalDetai
 // };
 
 const PersonalDetails = () => {
-
-//   const adviceFitAttendance = await getAttendance();
-
   return (
     <div className="h-full w-full">
     <PersonalDetailsSection />

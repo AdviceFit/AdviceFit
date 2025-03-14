@@ -2,11 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import PaymentActionDropdown from "./PaymentActionDropdown";
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString();
-};
+import { formatDate } from "@/lib/utils";
 
 const columns: ColumnDef<PaymentsParams>[] = [
   {
@@ -42,7 +38,8 @@ const columns: ColumnDef<PaymentsParams>[] = [
     accessorKey: "paymentDate",
     header: "Payment Date",
     cell: ({ row }) => {
-      return <span>{formatDate(row.original.paymentDate) || ""}</span>;
+      const date = formatDate(row.original.paymentDate);
+      return <span>{date || ""}</span>;
     },
   },
   {

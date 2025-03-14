@@ -1,13 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import AttendanceActionDropdown from "./AttendanceActionDropdown";
+import { formatDateTime } from "@/lib/utils";
 
-const formatDateTime = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString();
-};
-
-  const columns: ColumnDef<any>[] = [
-
+const columns: ColumnDef<any>[] = [
   {
     accessorKey: "member.name",
     header: "Member",
@@ -34,7 +29,7 @@ const formatDateTime = (dateString: string) => {
     header: "Actions",
     cell: ({ row }) => {
       const id = row.original._id;
-      return <AttendanceActionDropdown id={id}  />;
+      return <AttendanceActionDropdown id={id} />;
     },
   },
 ];

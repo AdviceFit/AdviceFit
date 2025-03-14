@@ -1,17 +1,25 @@
-import axios from 'axios';
-import { NextResponse } from 'next/server';
+import axios from "axios";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 // Create an Axios instance
 const apiClient = axios.create({
   headers: {
     "Cache-Control": "no-cache",
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 // Create an Axios interceptor for request
 apiClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("authToken");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token?.value}`;
+    }
+
     return config;
   },
   (error) => {
@@ -25,8 +33,12 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (error.response && error.response.status === 401 && error.response.data.message === 'Unauthorized') {
-      return NextResponse.redirect('/sign-in');
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      error.response.data.message === "Invalid token"
+    ) {
+      return redirect("/sign-in");
     }
 
     return Promise.reject(error);

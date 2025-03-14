@@ -21,7 +21,6 @@ const getAttendance = async (): Promise<AttendanceDataParams> => {
 };
 
 const AttendanceMain = async () => {
-
   const adviceFitAttendance = await getAttendance();
 
   return (

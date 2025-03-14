@@ -6,7 +6,7 @@ const SignInRoute = () => {
       <div className='w-full'>
         <h2 className='mb-4'>Signin</h2>
         <SignInPage />
-      </div>
+      </div> 
     </section>
   )
 }

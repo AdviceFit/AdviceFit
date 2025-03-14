@@ -5,11 +5,7 @@ import MemberActionDropdown from "./MemberActionDropdown";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox"
-
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
+import { formatDate } from "@/lib/utils";
 
 const columns: ColumnDef<MembersParams>[] = [
     {

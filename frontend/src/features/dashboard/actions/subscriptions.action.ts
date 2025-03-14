@@ -19,6 +19,7 @@ export const getSubscriptions = async (): Promise<{
     },
     cache: "no-cache",
   });
+
   return res.json();
 };
 

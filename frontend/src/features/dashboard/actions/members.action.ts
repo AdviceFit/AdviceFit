@@ -1,84 +1,28 @@
 "use server";
 
 import { BASE_URL } from "@/constants/constant";
-import { cookies } from "next/headers";
+import apiClient from "@/lib/axios";
 
 const API_URL = `${BASE_URL}/members`;
 
 const addMembers = async (payload: unknown) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const response = await fetch(`${API_URL}`, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-  });
-
-  if (!response.ok) {
-    return { error: (await response.json())?.error ?? "Failed to add member" };
-  }
-
-  return response.json();
+  const response = await apiClient.post(API_URL, payload);
+  return response.data;
 };
 
-const editMember = async (id : string , payload: unknown) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-  });
-
-  if (!response.ok) {
-    return { error: (await response.json())?.error ?? "Failed to add member" };
-  }
-
-  return response.json();
+const editMember = async (id: string, payload: unknown) => {
+  const response = await apiClient.patch(`${API_URL}/${id}`, payload);
+  return response.data;
 };
-
 
 const deleteMembers = async (id: string) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete member");
-  }
-
-  return response.json();
+  const response = await apiClient.delete(`${API_URL}/${id}`);
+  return response.data;
 };
 
 const getAllMembers = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
-  const res = await fetch(API_URL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-    cache: "no-cache",
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch members");
-  }
-
-  return res.json();
+  const res = await apiClient.get(`${API_URL}`);
+  return res.data;
 };
 
-export { deleteMembers, getAllMembers, addMembers , editMember };
+export { deleteMembers, getAllMembers, addMembers, editMember };

@@ -68,9 +68,9 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.generateTokens = async function (role , refresh) {
   const accessToken = jwt.sign(
-    { id: this._id, email: this.email, role, expires: "5h" },
+    { id: this._id, email: this.email, role, expires: "1h" },
     process.env.JWT_SECRET,
-    { expiresIn: "5h" }
+    { expiresIn: "1h" }
   );
 
   if (refresh) {

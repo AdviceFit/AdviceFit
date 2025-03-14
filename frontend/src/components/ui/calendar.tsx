@@ -43,6 +43,7 @@ function Calendar({
             : "[&:has([aria-selected])]:rounded-md"
         ),
         day: "text-center text-sm p-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-75 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-opacity-75 cursor-pointer",
+        selected : "bg-primary text-primary-foreground",
         // day: cn(
         //   buttonVariants({ variant: "ghost" }),
         //   "h-8 w-8 p-0 font-normal aria-selected:opacity-100"

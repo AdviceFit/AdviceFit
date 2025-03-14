@@ -266,7 +266,6 @@ const Sidebar: React.FC = () => {
                       isActive("/reports/payments") ? "text-blue-600" : ""
                     }`}
                   >
-                    {" "}
                     <div className="grid mr-4 place-items-center">
                       <svg
                         className="w-6 h-6 text-gray-800 dark:text-white"
@@ -295,7 +294,6 @@ const Sidebar: React.FC = () => {
                       isActive("/reports/follow-ups") ? "text-blue-600" : ""
                     }`}
                   >
-                    {" "}
                     <div className="grid mr-4 place-items-center">
                       <svg
                         className="w-6 h-6 text-gray-800 dark:text-white"
