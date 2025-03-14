@@ -1,12 +1,14 @@
-const getInvoiceHTML = () => {
+const { v4 } = require("uuid");
+const { numberToWords } = require("./common.utils");
+
+const getInvoiceHTML = (invoice) => {
   return `
     <!DOCTYPE html>
         <html>
         <head>
             <style>
-
 				body {
-					padding : 0px 40px
+					padding : 30px 40px
                 }
                 table, th, td, tr {
                     border: 1px solid black;
@@ -70,22 +72,52 @@ const getInvoiceHTML = () => {
             </tr>
             <tr>
                 <td colspan="2">
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
+                    <span class="block">Gym Name : ${
+                      invoice.memberId.center.name
+                    }</span>
+                    <span class="block">Contact No : ${
+                      invoice.memberId.mobile
+                    }</span>
+                    <span class="block">Email : ${invoice.memberId.email}</span>
+                    <span class="block">GST No : ${
+                      invoice.memberId.gst ?? ""
+                    }</span>
+                    <span class="block">Address : .memberId${
+                      invoice.memberId.address.addressLine1 +
+                      ", " +
+                      invoice.memberId.address.addressLine2 +
+                      ", " +
+                      invoice.memberId.address.city +
+                      ", " +
+                      invoice.memberId.address.pincode
+                    }</span>
                 </td>
             </tr>
             <tr>
-                <td>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
+                <td style="width: 50%;">
+                    <span class="block">Member Name: ${
+                      invoice.memberId.name
+                    }</span>
+                    <span class="block">Member Code: ${
+                      invoice.memberId.gym_member_code
+                    }</span>
+                    <span class="block">Mobile No. : ${
+                      invoice.memberId.mobile
+                    }</span>
+                    <span class="block">Email : ${invoice.memberId.email}</span>
+                    <span class="block">Address :  ${
+                      invoice.memberId.address.addressLine1 +
+                      ", " +
+                      invoice.memberId.address.addressLine2 +
+                      ", " +
+                      invoice.memberId.address.city +
+                      ", " +
+                      invoice.memberId.address.pincode
+                    }</span>
                 </td>
-                <td>
-                    <span class="block">Name</span>
-                    <span class="block">Name</span>
+                <td style="width: 50%;">
+                    <span class="block">Invoice No. : ${v4()}</span>
+                    <span class="block">Date : ${invoice.paymentDate}</span>
                 </td>
             </tr>
         </table>
@@ -97,35 +129,37 @@ const getInvoiceHTML = () => {
                     <td style="width: 20%;">Package Details</td>
                     <td style="width: 10%;">Price</td>
                     <td style="width: 10%;">Offer</td>
-                    <td style="width: 50%;">Amount</td>
+                    <td style="width: 50%;">Paid Amount </td>
                 </tr>
                 <tr>
-                    <td>Eve</td>
-                    <td>Jackson</td>
-                    <td>57</td>
-                    <td>43</td>
-                    <td>43</td>
+                    <td>1</td>
+                    <td>${invoice.subscriptionId.package}</td>
+                    <td>${invoice.offerAmount}</td>
+                    <td>${invoice.offerAmount}</td>
+                    <td>${invoice.paidAmount}</td>
                 </tr>
             </tbody>
         </table>
 
         <div class="grid-container highlight">
-            <div>In words five thousand only</div>
+            <div>In words ${numberToWords(invoice.paidAmount)} only</div>
             <div>
                 <table>
                     <tr>
                         <th class="inline-padding">Receive</th>
-                        <th class="inline-padding">5000 (UPI)</th>
+                        <th class="inline-padding">${
+                          invoice.subscriptionId.paidAmount
+                        } +  (${invoice.paymentMode})</th>
                     </tr>
                 </table>
             </div>
         </div>
 
         <div class="grid-container">
-            <div>Balance 0</div>
+            <div>Balance ${invoice.paidAmount}</div>
             <div>
-                <span class="block">New Gym</span>
-                <span class="block">8885956599</span>
+                <span class="block">${invoice.memberId.center.name}</span>
+                <span class="block">${invoice.memberId.mobile}</span>
                 <span class="block">Receiver</span>
             </div>
         </div>

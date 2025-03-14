@@ -29,11 +29,11 @@ export const getReport = async (
 };
 
 
-export const getInvoice = async () => { 
+export const getPaymentInvoice = async (id : string) => { 
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken");
 
-  const res = await fetch(API_URL + "/get-invoice", {
+  const res = await fetch(API_URL + "/get-invoice/" + id, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

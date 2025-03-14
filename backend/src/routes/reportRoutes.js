@@ -10,7 +10,7 @@ router.post(
   ReportController.getReport
 );
 
-router.get("/get-invoice", 
+router.get("/get-invoice/:id", 
   authMiddleware.authenticate,
   ReportController.getInvoice
 )

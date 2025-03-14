@@ -167,8 +167,6 @@ const getReportData = async (reportName) => {
         },
       ];
     case "invoice_report":
-      const invoices = await findPaymentById('67cf171d766e6bbf6c8221d2');
-      console.log(invoices);
       return [
         { id: 1, invoiceNumber: "INV001", amount: 500, date: "2023-01-15" },
         { id: 2, invoiceNumber: "INV002", amount: 300, date: "2023-01-20" },
@@ -188,12 +186,18 @@ const getReportData = async (reportName) => {
   }
 };
 
-const getInvoice = async (_req, res) => {
-  try {
+const getInvoice = async (req, res) => {
+  try {    
+    if(!req.params.id){
+      return res.status(404).json({ message: "Payment is missing." });
+    }
+
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
-    const sampleHtml = getInvoiceHTML()
+    const invoiceData = await findPaymentById(req.params.id);
+    
+    const sampleHtml = getInvoiceHTML(invoiceData)
     // Set the HTML content
     await page.setContent(sampleHtml, { waitUntil: "domcontentloaded" });
 

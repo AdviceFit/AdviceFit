@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { deletePayment } from "../../actions/payments.action";
 import { handleFileDownload } from "@/lib/utils";
-import { getInvoice } from "../../actions/report.action";
+import { getPaymentInvoice } from "../../actions/report.action";
 
 const PaymentActionDropdown = ({ id }: { id: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -33,7 +33,7 @@ const PaymentActionDropdown = ({ id }: { id: string }) => {
   };
 
   const handleDownloadInvoice = async () => {
-    const response = await getInvoice();
+    const response = await getPaymentInvoice(id);
     handleFileDownload(response, {
       reportName: "Payment Invoice",
       format: "pdf",
