@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { deletePayment } from "../../actions/payments.action";
 import { handleFileDownload } from "@/lib/utils";
-import { getPaymentInvoice } from "../../actions/report.action";
+import { getPaymentInvoice } from "../../actions/reports.action";
 
 const PaymentActionDropdown = ({ id }: { id: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);

@@ -24,7 +24,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { downloadReport } from "../../actions/reports.action";
+import {  getReport } from "../../actions/reports.action";
 
 type Props = {
   centers: CenterParams[];
@@ -70,7 +70,7 @@ const DownloadReports = (props: Props) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      const response = await downloadReport(values);
+      const response = await getReport(values);
       handleFileDownload(response, values);
     } finally {
       setIsLoading(false);

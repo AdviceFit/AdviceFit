@@ -12,8 +12,9 @@ import {
 import LogoIcon from "../../../../public/af-logo.jpg";
 import { toast } from "sonner";
 import { useLocalStorageHook } from "@/hooks/useLocalStorageHook";
-import { BASE_URL } from "@/constants/constant";
 import { CircleUser } from "lucide-react";
+import axios from "axios";
+import { BASE_URL } from "@/constants/constant";
 
 const DashboardNavbar: React.FC = () => {
   const router = useRouter();
@@ -22,19 +23,7 @@ const DashboardNavbar: React.FC = () => {
   const userDetails = localStorageHook.userDetails;
 
   const handleSignOut = async () => {
-    const response = await fetch(`${BASE_URL}/api/users/logout`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      toast.error("Failed to logout!");
-      return;
-    }
-
+    await axios.get(`${BASE_URL}/api/users/logout` , { withCredentials: true });    
     localStorageHook.clearLocalStorage();
     router.push("/sign-in");
     toast.success("Logout successful!");

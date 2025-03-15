@@ -1,27 +1,24 @@
 "use server";
 
 import { BASE_URL } from "@/constants/constant";
-import { cookies } from "next/headers";
+import apiClient from "@/lib/axios";
 
 const API_URL = `${BASE_URL}/reports`;
 
-export const downloadReport = async (payload: Record<string, unknown>) => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken");
+export const getReport = async (
+  payload: Record<string, string | Record<string, Date>>
+): Promise<any> => {
+  const response = await apiClient.post(`${API_URL}/get-report`, payload, {
+    responseType: "blob",
+  });    
+  return response.data;
+};
 
-  const response = await fetch(API_URL + "/get-report", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-    body: JSON.stringify(payload),
-  });  
+export const getPaymentInvoice = async (id: string) => {
+  const response = await apiClient.get(`${API_URL}/get-invoice/${id}`, {
+    responseType: "blob",
+  });
+  console.log(response.data);
 
-  if (!response.ok) {
-    throw new Error(`Failed to download report: ${response.statusText}`);
-  }
-
-  const blob = await response.blob();
-  return blob;
+  return response.data;
 };

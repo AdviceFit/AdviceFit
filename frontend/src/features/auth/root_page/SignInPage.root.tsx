@@ -1,4 +1,5 @@
 "use client";
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getUserInfo } from "../actions/auth.action";
+import axios from "axios";
 import { BASE_URL } from "@/constants/constant";
 
 // Define the schema for validation
@@ -35,43 +38,26 @@ export default function MyForm() {
   // Update onSubmit function to handle API call
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const dataToSend = { 
+      const dataToSend = {
         ...values, // Includes email and password
         role, // Adds the selected role (either 'Member' or 'Admin')
       };
 
-      const response = await fetch(`${BASE_URL}/api/users/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(dataToSend), // Send email and password as JSON
+      await axios.post(`${BASE_URL + "/api/users/login"}`, dataToSend, {
+        withCredentials: true,
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      const responseOfMe = await getUserInfo();
+
+      if (responseOfMe.user) {
+        localStorage.setItem("user", JSON.stringify(responseOfMe.user));
       }
 
-      const responseOfMe = await fetch(`${BASE_URL}/api/users/me`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!responseOfMe.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const userData = await responseOfMe.json();
-      if (userData.user) {
-        localStorage.setItem("user", JSON.stringify(userData.user));
-      }
-      
       toast.success("Login successful!"); // Show success message
 
-      if (userData.user.role.name === "Admin") {
+      if (responseOfMe.user.role.name === "Admin") {
         router.push("/dashboard/attendance");
-      } else if (userData.user.role.name === "Member") {
+      } else if (responseOfMe.user.role.name === "Member") {
         router.push("/personal-details");
       }
     } catch (error) {

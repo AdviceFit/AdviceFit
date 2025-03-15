@@ -1,57 +1,63 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const handleFileDownload = (
-    blob: Blob,
-    payload: Record<string, string | unknown>
-  ) => {
-    const fileType =
-      payload.format === "pdf"
-        ? "application/pdf"
-        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  blob: Blob,
+  payload: { format: "pdf" | "excel"; reportName?: string }
+): void => {
+  const mimeType =
+    {
+      pdf: "application/pdf",
+      excel:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }[payload.format] || "application/octet-stream";
 
-    const fileBlob = new Blob([blob], { type: fileType });
-    const fileLink = document.createElement("a");
-    const fileURL = window.URL.createObjectURL(fileBlob);
+  const fileName = `${payload.reportName || "report"}.${payload.format}`;
 
-    fileLink.href = fileURL;
-    fileLink.setAttribute(
-      "download",
-      `${payload.reportName}.${payload.format === "pdf" ? "pdf" : "xlsx"}`
-    );
-    document.body.appendChild(fileLink);
-    fileLink.click();
-    fileLink.remove();
-  };
+  try {    
+    const fileURL = URL.createObjectURL(new Blob([blob], { type: mimeType }));
 
+    const link = document.createElement("a");
+    link.href = fileURL;
+    link.download = fileName;
 
-  export const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(fileURL);
+  } catch (error) {
+    console.error("File download failed:", error);
+    throw new Error("Failed to initiate file download");
+  }
+};
 
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear();
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
 
-    return `${day}/${month}/${year}`;
-  };
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
 
-  export const formatDateTime = (dateString : string) => {
-    const date = new Date(dateString);
+  return `${day}/${month}/${year}`;
+};
 
-    // Extract the month, day, year
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear();
+export const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
 
-    // Extract the hours, minutes, and seconds
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
+  // Extract the month, day, year
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
 
-    // Return in MM/DD/YYYY HH:mm:ss format
-    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
-}
+  // Extract the hours, minutes, and seconds
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+
+  // Return in MM/DD/YYYY HH:mm:ss format
+  return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+};

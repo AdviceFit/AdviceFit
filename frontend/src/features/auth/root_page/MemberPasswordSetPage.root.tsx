@@ -17,6 +17,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "@/constants/constant";
+import apiClient from "@/lib/axios";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -35,19 +36,10 @@ export default function MyForm() {
 
   async function validateLink() {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/users/validate-member-pass/${id}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
+      const response = await apiClient.get(
+        `${BASE_URL}/api/users/validate-member-pass/${id}`
       );
-
-      if (!response.ok) {
-        throw new Error("Link is expired or invalid");
-      }
-
-      const data = await response.json();
+      const data = await response.data;
       if (data.isMemberPassLinkValid) {
         setIsLinkValid(true);
       } else {
@@ -71,25 +63,14 @@ export default function MyForm() {
   // Update onSubmit function to handle API call
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const response = await fetch(
+      const response = await apiClient.patch(
         `${BASE_URL}/api/users/set-member-password/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(values), // Send password as JSON
-        }
+        values
       );
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      if(data){
-      toast.success(data.message);
-      router.push("/sign-in");
+      const data = await response.data;
+      if (data) {
+        toast.success(data.message);
+        router.push("/sign-in");
       }
     } catch (error) {
       console.error("Form submission error", error);

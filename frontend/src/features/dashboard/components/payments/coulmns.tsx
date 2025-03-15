@@ -9,7 +9,7 @@ const columns: ColumnDef<PaymentsParams>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      return <span>{row.original.memberId.name || ""}</span>;
+      return <span>{row.original.memberId?.name || ""}</span>;
     },
   },
   {
@@ -30,7 +30,7 @@ const columns: ColumnDef<PaymentsParams>[] = [
     accessorKey: "gymName",
     header: "Gym Name",
     cell: ({ row }) => {
-      const coupon = (row.original.memberId.center as EmployeeCenter).name || "";
+      const coupon = (row.original.memberId?.center as EmployeeCenter)?.name || "";
       return <span>{coupon}</span>;
     },
   },
@@ -46,7 +46,7 @@ const columns: ColumnDef<PaymentsParams>[] = [
     accessorKey: "collectedBy",
     header: "Collected By",
     cell: ({ row }) => {
-      return <span>{row.original.memberId.name || ""}</span>;
+      return <span>{row.original.memberId?.name || ""}</span>;
     },
   },
   {

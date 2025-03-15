@@ -1,8 +1,4 @@
 "use client"
-
-import {
-  useState
-} from "react"
 import {
   toast
 } from "sonner"
@@ -52,9 +48,7 @@ const formSchema = z.object({
 });
 
 const SignUpPage = () => {
-    const router = useRouter();
-  const [countryName, setCountryName] = useState<string>('');
-  const [stateName, setStateName] = useState<string>('');
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,10 +93,8 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
       throw new Error('Network response was not ok');
     }
 
-    const data = await response.json();
     toast.success('Signup successful!');
     router.push("/sign-in");
-
 
   } catch (error) {
     console.error('Form submission error', error);
@@ -217,17 +209,15 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
         <FormField
           control={form.control}
           name="country"
-          render={({ field }) => (
+          render={({ }) => (
             <FormItem>
               <FormLabel>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
                   onCountryChange={(country) => {
-                    setCountryName(country?.name || '');
                     form.setValue('country', country?.name || ''); // Set country directly as a string
                   }}
                   onStateChange={(state) => {
-                    setStateName(state?.name || '');
                     form.setValue('state', state?.name || ''); // Set state separately
                   }}
                 />

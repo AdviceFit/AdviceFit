@@ -20,19 +20,26 @@ const generatePDF = async (reportName, data) => {
   const keys = Object.keys(data[0]);
   let x = 30;
 
-  doc.fontSize(12).font("Helvetica-Bold");
+  doc.fontSize(10).font("Helvetica-Bold");
+
+  // Dynamically calculate header height
+  const headerHeights = keys.map((key) => {
+    return doc.heightOfString(key, { width: cellWidth - 2 * cellPadding });
+  });
+  const headerRowHeight = Math.max(...headerHeights) + 2 * cellPadding;
+
   keys.forEach((key) => {
-    doc.rect(x, tableTop, cellWidth, 25).stroke();
+    doc.rect(x, tableTop, cellWidth, headerRowHeight).stroke();
     doc.text(key, x + cellPadding, tableTop + cellPadding, {
-      width: cellWidth - cellPadding,
+      width: cellWidth - 2 * cellPadding,
       align: "center",
     });
     x += cellWidth;
   });
 
   // Add Data Rows
-  let y = tableTop + 25;
-  doc.font("Helvetica").fontSize(10);
+  let y = tableTop + headerRowHeight;
+  doc.font("Helvetica").fontSize(8);
 
   data.forEach((row) => {
     x = 30;
@@ -44,13 +51,15 @@ const generatePDF = async (reportName, data) => {
     });
 
     const rowHeight = Math.max(...cellHeights) + 2 * cellPadding;
+
     keys.forEach((key) => {
       doc.rect(x, y, cellWidth, rowHeight).stroke();
       doc.text(row[key], x + cellPadding, y + cellPadding, {
-        width: cellWidth - cellPadding,
+        width: cellWidth - 2 * cellPadding,
       });
       x += cellWidth;
     });
+
     y += rowHeight;
   });
 

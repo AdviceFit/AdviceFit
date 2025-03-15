@@ -209,11 +209,6 @@ const getInvoice = async (req, res) => {
 
     await browser.close();
 
-    // Set response headers explicitly for PDF
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"'); // Change 'inline' to 'attachment' for download
-    res.setHeader("Content-Length", pdfBuffer.length);
-
     // Send the PDF buffer as the response
     res.end(pdfBuffer);
   } catch (error) {

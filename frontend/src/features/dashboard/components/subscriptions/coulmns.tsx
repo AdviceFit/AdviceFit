@@ -9,7 +9,7 @@ const columns: ColumnDef<SubscriptionsParams>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      return <span>{row.original.memberId.name || ""}</span>;
+      return <span>{row.original.memberId?.name || ""}</span>;
     },
   },
   {

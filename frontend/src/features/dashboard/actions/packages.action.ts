@@ -1,93 +1,39 @@
 "use server";
 
 import { BASE_URL } from "@/constants/constant";
-import { cookies } from "next/headers";
+import apiClient from "@/lib/axios";
 
 const API_URL = `${BASE_URL}/packages`;
 
-
 export const getPackages = async (): Promise<PackageDataParams> => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken")
-  
-    const res = await fetch(API_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token?.value}`,
-      },
-      cache: "no-cache",
-    });
-  
-    return res.json();
-  };
-
+  const response = await apiClient.get(API_URL);
+  return response.data;
+};
 
 // Create a new Packages (POST request)
 export const createPackage = async (data: PackageParams) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-
-    const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-        cache: "no-cache",
-        body: JSON.stringify(data),
-    });    
-    return res.json();
+  const response = await apiClient.post(API_URL, data);
+  return response.data;
 };
 
 // Update an existing Packages (PATCH request)
-export const updatePackage = async (id: string, data: Partial<PackageParams>) => {    
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-
-    const res = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-        cache: "no-cache",
-        body: JSON.stringify(data),
-    });
-
-    return res.json();
+export const updatePackage = async (
+  id: string,
+  data: Partial<PackageParams>
+) => {
+  const response = await apiClient.patch(`${API_URL}/${id}`, data);
+  return response.data;
 };
 
 // Delete a Packages (DELETE request)
 export const deletePackage = async (id: string) => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-
-    const res = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-        cache: "no-cache",
-    });
-
-    return res.json();
+  const response = await apiClient.delete(`${API_URL}/${id}`);
+  return response.data;
 };
-
 // Get a single Package by ID (GET request)
-export const getPackageById = async (id: string): Promise<PackageDataParams> => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-
-    const res = await fetch(`${API_URL}/${id}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token?.value}`,
-        },
-        cache: "no-cache",
-    });
-
-    return res.json();
+export const getPackageById = async (
+  id: string
+): Promise<PackageDataParams> => {
+  const response = await apiClient.get(`${API_URL}/${id}`);
+  return response.data;
 };

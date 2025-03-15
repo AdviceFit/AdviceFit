@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const Role = require("../models/rolesModel");
 const Right = require("../models/rightModel");
 const LoginHistory = require("../models/loginHistory");
-const { create } = require("../models/userModel");
 
 // Signup Controller
 exports.signup = async (req, res) => {
@@ -45,9 +44,9 @@ exports.signup = async (req, res) => {
 // Login Controller
 exports.login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-
+    const { email, password, role } = req.body;    
     let user;
+    
     if (role === "Admin") {
       user = await UserService.findUserByEmail(email);
       if (!user) {
@@ -83,14 +82,14 @@ exports.login = async (req, res) => {
       sameSite: "lax",
       path: "/",
     });
-
+    
     res.status(200).json({ message: "Login successful" , token : accessToken });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-exports.logout = async (req, res) => {
+exports.logout = async (_req, res) => {
   try {    
     res.setHeader('Set-Cookie', [`authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict`]);
     res.status(200).json({ message: 'Logout Successfully' });

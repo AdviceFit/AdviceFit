@@ -1,29 +1,9 @@
 "use server";
 
 import { BASE_URL } from "@/constants/constant";
-import { cookies } from "next/headers";
+import apiClient from "@/lib/axios";
 
 export const updateAdminRights = async (adminRightsData: any) => {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
-    const response = await fetch(`${BASE_URL}/admin-rights`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token?.value}`,
-      },
-      credentials: "include",
-      body: JSON.stringify({ adminRightsData }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update admin rights");
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error("Error updating admin rights:", error);
-    throw error;
-  }
+    const response = await apiClient.post(`${BASE_URL}/admin-rights`, adminRightsData);
+    return response.data;
 };

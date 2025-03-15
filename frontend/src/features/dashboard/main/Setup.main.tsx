@@ -1,56 +1,25 @@
-import { cookies } from "next/headers";
 import AdminRightsSetup from "../components/setup/AdminRightsSetup";
 import { BASE_URL } from "@/constants/constant";
+import apiClient from "@/lib/axios";
 
 async function fetchAdminRightsData() {
   try {
-    // Get auth token from cookies
-    const cookieStore = await cookies();
-    const token = cookieStore.get("authToken");
 
     // Fetch Roles, Rights, and Existing Admin Rights
     const [rolesResponse, rightsResponse, adminRightsResponse] =
       await Promise.all([
-        fetch(`${BASE_URL}/api/users/roles`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token?.value}`,
-          },
-          cache: "no-cache",
-          credentials: "include",
-        }),
-        fetch(`${BASE_URL}/api/users/rights`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token?.value}`,
-          },
-          cache: "no-cache",
-          credentials: "include",
-        }),
-        fetch(`${BASE_URL}/admin-rights`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token?.value}`,
-          },
-          cache: "no-cache",
-          credentials: "include",
-        }),
+        apiClient.get(`${BASE_URL}/api/users/roles`),
+        apiClient.get(`${BASE_URL}/api/users/rights`),
+        apiClient.get(`${BASE_URL}/admin-rights`),
       ]);
 
-    if (!rolesResponse.ok || !rightsResponse.ok || !adminRightsResponse.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    const roles = await rolesResponse.json();
-    const rights = await rightsResponse.json();
-    const adminRights = await adminRightsResponse.json();
+    const roles = await rolesResponse.data;
+    const rights = await rightsResponse.data;
+    const adminRights = await adminRightsResponse.data;
 
     // Exclude "Admin" and "Member" roles
     const filteredRoles = roles.filter(
-      (role) => role.name !== "Admin" && role.name !== "Member"
+      (role: { name: string; }) => role.name !== "Admin" && role.name !== "Member"
     );
 
     return {
