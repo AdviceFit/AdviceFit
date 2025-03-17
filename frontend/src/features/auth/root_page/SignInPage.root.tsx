@@ -21,6 +21,7 @@ import { useState } from "react";
 import { getUserInfo } from "../actions/auth.action";
 import axios from "axios";
 import { BASE_URL } from "@/constants/constant";
+import Link from "next/link";
 
 // Define the schema for validation
 const formSchema = z.object({
@@ -136,7 +137,18 @@ export default function MyForm() {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button className="w-full" type="submit">
+          Submit
+        </Button>
+
+        <div className="text-center mt-2">
+          <p className="text-sm text-gray-500">
+            {"Don't have an account?"}{" "}
+            <Link href="/sign-up" className="text-black hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
       </form>
     </Form>
   );

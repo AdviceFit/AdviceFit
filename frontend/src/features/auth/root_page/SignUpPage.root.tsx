@@ -1,17 +1,9 @@
-"use client"
-import {
-  toast
-} from "sonner"
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {
-  Button
-} from "@/components/ui/button"
+"use client";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -20,19 +12,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import {
-  Input
-} from "@/components/ui/input"
-import {
-  PasswordInput
-} from "@/components/ui/password-input"
-import {
-  Textarea
-} from "@/components/ui/textarea"
-import LocationSelector from "@/components/ui/location-input"
-import { useRouter } from "next/navigation"
-import { BASE_URL } from "@/constants/constant"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Textarea } from "@/components/ui/textarea";
+import LocationSelector from "@/components/ui/location-input";
+import { useRouter } from "next/navigation";
+import { BASE_URL } from "@/constants/constant";
+import Link from "next/link";
 
 const formSchema = z.object({
   gym_name: z.string().min(2).max(50),
@@ -44,7 +31,7 @@ const formSchema = z.object({
   country: z.string(),
   city: z.string().min(2).max(50),
   pincode: z.string().min(6).max(8),
-  state: z.string() 
+  state: z.string(),
 });
 
 const SignUpPage = () => {
@@ -53,58 +40,60 @@ const SignUpPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      gym_name: '',
-      gym_owner_name: '',
-      email: '',
+      gym_name: "",
+      gym_owner_name: "",
+      email: "",
       number: undefined,
-      password: '',
-      describe: '',
-      country: '', 
-      city: '',
-      pincode: '',
-      state: '' 
+      password: "",
+      describe: "",
+      country: "",
+      city: "",
+      pincode: "",
+      state: "",
     },
   });
 
-async function onSubmit(values: z.infer<typeof formSchema>) {
-  const payload = {
-    gym_name: values.gym_name,
-    gym_owner_name: values.gym_owner_name,
-    number: values.number,
-    email: values.email,
-    describe: values.describe,
-    country: values.country,
-    state: values.state,
-    city: values.city,
-    pincode: values.pincode,
-    password: values.password,
-  };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const payload = {
+      gym_name: values.gym_name,
+      gym_owner_name: values.gym_owner_name,
+      number: values.number,
+      email: values.email,
+      describe: values.describe,
+      country: values.country,
+      state: values.state,
+      city: values.city,
+      pincode: values.pincode,
+      password: values.password,
+    };
 
-  try {
-    const response = await fetch(`${BASE_URL}/api/users/signup`, {     
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch(`${BASE_URL}/api/users/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      toast.success("Signup successful!");
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Form submission error", error);
+      toast.error("Failed to submit the form. Please try again.");
     }
-
-    toast.success('Signup successful!');
-    router.push("/sign-in");
-
-  } catch (error) {
-    console.error('Form submission error', error);
-    toast.error('Failed to submit the form. Please try again.');
   }
-}
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-3xl mx-auto">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4 max-w-3xl mx-auto"
+      >
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-6">
             <FormField
@@ -148,7 +137,11 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="johndoe@example.com" type="email" {...field} />
+                    <Input
+                      placeholder="johndoe@example.com"
+                      type="email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>Email to contact</FormDescription>
                   <FormMessage />
@@ -199,7 +192,11 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="type here ..." className="resize-none" {...field} />
+                <Textarea
+                  placeholder="type here ..."
+                  className="resize-none"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>Brief description of your gym.</FormDescription>
               <FormMessage />
@@ -209,20 +206,23 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
         <FormField
           control={form.control}
           name="country"
-          render={({ }) => (
+          render={({}) => (
             <FormItem>
               <FormLabel>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
                   onCountryChange={(country) => {
-                    form.setValue('country', country?.name || ''); // Set country directly as a string
+                    form.setValue("country", country?.name || ""); // Set country directly as a string
                   }}
                   onStateChange={(state) => {
-                    form.setValue('state', state?.name || ''); // Set state separately
+                    form.setValue("state", state?.name || ""); // Set state separately
                   }}
                 />
               </FormControl>
-              <FormDescription>If your country has states, it will appear after selecting the country.</FormDescription>
+              <FormDescription>
+                If your country has states, it will appear after selecting the
+                country.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -261,7 +261,18 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
             />
           </div>
         </div>
-        <Button type="submit">Submit</Button>
+        <Button className="w-full" type="submit">
+          Submit
+        </Button>
+
+        <div className="text-center mt-2">
+          <p className="text-sm text-gray-500">
+            {"Already have an account?"}{" "}
+            <Link href="/sign-in" className="text-black hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </form>
     </Form>
   );
