@@ -101,6 +101,9 @@ const AddAndEditMembers = ({
     paymentDueDate:
       columnData?.subscriptionDetails?.paymentDueDate || new Date(),
     comments: columnData?.subscriptionDetails?.comments || "",
+    subscription : {
+      package : columnData?.subscriptionDetails?.package || "",
+    }
   };
 
   const formSchema = z.object({
@@ -175,36 +178,36 @@ const AddAndEditMembers = ({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const formattedPayload = {
-      ...values,
-      address: {
-        addressLine1: values.addressLine1 || "",
-        addressLine2: values.addressLine2 || "",
-        country: values.address[0],
-        state: values.address[1],
-        city: values.city || "",
-        pincode: values.pincode || "",
-      },
-    };
-
-    if (columnData) {
-      const response = await editMember(columnData._id, formattedPayload);
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      const formattedPayload = {
+        ...values,
+        address: {
+          addressLine1: values.addressLine1 || "",
+          addressLine2: values.addressLine2 || "",
+          country: values.address[0],
+          state: values.address[1],
+          city: values.city || "",
+          pincode: values.pincode || "",
+        },
+      };
+  
+      if (columnData) {
+        const response = await editMember(columnData._id, formattedPayload);
+        if (response.error) {
+          toast.error(response.error);
+          return;
+        }
+        toast.success(TOAST_MESSAGES.memberUpdated);
+      } else {
+        const response = await addMembers(formattedPayload);
+        if (response?.error) {
+          toast.error(response.error);
+          return;
+        }
+        toast.success(TOAST_MESSAGES.memberAdded);
       }
-      toast.success(TOAST_MESSAGES.memberUpdated);
-    } else {
-      const response = await addMembers(formattedPayload);
-      if (response.error) {
-        toast.error(response.error);
-        return;
-      }
-      toast.success(TOAST_MESSAGES.memberAdded);
-    }
-    const { members } = await getAllMembers();
-    setMemberState((prev: any) => ({ ...prev, members }));
-    setOpenState(false);
+      const { members } = await getAllMembers();
+      setMemberState((prev: any) => ({ ...prev, members }));
+      setOpenState(false)
   }
 
   return (

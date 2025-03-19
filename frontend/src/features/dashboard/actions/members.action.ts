@@ -6,8 +6,8 @@ import apiClient from "@/lib/axios";
 const API_URL = `${BASE_URL}/members`;
 
 const addMembers = async (payload: unknown) => {
-  const response = await apiClient.post(API_URL, payload);
-  return response.data;
+    const response = await apiClient.post(API_URL, payload);
+    return response.data;
 };
 
 const editMember = async (id: string, payload: unknown) => {

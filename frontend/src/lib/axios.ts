@@ -48,8 +48,7 @@ apiClient.interceptors.response.use(
     ) {
       return redirect("/sign-in");
     }
-
-    return Promise.reject(error);
+    return error.response ?? { error : "Something went wrong" };
   }
 );
 
