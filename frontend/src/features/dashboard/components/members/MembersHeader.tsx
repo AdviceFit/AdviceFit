@@ -10,6 +10,7 @@ import {
 import AddAndEditMembers from "./AddAndEditMembers";
 import { useState } from "react";
 import { DialogAlert } from "@/components/shared/DialogAlert";
+import { X } from "lucide-react";
 
 const MembersHeader = ({
   centers,
@@ -42,10 +43,12 @@ const MembersHeader = ({
         </Button>
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
-          className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto"
+          className="sm:max-w-[920px] lg:h-[90%] h-5/6 overflow-y-auto py-0"
+          customClose={true}
         >
-          <DialogHeader>
+          <DialogHeader className="sticky top-0 bg-white pt-4 pb-2 flex flex-row justify-between">
             <DialogTitle>Add Members</DialogTitle>
+            <X className="h-4 w-4" onClick={handleClose} />
           </DialogHeader>
           <AddAndEditMembers
             setOpenState={setOpenState}

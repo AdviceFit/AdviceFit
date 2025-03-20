@@ -70,6 +70,7 @@ const AddAndEditMembers = ({
   const [stateName, setStateName] = useState<string>("");
   const [packages, setPackages] = useState<PackageParams[] | null>(null);
   const [showSubscription, setShowSubscription] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const defaultValues = {
     joining_date: columnData?.joining_date
@@ -103,6 +104,20 @@ const AddAndEditMembers = ({
     paymentDueDate:
       columnData?.subscriptionDetails?.paymentDueDate || new Date(),
     comments: columnData?.subscriptionDetails?.comments || "",
+    subscription : !showSubscription ? {
+      package: columnData?.subscriptionDetails?.package || "",
+      promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+      offerAmount: columnData?.subscriptionDetails?.offerAmount,
+      paymentDate: columnData?.subscriptionDetails?.paymentDate
+        ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+        : new Date(),
+      startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+      paidAmount: columnData?.subscriptionDetails?.paidAmount,
+      paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+      paymentDueDate:
+        columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+      comments: columnData?.subscriptionDetails?.comments || "",
+    } : undefined
   };
 
   const formSchema = z.object({
@@ -184,79 +199,81 @@ const AddAndEditMembers = ({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const formattedPayload = {
-      ...values,
-      address: {
-        addressLine1: values.addressLine1 || "",
-        addressLine2: values.addressLine2 || "",
-        country: values.address[0],
-        state: values.address[1],
-        city: values.city || "",
-        pincode: values.pincode || "",
-      },
-    };
+    try {
+      setLoader(true);
+      const formattedPayload = {
+        ...values,
+        address: {
+          addressLine1: values.addressLine1 || "",
+          addressLine2: values.addressLine2 || "",
+          country: values.address[0],
+          state: values.address[1],
+          city: values.city || "",
+          pincode: values.pincode || "",
+        },
+      };
 
-    if (columnData) {
-      const response = await editMember(columnData._id, formattedPayload);
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      if (columnData) {
+        const response = await editMember(columnData._id, formattedPayload);
+        if (response.error) {
+          toast.error(response.error);
+          return;
+        }
+        toast.success(TOAST_MESSAGES.memberUpdated);
+      } else {
+        const response = await addMembers(formattedPayload);
+        console.log(response);
+        if (response?.error) {
+          toast.error(response.error);
+          return;
+        }
+        toast.success(TOAST_MESSAGES.memberAdded);
       }
-      toast.success(TOAST_MESSAGES.memberUpdated);
-    } else {
-      const response = await addMembers(formattedPayload);
-      if (response?.error) {
-        toast.error(response.error);
-        return;
-      }
-      toast.success(TOAST_MESSAGES.memberAdded);
+      const { members } = await getAllMembers();
+      setMemberState((prev: any) => ({ ...prev, members }));
+      setOpenState(false);
+    } finally {
+      setLoader(false);
     }
-    const { members } = await getAllMembers();
-    setMemberState((prev: any) => ({ ...prev, members }));
-    setOpenState(false);
   }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 w-full mx-auto pt-4 pb-4"
+        className="space-y-4 w-full mx-auto pt-4 pb-4"
       >
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 py-1 items-end">
-          <div>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John doe" type="text" {...field} />
-                  </FormControl>
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 py-1 items-start">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John doe" type="text" {...field} />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div>
-            <FormField
-              control={form.control}
-              name="mobile"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mobile</FormLabel>
-                  <FormControl>
-                    <Input placeholder="0000000000" type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="mobile"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mobile</FormLabel>
+                <FormControl>
+                  <Input placeholder="0000000000" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <FormField
             control={form.control}
             name="gender"
@@ -303,20 +320,20 @@ const AddAndEditMembers = ({
                     className="flex flex-row gap-2"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Single" id="r2" />
-                      <Label htmlFor="r2">Single</Label>
+                      <RadioGroupItem value="Single" id="marital_status_r1" />
+                      <Label htmlFor="marital_status_r1">Single</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Married" id="r1" />
-                      <Label htmlFor="r1">Married</Label>
+                      <RadioGroupItem value="Married" id="marital_status_r2" />
+                      <Label htmlFor="marital_status_r2">Married</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Divorced" id="r3" />
-                      <Label htmlFor="r3">Divorced</Label>
+                      <RadioGroupItem value="Divorced" id="marital_status_r3" />
+                      <Label htmlFor="marital_status_r3">Divorced</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Widowed" id="r3" />
-                      <Label htmlFor="r3">Widowed</Label>
+                      <RadioGroupItem value="Widowed" id="marital_status_r4" />
+                      <Label htmlFor="marital_status_r4">Widowed</Label>
                     </div>
                   </RadioGroup>
                 </FormControl>
@@ -326,7 +343,7 @@ const AddAndEditMembers = ({
           />
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <div>
             <FormField
               control={form.control}
@@ -353,7 +370,7 @@ const AddAndEditMembers = ({
               control={form.control}
               name="joining_date"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel>Joining Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -392,7 +409,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <div>
             <FormField
               control={form.control}
@@ -418,7 +435,7 @@ const AddAndEditMembers = ({
               control={form.control}
               name="center"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel>Center</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -476,7 +493,6 @@ const AddAndEditMembers = ({
                       </Command>
                     </PopoverContent>
                   </Popover>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -484,7 +500,7 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <div>
             <FormField
               control={form.control}
@@ -614,13 +630,13 @@ const AddAndEditMembers = ({
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <div>
             <FormField
               control={form.control}
               name="dob"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -740,7 +756,7 @@ const AddAndEditMembers = ({
           )}
         /> */}
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <FormField
             control={form.control}
             name="addressLine1"
@@ -777,6 +793,7 @@ const AddAndEditMembers = ({
               <FormLabel>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
+                  formState={form.formState.isSubmitted}
                   value={field.value}
                   onCountryChange={(country) => {
                     field.onChange([country?.name || "", stateName || ""]);
@@ -798,12 +815,11 @@ const AddAndEditMembers = ({
                 If your country has states, it will be appear after selecting
                 country
               </FormDescription>
-              <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
           <div>
             <FormField
               control={form.control}
@@ -855,14 +871,14 @@ const AddAndEditMembers = ({
         )}
         {showSubscription && (
           <>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
               <div>
                 <FormField
                   control={form.control}
                   name="subscription.package"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Package</FormLabel>
+                    <FormItem className="flex flex-col gap-1">
+                      <FormLabel className="mt-[6px]">Package</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -956,7 +972,7 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
               <div>
                 <FormField
                   control={form.control}
@@ -982,7 +998,7 @@ const AddAndEditMembers = ({
                   control={form.control}
                   name="subscription.paymentDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-col gap-2">
                       <FormLabel>Payment Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -1018,13 +1034,13 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
               <div>
                 <FormField
                   control={form.control}
                   name="subscription.startDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-col gap-2">
                       <FormLabel>Start Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -1080,7 +1096,7 @@ const AddAndEditMembers = ({
                 />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-4 items-end py-1">
+            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
               <div>
                 <FormField
                   control={form.control}
@@ -1116,7 +1132,7 @@ const AddAndEditMembers = ({
                   control={form.control}
                   name="subscription.paymentDueDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-col gap-2">
                       <FormLabel>Payment Due Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -1170,7 +1186,7 @@ const AddAndEditMembers = ({
           </>
         )}
         <Button type="submit" className="w-full sm:w-auto">
-          Submit
+          {loader ? "Loading ..." : "Submit"}
         </Button>
       </form>
     </Form>
