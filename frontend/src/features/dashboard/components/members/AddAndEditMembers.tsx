@@ -55,6 +55,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getPackages } from "../../actions/packages.action";
+import { useRouter } from "next/navigation";
 
 const AddAndEditMembers = ({
   setOpenState,
@@ -71,6 +72,8 @@ const AddAndEditMembers = ({
   const [packages, setPackages] = useState<PackageParams[] | null>(null);
   const [showSubscription, setShowSubscription] = useState(false);
   const [loader, setLoader] = useState(false);
+  const router = useRouter();
+
 
   const defaultValues = {
     joining_date: columnData?.joining_date
@@ -106,19 +109,19 @@ const AddAndEditMembers = ({
     comments: columnData?.subscriptionDetails?.comments || "",
     subscription: !showSubscription
       ? {
-          package: columnData?.subscriptionDetails?.package || "",
-          promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-          offerAmount: columnData?.subscriptionDetails?.offerAmount,
-          paymentDate: columnData?.subscriptionDetails?.paymentDate
-            ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-            : new Date(),
-          startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-          paidAmount: columnData?.subscriptionDetails?.paidAmount,
-          paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-          paymentDueDate:
-            columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-          comments: columnData?.subscriptionDetails?.comments || "",
-        }
+        package: columnData?.subscriptionDetails?.package || "",
+        promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+        offerAmount: columnData?.subscriptionDetails?.offerAmount,
+        paymentDate: columnData?.subscriptionDetails?.paymentDate
+          ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+          : new Date(),
+        startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+        paidAmount: columnData?.subscriptionDetails?.paidAmount,
+        paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+        paymentDueDate:
+          columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+        comments: columnData?.subscriptionDetails?.comments || "",
+      }
       : undefined,
   };
 
@@ -167,32 +170,32 @@ const AddAndEditMembers = ({
     subscription: !showSubscription
       ? z.undefined()
       : z.object({
-          package: z.string().nonempty({ message: "Package is required" }),
-          promoCoupon: z.string().optional(),
-          offerAmount: z.coerce
-            .number()
-            .min(0, { message: "Offer Amount must be positive" }),
-          paymentDate: z.coerce.date(),
-          startDate: z.coerce.date(),
-          paidAmount: z.coerce
-            .number()
-            .min(0, { message: "Paid Amount must be positive" }),
-          paymentMode: z.enum(
-            ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
-            {
-              message: "Marital Status must be valid  method",
-            }
-          ),
-          paymentDueDate: z.coerce.date().optional(),
-          comments: z.string().optional(),
-        }),
+        package: z.string().nonempty({ message: "Package is required" }),
+        promoCoupon: z.string().optional(),
+        offerAmount: z.coerce
+          .number()
+          .min(0, { message: "Offer Amount must be positive" }),
+        paymentDate: z.coerce.date(),
+        startDate: z.coerce.date(),
+        paidAmount: z.coerce
+          .number()
+          .min(0, { message: "Paid Amount must be positive" }),
+        paymentMode: z.enum(
+          ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
+          {
+            message: "Marital Status must be valid  method",
+          }
+        ),
+        paymentDueDate: z.coerce.date().optional(),
+        comments: z.string().optional(),
+      }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
-
+  const selectedCenterId = form.watch("center");
   const packagesHandle = async (centerId: string) => {
     const response = await getPackages(centerId);
     if (response?.packages) {
@@ -452,9 +455,9 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? centers
-                                .map((c) => ({ label: c.name, value: c._id }))
-                                .find((center) => center.value === field.value)
-                                ?.label
+                              .map((c) => ({ label: c.name, value: c._id }))
+                              .find((center) => center.value === field.value)
+                              ?.label
                             : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -523,8 +526,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? MEMBERS_SOURCES.find(
-                                (source) => source.value === field.value
-                              )?.label
+                              (source) => source.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -587,8 +590,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? OCCUPATIONS.find(
-                                (occupation) => occupation.value === field.value
-                              )?.label
+                              (occupation) => occupation.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -878,82 +881,85 @@ const AddAndEditMembers = ({
                 <FormField
                   control={form.control}
                   name="subscription.package"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="mt-[6px]" required>
-                        Package
-                      </FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? (packages ?? [])
-                                    .map((c) => ({
-                                      label: c.packageName,
-                                      value: c._id,
-                                    }))
-                                    .find(
-                                      (packageData) =>
-                                        packageData.value === field.value
-                                    )?.label
-                                : "Select Package"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="p-0">
-                          <Command>
-                            <CommandInput placeholder="Search package..." />
-                            <CommandList>
-                              <CommandEmpty>No packages found.</CommandEmpty>
-                              <CommandGroup>
-                                {packages &&
-                                  packages
-                                    .map((c) => ({
-                                      label: c.packageName,
-                                      value: c._id,
-                                    }))
-                                    .map((packageData) => (
-                                      <CommandItem
-                                        value={packageData.label}
-                                        key={packageData.value}
-                                        onSelect={() => {
-                                          field.onChange(packageData.value);
-                                          form.setValue(
-                                            "subscription.package",
-                                            packageData.value
-                                          );
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            packageData.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                        {packageData.label}
-                                      </CommandItem>
-                                    ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
+                  render={({ field }) => {
+                    const packageList = packages ?? []; // Ensure it's always an array
+                    const selectedPackage = packageList.find((pkg) => pkg._id === field.value);
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                    return (
+                      <FormItem className="flex flex-col gap-1">
+                        <FormLabel className="mt-[6px]" required>
+                          Package
+                        </FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn("justify-between", !field.value && "text-muted-foreground")}
+                              >
+                                {selectedPackage ? selectedPackage.packageName : "Select Package"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="p-0">
+                            <Command>
+                              <CommandInput placeholder="Search package..." />
+                              <CommandList>
+                                {packageList.length === 0 && <CommandEmpty>No packages found.</CommandEmpty>}
+
+                                <CommandGroup>
+                                  {packageList.map((pkg) => (
+                                    <CommandItem
+                                      key={pkg._id}
+                                      value={pkg.packageName}
+                                      onSelect={() => {
+                                        field.onChange(pkg._id);
+                                        form.setValue("subscription.package", pkg._id);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn("mr-2 h-4 w-4", pkg._id === field.value ? "opacity-100" : "opacity-0")}
+                                      />
+                                      {pkg.packageName}
+                                    </CommandItem>
+                                  ))}
+                                  <CommandItem
+                                    onSelect={() => {
+                                      if (selectedCenterId) {
+                                        router.push(`/dashboard/packages?centerId=${selectedCenterId}`);
+                                      } else {
+                                        router.push(`/dashboard/packages`);
+                                      }
+                                    }} className=" hover:bg-blue-100 cursor-pointer"
+                                  >
+                                    Create Package
+                                  </CommandItem>
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+
+                        <FormMessage />
+
+                        {/* Show details below only if a package is selected */}
+                        {selectedPackage && (
+                          <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
+                            <p>
+                              <strong>Package Amount:</strong> ${selectedPackage.price}
+                            </p>
+                            <p>
+                              <strong> Number of Days:</strong> {selectedPackage.noOfDays} days
+                            </p>
+                          </div>
+                        )}
+                      </FormItem>
+                    );
+                  }}
                 />
+
               </div>
 
               <div>

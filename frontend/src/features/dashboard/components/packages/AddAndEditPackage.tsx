@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCenters } from "../../actions/centers.action";
 
 import { toast } from "sonner";
@@ -63,12 +63,17 @@ export default function AddAndEditPackage({
   onClose?: () => void;
 }) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
+  const searchParams = useSearchParams();
+  const centerIdFromParams = searchParams.get("centerId");
+  
+  console.log('centerIdFromParams', centerIdFromParams);
+
   const router = useRouter();
   const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     packageName: data.packageName || "",
     price: data.price || 0,
-    center: data.center._id || "",
+    center: data.center?._id || centerIdFromParams || "", 
     productType: data.productType as
       | "General"
       | "Gift"
@@ -80,28 +85,17 @@ export default function AddAndEditPackage({
     packageType: data.packageType as "Main" | "Add On",
     showAtAdviceFit: data.showAtAdviceFit || false,
   });
+  
+  
 
-  useEffect(() => {
-    const fetchPackageDetails = async () => {
-      if (!id) return;
-      try {
-        const data = await getPackageById(id);
-        const formattedData = formatPackageData(data.packages);
-        form.reset(formattedData);
-      } catch (error) {
-        toast.error("Failed to fetch package details.");
-      }
-    };
-
-    fetchPackageDetails();
-  }, [id]);
+  //To-do temp fix for center populate
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       packageName: "",
       price: 0,
-      center: "",
+      center: centerIdFromParams || "", 
       productType: "General",
       noOfDays: 0,
       packageTiming: "Normal Hours",
@@ -148,11 +142,25 @@ export default function AddAndEditPackage({
     fetchCenters();
   }, []);
 
+  useEffect(() => {
+    const fetchPackageDetails = async () => {
+      if (!id) return;
+      try {
+        const data = await getPackageById(id);  
+        const formattedData = formatPackageData(data.packages);  
+        form.reset(formattedData); 
+      } catch (error) {
+        toast.error("Failed to fetch package details.");
+      }
+    };
+  
+    fetchPackageDetails();
+  }, [id, form]);
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 max-w-3xl mx-auto py-10"
+        className="space-y-8 max-w-full mx-20 py-10"
       >
         <div className="grid grid-cols-2 gap-4">
           {/* Package Name */}
@@ -198,7 +206,10 @@ export default function AddAndEditPackage({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Center</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value} // Ensure selected value updates dynamically
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a center" />
@@ -216,6 +227,7 @@ export default function AddAndEditPackage({
             </FormItem>
           )}
         />
+
 
         {/* Product Type */}
         <FormField
@@ -376,13 +388,13 @@ export default function AddAndEditPackage({
           name="showAtAdviceFit"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Show at AdviceFit Platform</FormLabel>
+              <FormLabel className="pb-2">Show at AdviceFit Platform</FormLabel>
               <FormControl>
                 <input
                   type="checkbox"
                   checked={field.value}
                   onChange={(e) => field.onChange(e.target.checked)}
-                  className="mr-2"
+                  className=" m-2 p-2"
                 />
               </FormControl>
               <FormMessage />
