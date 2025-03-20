@@ -47,9 +47,8 @@ export default function MyForm() {
       await axios.post(`${BASE_URL + "/api/users/login"}`, dataToSend, {
         withCredentials: true,
       });
-
-      const responseOfMe = await getUserInfo();
-
+      
+      const responseOfMe = await getUserInfo();      
       if (responseOfMe.user) {
         localStorage.setItem("user", JSON.stringify(responseOfMe.user));
       }

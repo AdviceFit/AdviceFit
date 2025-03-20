@@ -68,9 +68,9 @@ exports.login = async (req, res) => {
     }
 
     // Generate a Tokens
-    const  { accessToken , refreshToken, expires } = await user.generateTokens(role);
-    user.refreshTokens.push({ token: refreshToken, expires });
-    await user.save();
+    const  { accessToken  } = await user.generateTokens(role);
+    // user.refreshTokens.push({ token: refreshToken, expires });
+    // await user.save();
 
     // Add login history
     const loginHistory = new LoginHistory({ userId: user._id , createdAt: new Date() });
@@ -102,6 +102,7 @@ exports.logout = async (_req, res) => {
 exports.getMe = async (req, res) => {
   try {
     // Send user data from req using middleware
+    
     res.status(200).json({ user: req?.user || "" });
   } catch (error) {
     res.status(500).json({ message: error.message });

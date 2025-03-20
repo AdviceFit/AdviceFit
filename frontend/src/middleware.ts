@@ -3,13 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 // Middleware function
 export function middleware(request: NextRequest) {
   const authToken = request.cookies.get("authToken")?.value;
-
-  if (!authToken && request.nextUrl.pathname !== "/sign-in") {
+  
+  if (!authToken && request.nextUrl.pathname !== "/sign-in" && request.nextUrl.pathname !== "/sign-up") {
     return NextResponse.redirect(new URL("/sign-in", request.url));
-  }
-
-  if(authToken && request.nextUrl.pathname === "/sign-in" || request.nextUrl.pathname === "/sign-up") {
-    return NextResponse.redirect(new URL("/dashboard/attendance", request.url));
   }
 
   return NextResponse.next();
