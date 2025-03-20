@@ -104,20 +104,22 @@ const AddAndEditMembers = ({
     paymentDueDate:
       columnData?.subscriptionDetails?.paymentDueDate || new Date(),
     comments: columnData?.subscriptionDetails?.comments || "",
-    subscription : !showSubscription ? {
-      package: columnData?.subscriptionDetails?.package || "",
-      promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-      offerAmount: columnData?.subscriptionDetails?.offerAmount,
-      paymentDate: columnData?.subscriptionDetails?.paymentDate
-        ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-        : new Date(),
-      startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-      paidAmount: columnData?.subscriptionDetails?.paidAmount,
-      paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-      paymentDueDate:
-        columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-      comments: columnData?.subscriptionDetails?.comments || "",
-    } : undefined
+    subscription: !showSubscription
+      ? {
+          package: columnData?.subscriptionDetails?.package || "",
+          promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+          offerAmount: columnData?.subscriptionDetails?.offerAmount,
+          paymentDate: columnData?.subscriptionDetails?.paymentDate
+            ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+            : new Date(),
+          startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+          paidAmount: columnData?.subscriptionDetails?.paidAmount,
+          paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+          paymentDueDate:
+            columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+          comments: columnData?.subscriptionDetails?.comments || "",
+        }
+      : undefined,
   };
 
   const formSchema = z.object({
@@ -170,8 +172,8 @@ const AddAndEditMembers = ({
           offerAmount: z.coerce
             .number()
             .min(0, { message: "Offer Amount must be positive" }),
-          paymentDate: z.coerce.date().optional(),
-          startDate: z.coerce.date().optional(),
+          paymentDate: z.coerce.date(),
+          startDate: z.coerce.date(),
           paidAmount: z.coerce
             .number()
             .min(0, { message: "Paid Amount must be positive" }),
@@ -249,7 +251,7 @@ const AddAndEditMembers = ({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel required>Name</FormLabel>
                 <FormControl>
                   <Input placeholder="John doe" type="text" {...field} />
                 </FormControl>
@@ -263,7 +265,7 @@ const AddAndEditMembers = ({
             name="mobile"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mobile</FormLabel>
+                <FormLabel required>Mobile</FormLabel>
                 <FormControl>
                   <Input placeholder="0000000000" type="number" {...field} />
                 </FormControl>
@@ -279,7 +281,7 @@ const AddAndEditMembers = ({
             name="gender"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Gender</FormLabel>
+                <FormLabel required>Gender</FormLabel>
                 <FormControl>
                   <RadioGroup
                     {...field}
@@ -311,7 +313,7 @@ const AddAndEditMembers = ({
             name="marital_status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Marital Status</FormLabel>
+                <FormLabel required>Marital Status</FormLabel>
                 <FormControl>
                   <RadioGroup
                     {...field}
@@ -371,7 +373,7 @@ const AddAndEditMembers = ({
               name="joining_date"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Joining Date</FormLabel>
+                  <FormLabel required>Joining Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -416,7 +418,7 @@ const AddAndEditMembers = ({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel required>Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="johndoe@example.com"
@@ -436,7 +438,7 @@ const AddAndEditMembers = ({
               name="center"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Center</FormLabel>
+                  <FormLabel required>Center</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -637,7 +639,7 @@ const AddAndEditMembers = ({
               name="dob"
               render={({ field }) => (
                 <FormItem className="flex flex-col gap-2">
-                  <FormLabel>Date of birth</FormLabel>
+                  <FormLabel required>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -679,7 +681,7 @@ const AddAndEditMembers = ({
               name="health_conditions"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Health condition</FormLabel>
+                  <FormLabel required>Health condition</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Your health condition"
@@ -762,7 +764,7 @@ const AddAndEditMembers = ({
             name="addressLine1"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address line 1</FormLabel>
+                <FormLabel required>Address line 1</FormLabel>
                 <FormControl>
                   <Input placeholder="Address line 1" {...field} />
                 </FormControl>
@@ -790,7 +792,7 @@ const AddAndEditMembers = ({
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Select Country</FormLabel>
+              <FormLabel required>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
                   formState={form.formState.isSubmitted}
@@ -826,7 +828,7 @@ const AddAndEditMembers = ({
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City</FormLabel>
+                  <FormLabel required>City</FormLabel>
                   <FormControl>
                     <Input placeholder="Delhi" type="" {...field} />
                   </FormControl>
@@ -878,7 +880,9 @@ const AddAndEditMembers = ({
                   name="subscription.package"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="mt-[6px]">Package</FormLabel>
+                      <FormLabel className="mt-[6px]" required>
+                        Package
+                      </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -979,7 +983,7 @@ const AddAndEditMembers = ({
                   name="subscription.offerAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Offer Amount</FormLabel>
+                      <FormLabel required>Offer Amount</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Offer Amount"
@@ -999,7 +1003,7 @@ const AddAndEditMembers = ({
                   name="subscription.paymentDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Payment Date</FormLabel>
+                      <FormLabel required>Payment Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -1041,7 +1045,7 @@ const AddAndEditMembers = ({
                   name="subscription.startDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Start Date</FormLabel>
+                      <FormLabel required>Start Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -1082,7 +1086,7 @@ const AddAndEditMembers = ({
                   name="subscription.paidAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Paid Amount</FormLabel>
+                      <FormLabel required>Paid Amount</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Paid Amount"
@@ -1103,7 +1107,7 @@ const AddAndEditMembers = ({
                   name="subscription.paymentMode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Mode</FormLabel>
+                      <FormLabel required>Payment Mode</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
