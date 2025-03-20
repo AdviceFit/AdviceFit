@@ -1,15 +1,9 @@
-"use client"
+"use client";
 
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {
-  Button
-} from "@/components/ui/button"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -18,61 +12,87 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getCenters } from "../../actions/centers.action";
+
+import { toast } from "sonner";
+
 import {
-  Input
-} from "@/components/ui/input"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { getCenters } from "../../actions/centers.action"
-
-import { toast } from "sonner"
-
-import { createPackage, getPackageById, updatePackage } from "../../actions/packages.action"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  createPackage,
+  getPackageById,
+  updatePackage,
+} from "../../actions/packages.action";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   _id: z.string().optional(),
   packageName: z.string().min(1, "Package name is required"),
   price: z.number().min(1, "Price must be greater than 0"),
   center: z.string().min(1, "Center is required"),
-  productType: z.enum(["General", "Gift", "Registration", "Session"], { required_error: "Product type is required" }),
+  productType: z.enum(["General", "Gift", "Registration", "Session"], {
+    required_error: "Product type is required",
+  }),
   noOfDays: z.number().min(1, "Number of days must be greater than 0"),
-  packageTiming: z.enum(["Normal Hours", "Sunny Hours"], { required_error: "Package timing is required" }),
-  trainingType: z.enum(["General", "Personal"], { required_error: "Training type is required" }),
-  packageType: z.enum(["Main", "Add On"], { required_error: "Package type is required" }),
+  packageTiming: z.enum(["Normal Hours", "Sunny Hours"], {
+    required_error: "Package timing is required",
+  }),
+  trainingType: z.enum(["General", "Personal"], {
+    required_error: "Training type is required",
+  }),
+  packageType: z.enum(["Main", "Add On"], {
+    required_error: "Package type is required",
+  }),
   // cafeSubscription: z.boolean().optional(),
   showAtAdviceFit: z.boolean().optional(),
 });
 
-export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClose?: () => void }){
+export default function AddAndEditPackage({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
-  const router = useRouter()
+  const router = useRouter();
   const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     packageName: data.packageName || "",
     price: data.price || 0,
     center: data.center._id || "",
-    productType: data.productType as "General" | "Gift" | "Registration" | "Session",
+    productType: data.productType as
+      | "General"
+      | "Gift"
+      | "Registration"
+      | "Session",
     noOfDays: data.noOfDays || 0,
     packageTiming: data.packageTiming as "Normal Hours" | "Sunny Hours",
     trainingType: data.trainingType as "General" | "Personal",
     packageType: data.packageType as "Main" | "Add On",
     showAtAdviceFit: data.showAtAdviceFit || false,
   });
-  
+
   useEffect(() => {
     const fetchPackageDetails = async () => {
       if (!id) return;
       try {
         const data = await getPackageById(id);
-        const formattedData = formatPackageData(data.package);
+        const formattedData = formatPackageData(data.packages);
         form.reset(formattedData);
       } catch (error) {
         toast.error("Failed to fetch package details.");
       }
     };
-  
+
     fetchPackageDetails();
   }, [id]);
 
@@ -109,13 +129,13 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
           toast.error("Failed to create the package.");
         }
       }
-      router.replace("/dashboard/packages"); 
-      onClose?.(); 
+      router.replace("/dashboard/packages");
+      onClose?.();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     }
   }
-  
+
   useEffect(() => {
     async function fetchCenters() {
       try {
@@ -130,7 +150,10 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 max-w-3xl mx-auto py-10"
+      >
         <div className="grid grid-cols-2 gap-4">
           {/* Package Name */}
           <FormField
@@ -155,7 +178,12 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
               <FormItem>
                 <FormLabel>Price</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Price" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                  <Input
+                    type="number"
+                    placeholder="Price"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -177,7 +205,7 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {centers.map(center => (
+                  {centers.map((center) => (
                     <SelectItem key={center._id} value={center._id}>
                       {center.name}
                     </SelectItem>
@@ -189,36 +217,35 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
           )}
         />
 
-
         {/* Product Type */}
         <FormField
           control={form.control}
           name="productType"
           render={({ field }) => (
             <FormItem>
-            <FormLabel>Product Type</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select product type" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {[
-                  { value: "General", label: "General" },
-                  { value: "Gift", label: "Gift" },
-                  { value: "Trainer", label: "Trainer" },
-                  { value: "Registration", label: "Registration" },
-                  { value: "Session", label: "Session" },
-                ].map((product) => (
-                  <SelectItem key={product.value} value={product.value}>
-                    {product.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
+              <FormLabel>Product Type</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select product type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {[
+                    { value: "General", label: "General" },
+                    { value: "Gift", label: "Gift" },
+                    { value: "Trainer", label: "Trainer" },
+                    { value: "Registration", label: "Registration" },
+                    { value: "Session", label: "Session" },
+                  ].map((product) => (
+                    <SelectItem key={product.value} value={product.value}>
+                      {product.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
@@ -230,7 +257,12 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
             <FormItem>
               <FormLabel>Number of Days</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Number of Days" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                <Input
+                  type="number"
+                  placeholder="Number of Days"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -357,9 +389,10 @@ export default function AddAndEditPackage ({ id, onClose }: { id?: string; onClo
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full sm:w-auto">Submit</Button>
-
+        <Button type="submit" className="w-full sm:w-auto">
+          Submit
+        </Button>
       </form>
     </Form>
-  )
+  );
 }

@@ -99,7 +99,7 @@ type VisitorsDataParams = {
 type SubscriptionsParams = {
   _id: string;
   memberId: MembersParams;
-  package: string;
+  packageId: PackageParams;
   promoCoupon: string;
   offerAmount: number;
   paymentDate: string;
@@ -184,7 +184,7 @@ type PackageParams = {
 };
 
 type PackageDataParams = {
-  package: PackageParams[];
+  packages: PackageParams[];
 };
 
 type SessionParams = {

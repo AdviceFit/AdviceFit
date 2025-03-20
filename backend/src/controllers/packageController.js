@@ -19,7 +19,7 @@ exports.getPackages = async (req, res) => {
 
     // Pass userId to service to ensure only the user's packages are fetched
     const packages = await packageService.getPackages(centerId, userId);
-    res.status(200).json({ success: true, package:packages });
+    res.status(200).json({ success: true, packages: packages });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -29,13 +29,18 @@ exports.getPackageById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const packageDetails = await packageService.getPackageById(id, req.user._id);
+    const packageDetails = await packageService.getPackageById(
+      id,
+      req.user._id
+    );
 
     if (!packageDetails) {
-      return res.status(404).json({ success: false, message: "Package not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Package not found" });
     }
 
-    res.status(200).json({ success: true, package: packageDetails });
+    res.status(200).json({ success: true, packages: packageDetails });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -46,10 +51,17 @@ exports.updatePackage = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    const updatedPackage = await packageService.updatePackage(id, updateData, req.user._id);
+    const updatedPackage = await packageService.updatePackage(
+      id,
+      updateData,
+      req.user._id
+    );
 
     if (!updatedPackage) {
-      return res.status(404).json({ success: false, message: "Package not found or not authorized" });
+      return res.status(404).json({
+        success: false,
+        message: "Package not found or not authorized",
+      });
     }
 
     res.status(200).json({ success: true, package: updatedPackage });
@@ -65,10 +77,15 @@ exports.deletePackage = async (req, res) => {
     const deletedPackage = await packageService.deletePackage(id, req.user._id);
 
     if (!deletedPackage) {
-      return res.status(404).json({ success: false, message: "Package not found or not authorized" });
+      return res.status(404).json({
+        success: false,
+        message: "Package not found or not authorized",
+      });
     }
 
-    res.status(200).json({ success: true, message: "Package deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Package deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

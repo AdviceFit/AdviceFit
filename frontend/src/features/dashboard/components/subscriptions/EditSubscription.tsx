@@ -67,7 +67,7 @@ export default function EditSubscription({
   const router = useRouter();
   const formatSubscriptionData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
-    package: data?.package || "",
+    package: data?.packageId?.packageName || "",
     promoCoupon: data?.promoCoupon || "",
     offerAmount: data?.offerAmount,
     paymentDate: data?.paymentDate
@@ -150,7 +150,12 @@ export default function EditSubscription({
                 <FormItem>
                   <FormLabel>Package</FormLabel>
                   <FormControl>
-                    <Input placeholder="Package" type="text" {...field} />
+                    <Input
+                      placeholder="Package"
+                      type="text"
+                      {...field}
+                      disabled
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

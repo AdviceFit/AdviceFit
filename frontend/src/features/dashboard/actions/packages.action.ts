@@ -5,8 +5,11 @@ import apiClient from "@/lib/axios";
 
 const API_URL = `${BASE_URL}/packages`;
 
-export const getPackages = async (): Promise<PackageDataParams> => {
-  const response = await apiClient.get(API_URL);
+export const getPackages = async (
+  centerId: string
+): Promise<PackageDataParams> => {
+  const url = API_URL + (centerId ? `?centerId=${centerId}` : "");
+  const response = await apiClient.get(url);
   return response.data;
 };
 

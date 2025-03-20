@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import MembersHeader from "../components/members/MembersHeader";
 import MembersTable from "../components/members/MembersTable";
@@ -21,10 +21,13 @@ const MembersMain = () => {
   useEffect(() => {
     getRequiredData();
   }, []);
-  
+
   return (
     <>
-      <MembersHeader centers={memberState.centers} setMemberState={setMemberState}/>
+      <MembersHeader
+        centers={memberState.centers}
+        setMemberState={setMemberState}
+      />
       <MembersTable
         centers={memberState.centers}
         adviceFitMembers={memberState.members}

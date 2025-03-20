@@ -16,7 +16,7 @@ const columns: ColumnDef<SubscriptionsParams>[] = [
     accessorKey: "package",
     header: "Package",
     cell: ({ row }) => {
-      return <span>{row.original.package || ""}</span>;
+      return <span>{row.original.packageId?.packageName || ""}</span>;
     },
   },
   {

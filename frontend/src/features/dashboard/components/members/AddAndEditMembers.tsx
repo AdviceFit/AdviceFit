@@ -54,6 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getPackages } from "../../actions/packages.action";
 
 const AddAndEditMembers = ({
   setOpenState,
@@ -67,6 +68,7 @@ const AddAndEditMembers = ({
   setMemberState?: any;
 }) => {
   const [stateName, setStateName] = useState<string>("");
+  const [packages, setPackages] = useState<PackageParams[] | null>(null);
   const [showSubscription, setShowSubscription] = useState(false);
 
   const defaultValues = {
@@ -101,9 +103,6 @@ const AddAndEditMembers = ({
     paymentDueDate:
       columnData?.subscriptionDetails?.paymentDueDate || new Date(),
     comments: columnData?.subscriptionDetails?.comments || "",
-    subscription : {
-      package : columnData?.subscriptionDetails?.package || "",
-    }
   };
 
   const formSchema = z.object({
@@ -151,7 +150,7 @@ const AddAndEditMembers = ({
     subscription: !showSubscription
       ? z.undefined()
       : z.object({
-          package: z.string().min(2, { message: "Package is required" }),
+          package: z.string().nonempty({ message: "Package is required" }),
           promoCoupon: z.string().optional(),
           offerAmount: z.coerce
             .number()
@@ -177,37 +176,44 @@ const AddAndEditMembers = ({
     defaultValues: defaultValues,
   });
 
+  const packagesHandle = async (centerId: string) => {
+    const response = await getPackages(centerId);
+    if (response?.packages) {
+      setPackages(response.packages);
+    }
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-      const formattedPayload = {
-        ...values,
-        address: {
-          addressLine1: values.addressLine1 || "",
-          addressLine2: values.addressLine2 || "",
-          country: values.address[0],
-          state: values.address[1],
-          city: values.city || "",
-          pincode: values.pincode || "",
-        },
-      };
-  
-      if (columnData) {
-        const response = await editMember(columnData._id, formattedPayload);
-        if (response.error) {
-          toast.error(response.error);
-          return;
-        }
-        toast.success(TOAST_MESSAGES.memberUpdated);
-      } else {
-        const response = await addMembers(formattedPayload);
-        if (response?.error) {
-          toast.error(response.error);
-          return;
-        }
-        toast.success(TOAST_MESSAGES.memberAdded);
+    const formattedPayload = {
+      ...values,
+      address: {
+        addressLine1: values.addressLine1 || "",
+        addressLine2: values.addressLine2 || "",
+        country: values.address[0],
+        state: values.address[1],
+        city: values.city || "",
+        pincode: values.pincode || "",
+      },
+    };
+
+    if (columnData) {
+      const response = await editMember(columnData._id, formattedPayload);
+      if (response.error) {
+        toast.error(response.error);
+        return;
       }
-      const { members } = await getAllMembers();
-      setMemberState((prev: any) => ({ ...prev, members }));
-      setOpenState(false)
+      toast.success(TOAST_MESSAGES.memberUpdated);
+    } else {
+      const response = await addMembers(formattedPayload);
+      if (response?.error) {
+        toast.error(response.error);
+        return;
+      }
+      toast.success(TOAST_MESSAGES.memberAdded);
+    }
+    const { members } = await getAllMembers();
+    setMemberState((prev: any) => ({ ...prev, members }));
+    setOpenState(false);
   }
 
   return (
@@ -437,7 +443,7 @@ const AddAndEditMembers = ({
                     </PopoverTrigger>
                     <PopoverContent className="p-0">
                       <Command>
-                        <CommandInput placeholder="Search language..." />
+                        <CommandInput placeholder="Search center..." />
                         <CommandList>
                           <CommandEmpty>No Center found.</CommandEmpty>
                           <CommandGroup>
@@ -451,6 +457,7 @@ const AddAndEditMembers = ({
                                     onSelect={() => {
                                       field.onChange(center.value);
                                       form.setValue("center", center.value);
+                                      packagesHandle(center.value);
                                     }}
                                   >
                                     <Check
@@ -854,11 +861,75 @@ const AddAndEditMembers = ({
                   control={form.control}
                   name="subscription.package"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Package</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Package" type="text" {...field} />
-                      </FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? (packages ?? [])
+                                    .map((c) => ({
+                                      label: c.packageName,
+                                      value: c._id,
+                                    }))
+                                    .find(
+                                      (packageData) =>
+                                        packageData.value === field.value
+                                    )?.label
+                                : "Select Package"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="p-0">
+                          <Command>
+                            <CommandInput placeholder="Search package..." />
+                            <CommandList>
+                              <CommandEmpty>No packages found.</CommandEmpty>
+                              <CommandGroup>
+                                {packages &&
+                                  packages
+                                    .map((c) => ({
+                                      label: c.packageName,
+                                      value: c._id,
+                                    }))
+                                    .map((packageData) => (
+                                      <CommandItem
+                                        value={packageData.label}
+                                        key={packageData.value}
+                                        onSelect={() => {
+                                          field.onChange(packageData.value);
+                                          form.setValue(
+                                            "subscription.package",
+                                            packageData.value
+                                          );
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            packageData.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {packageData.label}
+                                      </CommandItem>
+                                    ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+
                       <FormMessage />
                     </FormItem>
                   )}

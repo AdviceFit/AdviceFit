@@ -10,13 +10,17 @@ exports.getAllSubscriptions = async (userId) => {
   return await Subscription.find({
     createdBy: userId,
     isDeleted: false,
-  }).populate({
-    path: "memberId",
-    populate: {
-      path: "center",
-      select: "_id name",
-    },
-  });
+  })
+    .populate({
+      path: "memberId",
+      populate: {
+        path: "center",
+        select: "_id name",
+      },
+    })
+    .populate({
+      path: "packageId",
+    });
 };
 
 // Get a subscription by ID
@@ -24,13 +28,17 @@ exports.findSubscriptionById = async (id) => {
   return await Subscription.findOne({
     _id: id,
     isDeleted: false,
-  }).populate({
-    path: "memberId",
-    populate: {
-      path: "center",
-      select: "_id name",
-    },
-  });
+  })
+    .populate({
+      path: "memberId",
+      populate: {
+        path: "center",
+        select: "_id name",
+      },
+    })
+    .populate({
+      path: "packageId",
+    });
 };
 
 // Update a subscription by ID

@@ -14,10 +14,10 @@ const subscriptionSchema = new Schema(
         ref: "Payment",
       },
     ],
-    package: {
-      type: String,
+    packageId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Package",
       required: true,
-      trim: true,
     },
     promoCoupon: {
       type: String,
