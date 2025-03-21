@@ -46,7 +46,6 @@ const subscriptionSchema = new Schema(
     },
     paymentDueDate: {
       type: Date,
-      required: true,
     },
     comments: {
       type: String,

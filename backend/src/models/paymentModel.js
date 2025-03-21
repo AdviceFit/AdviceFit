@@ -30,7 +30,6 @@ const paymentSchema = new Schema({
   },
   paymentDueDate: {
     type: Date,
-    required: true,
   },
   paymentMode: {
     type: String,
