@@ -72,7 +72,7 @@ const AttendanceActionDropdown =  ({ id }: { id: string }) => {
   
         {/* Edit Dialog */}
         <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+        <DialogContent className="sm:max-w-[765px] lg:h-2/4 h-5/6 overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Attendance</DialogTitle>
             </DialogHeader>

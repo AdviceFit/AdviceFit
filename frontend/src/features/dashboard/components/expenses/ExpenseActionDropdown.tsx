@@ -42,7 +42,7 @@ const ExpenseActionDropdown = ({ id }: { id: string }) => {
         try {
             await deleteExpense(id);
             toast.success("Expense deleted successfully!");
-            router.push("/dashboard/Expenses");
+            router.push("/dashboard/expenses");
         } catch (error) {
             toast.error("Failed to delete Expense.");
         } finally {
@@ -72,7 +72,7 @@ const ExpenseActionDropdown = ({ id }: { id: string }) => {
 
             {/* Controlled Dialog Component */}
             <Dialog open={isOpen} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+                <DialogContent className="sm:max-w-[765px] lg:h-4/6 h-5/6 overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Expense</DialogTitle>
                     </DialogHeader>

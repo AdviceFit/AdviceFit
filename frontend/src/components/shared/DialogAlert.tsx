@@ -14,11 +14,11 @@ export const DialogAlert = ({
   }) => {
     return (
       <Dialog open={open}>
-        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent customClose={true} onInteractOutside={(e) => e.preventDefault()} >
           <DialogHeader>
             <DialogTitle>{message}</DialogTitle>
           </DialogHeader>
-          <div className="flex gap-2 flex-row">
+          <div className="flex gap-2 flex-row justify-end">
             <Button
               type="button"
               className="w-full sm:w-auto"

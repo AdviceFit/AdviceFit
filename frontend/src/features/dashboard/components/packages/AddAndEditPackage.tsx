@@ -152,7 +152,7 @@ export default function AddAndEditPackage({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 max-w-3xl mx-auto py-10"
+        className="space-y-6 w-full mx-auto py-4"
       >
         <div className="grid grid-cols-2 gap-4">
           {/* Package Name */}
@@ -389,7 +389,7 @@ export default function AddAndEditPackage({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full sm:w-auto">
+        <Button type="submit" className="w-full float-end sm:w-auto">
           Submit
         </Button>
       </form>

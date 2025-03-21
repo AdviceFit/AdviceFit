@@ -200,7 +200,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-4">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-6">
             <FormField
@@ -691,8 +691,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
             />
           </div>
         </div>
-        <Button type="submit" className="w-full sm:w-auto">Submit</Button>
-
+        <Button type="submit" className="sm:w-auto ms-auto float-end">Submit</Button>
       </form>
     </Form>
   )

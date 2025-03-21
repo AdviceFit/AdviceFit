@@ -12,7 +12,6 @@ import { format } from "date-fns"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -58,7 +57,7 @@ export default function AddAndEditExpense({ id, onClose }: { id?: string; onClos
     amount: data.amount || 0,
     type_of_expense: data.type_of_expense || "Other",
     center: data.center._id || "",
-    expense_date: data.expense_date || new Date(),
+    expense_date: new Date(data.expense_date) || new Date(),
     payment_mode: data.payment_mode || "Cash",
     comment: data.comment || "",
   });
@@ -116,24 +115,37 @@ export default function AddAndEditExpense({ id, onClose }: { id?: string; onClos
           centerCode: "",
         },
       };
+      
       let response;
       if (id) {
         response = await updateExpense(id, payload);
-        response.expense ? toast.success("Expense updated successfully!") : toast.error("Failed to update expense.");
+        if(response.expense) {
+          toast.success("Expense updated successfully!");
+        }
+        else {
+          toast.error("Failed to update expense.");
+        }
       } else {
         response = await createExpense(payload);
-        response.expense ? toast.success("Expense created successfully!") : toast.error("Failed to create expense.");
+        if(response.expense) {
+          toast.success("Expense created successfully!")
+        }
+        else {
+          toast.error("Failed to create expense.")
+        }
       }
       router.replace("/dashboard/expenses");
-      onClose?.();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
+    }
+    finally {
+      onClose && onClose();
     }
   }
 
   return (
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full mx-auto py-4">
   
       <div className="grid grid-cols-12 gap-4">
         
@@ -218,7 +230,7 @@ export default function AddAndEditExpense({ id, onClose }: { id?: string; onClos
             control={form.control}
             name="expense_date"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-col gap-2">
                 <FormLabel>Expense Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>

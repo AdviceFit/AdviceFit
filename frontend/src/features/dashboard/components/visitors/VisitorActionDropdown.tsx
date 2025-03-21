@@ -69,7 +69,7 @@ const VisitorActionDropdown = ({ id }: { id: string }) => {
 
             {/* Controlled Dialog Component */}
             <Dialog open={isOpen} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+                <DialogContent className="sm:max-w-[920px] lg:h-[90%] h-5/6 overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Visitors</DialogTitle>
                     </DialogHeader>

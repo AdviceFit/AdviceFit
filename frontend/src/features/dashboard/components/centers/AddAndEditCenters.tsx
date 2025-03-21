@@ -148,7 +148,7 @@ export default function AddAndEditCenters({ id, onClose }: { id?: string; onClos
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-3xl mx-auto py-10">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-4">
                 <div className="grid grid-cols-2 gap-4">
                     {/* Name */}
                     <FormField
@@ -416,7 +416,7 @@ export default function AddAndEditCenters({ id, onClose }: { id?: string; onClos
 
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full float-end sm:w-auto">
                     Submit
                 </Button>
             </form>

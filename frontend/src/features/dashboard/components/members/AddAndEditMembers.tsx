@@ -222,7 +222,6 @@ const AddAndEditMembers = ({
         toast.success(TOAST_MESSAGES.memberUpdated);
       } else {
         const response = await addMembers(formattedPayload);
-        console.log(response);
         if (response?.error) {
           toast.error(response.error);
           return;
@@ -1185,7 +1184,7 @@ const AddAndEditMembers = ({
             </div>
           </>
         )}
-        <Button type="submit" className="w-full sm:w-auto">
+        <Button type="submit" className="w-full sm:w-auto float-end">
           {loader ? "Loading ..." : "Submit"}
         </Button>
       </form>

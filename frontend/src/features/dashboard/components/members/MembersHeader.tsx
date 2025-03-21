@@ -48,7 +48,7 @@ const MembersHeader = ({
         >
           <DialogHeader className="sticky top-0 bg-white pt-4 pb-2 flex flex-row justify-between">
             <DialogTitle>Add Members</DialogTitle>
-            <X className="h-4 w-4" onClick={handleClose} />
+            <X className="h-4 w-4 hover:cursor-pointer" onClick={handleClose} />
           </DialogHeader>
           <AddAndEditMembers
             setOpenState={setOpenState}

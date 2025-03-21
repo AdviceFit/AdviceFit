@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,18 +9,29 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Period } from "@/lib/time-picker-utils";
-import { Label } from "@/components/ui/label";
-import { TimePickerInput } from "@/components/ui/TimePickerInput";
-import { TimePeriodSelect } from "@/components/ui/period-select";
-import { createAttendance, getAttendanceById, updateAttendance } from "../../actions/attendance.action";
+// import { Period } from "@/lib/time-picker-utils";
+// import { Label } from "@/components/ui/label";
+// import { TimePickerInput } from "@/components/ui/TimePickerInput";
+// import { TimePeriodSelect } from "@/components/ui/period-select";
+import {
+  createAttendance,
+  getAttendanceById,
+  updateAttendance,
+} from "../../actions/attendance.action";
 import { getAllMembers } from "../../actions/members.action";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 type Member = {
   _id: string;
@@ -33,31 +44,39 @@ const formSchema = z.object({
   time_out: z.string().nonempty("Time-out is required"),
 });
 
-export default function AddAndEditAttendance({ id, onClose }: { id?: string; onClose?: () => void }) {
-
+export default function AddAndEditAttendance({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
   const [members, setMembers] = useState<Member[]>([]);
 
-  const router = useRouter()
-  const [timeOut, setTimeOut] = useState('10:00');
-  const [timeIn, setTimeIn] = useState<string>(
-    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  );
-  const [period, setPeriod] = useState<Period>("PM");
+  const router = useRouter();
 
-  const [date, setDate] = useState<Date>(new Date());
-  const minuteRef = useRef<HTMLInputElement>(null);
-  const hourRef = useRef<HTMLInputElement>(null);
-  const secondRef = useRef<HTMLInputElement>(null);
-  const periodRef = useRef<HTMLButtonElement>(null);
+  
+  // const [timeOut, setTimeOut] = useState("10:00");
+  // const [timeIn, setTimeIn] = useState<string>(
+  //   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  // );
+  // const [period, setPeriod] = useState<Period>("PM");
+
+  // const [date, setDate] = useState<Date>(new Date());
+  // const minuteRef = useRef<HTMLInputElement>(null);
+  // const hourRef = useRef<HTMLInputElement>(null);
+  // const secondRef = useRef<HTMLInputElement>(null);
+  // const periodRef = useRef<HTMLButtonElement>(null);
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      member: '',
-      // time_in: timeIn,
+      member: "",
+      time_in: "",
       time_out: "",
     },
   });
-
 
   useEffect(() => {
     async function fetchMembers() {
@@ -76,13 +95,21 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
       if (!id) return;
       try {
         const response = await getAttendanceById(id);
-        
+
         if (response?.attendance) {
           const { member, time_in, time_out } = response.attendance;
           form.reset({
             member: member._id,
-            time_in: new Date(time_in).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
-            time_out: new Date(time_out).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+            time_in: new Date(time_in).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+            time_out: new Date(time_out).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
           });
         } else {
           toast.error("Attendance record not found.");
@@ -99,8 +126,12 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
     try {
       const formattedData = {
         member: values.member,
-        time_in: new Date(`1970-01-01T${values.time_in}:00`).toISOString(),
-        time_out: new Date(`1970-01-01T${values.time_out}:00`).toISOString(),
+        time_in: new Date(
+          `1970-01-01T${values.time_in.replace(/ /g, "")}:00`
+        ).toISOString(),
+        time_out: new Date(
+          `1970-01-01T${values.time_out.replace(/ /g, "")}:00`
+        ).toISOString(),
       };
 
       if (id) {
@@ -119,9 +150,11 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
         }
       }
       router.replace("/dashboard/attendance");
-      onClose?.();
     } catch (error) {
       toast.error("Failed to submit attendance.");
+    }
+    finally {
+      onClose && onClose();
     }
   }
 
@@ -162,7 +195,7 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
             <FormItem>
               <FormLabel>Time In</FormLabel>
               <FormControl>
-                <input {...field} className="input read-only" />
+                <Input placeholder="Enter In Time" {...field} />
               </FormControl>
             </FormItem>
           )}
@@ -175,13 +208,11 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
             <FormItem>
               <FormLabel>Time Out</FormLabel>
               <FormControl>
-                <input {...field} className="input" />
+                <Input placeholder="Enter Out Time" {...field} />
               </FormControl>
             </FormItem>
           )}
         />
-
-
 
         {/* <div className="flex items-end gap-2">
           <div className="grid gap-1 text-center">
@@ -234,7 +265,6 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
 
         {/* Time Out */}
 
-
         {/* Submit Button */}
         <div className="w-full flex justify-end space-x-3">
           <Button type="submit">Submit</Button>
@@ -242,5 +272,4 @@ export default function AddAndEditAttendance({ id, onClose }: { id?: string; onC
       </form>
     </Form>
   );
-};
-
+}
