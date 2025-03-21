@@ -24,7 +24,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import {  getReport } from "../../actions/reports.action";
+import { getReport } from "../../actions/reports.action";
 
 type Props = {
   centers: CenterParams[];
@@ -85,6 +85,7 @@ const DownloadReports = (props: Props) => {
       >
         <Dropdown
           label="Report"
+          required
           fieldName={"reportName"}
           form={form}
           options={REPORT_TYPES}
@@ -94,7 +95,7 @@ const DownloadReports = (props: Props) => {
           name="dateSpan"
           render={({ field }) => (
             <FormItem className="flex flex-col mt-2">
-              <FormLabel>Date</FormLabel>
+              <FormLabel required>Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -131,6 +132,7 @@ const DownloadReports = (props: Props) => {
         />
         <Dropdown
           label="Center"
+          required
           fieldName={"center"}
           form={form}
           options={props.centers?.map((center) => ({
@@ -140,6 +142,7 @@ const DownloadReports = (props: Props) => {
         />
         <Dropdown
           label="Format"
+          required
           fieldName={"format"}
           form={form}
           options={REPORT_FORMATS}

@@ -59,7 +59,9 @@ const MessagesMain = () => {
     },
   });
 
-  const [centers, setCenters] = useState<{ label: string; value: string }[]>([]);
+  const [centers, setCenters] = useState<{ label: string; value: string }[]>(
+    []
+  );
 
   const [templates, setTemplates] = useState<TemplateDataParams[]>([]);
 
@@ -167,7 +169,7 @@ const MessagesMain = () => {
               name="center"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Center</FormLabel>
+                  <FormLabel required>Center</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -193,7 +195,7 @@ const MessagesMain = () => {
               name="to"
               render={() => (
                 <FormItem>
-                  <FormLabel>To</FormLabel>
+                  <FormLabel required>To</FormLabel>
                   <Select>
                     <FormControl>
                       <SelectTrigger>
@@ -233,7 +235,7 @@ const MessagesMain = () => {
               name="messageServiceType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message Service Type</FormLabel>
+                  <FormLabel required>Message Service Type</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -259,7 +261,7 @@ const MessagesMain = () => {
               name="messageType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message Type</FormLabel>
+                  <FormLabel required>Message Type</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -291,7 +293,7 @@ const MessagesMain = () => {
               name="messageTemplate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message Template</FormLabel>
+                  <FormLabel required>Message Template</FormLabel>
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -372,7 +374,7 @@ const MessagesMain = () => {
               </FormItem>
             )}
           />
-          ;{/* Submit Button */}
+          {/* Submit Button */}
           <div className="flex justify-end mt-4">
             <button
               type="submit"

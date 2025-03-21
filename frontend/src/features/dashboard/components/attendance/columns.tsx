@@ -6,7 +6,7 @@ const columns: ColumnDef<any>[] = [
   {
     accessorKey: "member.name",
     header: "Member",
-    cell: ({ row }) => <span>{row.original?.member?.name}</span>,
+    cell: ({ row }) => <span>{row.original.member?.name}</span>,
   },
   {
     accessorKey: "time_in",

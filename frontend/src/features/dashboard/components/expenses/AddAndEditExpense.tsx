@@ -1,13 +1,23 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { getCenters } from "../../actions/centers.action";
 import { toast } from "sonner";
-import { createExpense, getExpenseById, updateExpense } from "../../actions/expenses.action";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { format } from "date-fns"
+import {
+  createExpense,
+  getExpenseById,
+  updateExpense,
+} from "../../actions/expenses.action";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { format } from "date-fns";
 
 import {
   Form,
@@ -16,11 +26,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,11 +57,24 @@ const formSchema = z.object({
   ]),
   center: z.string().min(1, "Center is required"),
   expense_date: z.date(),
-  payment_mode: z.enum(["Cash", "Cheque", "Paytm", "Bank Transfer", "UPI", "Card"]),
+  payment_mode: z.enum([
+    "Cash",
+    "Cheque",
+    "Paytm",
+    "Bank Transfer",
+    "UPI",
+    "Card",
+  ]),
   comment: z.string().optional(),
 });
 
-export default function AddAndEditExpense({ id, onClose }: { id?: string; onClose?: () => void }) {
+export default function AddAndEditExpense({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const router = useRouter();
 
@@ -89,7 +116,6 @@ export default function AddAndEditExpense({ id, onClose }: { id?: string; onClos
     fetchSessionDetails();
   }, [id]);
 
-
   // Form Setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -115,235 +141,246 @@ export default function AddAndEditExpense({ id, onClose }: { id?: string; onClos
           centerCode: "",
         },
       };
-      
+
       let response;
       if (id) {
         response = await updateExpense(id, payload);
-        if(response.expense) {
+        if (response.expense) {
           toast.success("Expense updated successfully!");
-        }
-        else {
+        } else {
           toast.error("Failed to update expense.");
         }
       } else {
         response = await createExpense(payload);
-        if(response.expense) {
-          toast.success("Expense created successfully!")
-        }
-        else {
-          toast.error("Failed to create expense.")
+        if (response.expense) {
+          toast.success("Expense created successfully!");
+        } else {
+          toast.error("Failed to create expense.");
         }
       }
       router.replace("/dashboard/expenses");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
-    }
-    finally {
+    } finally {
       onClose && onClose();
     }
   }
 
   return (
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full mx-auto py-4">
-  
-      <div className="grid grid-cols-12 gap-4">
-        
-        {/* Expense Title */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="expense_title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Expense Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter expense title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-  
-        {/* Amount */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Enter amount"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))} // Ensure number type
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-  
-      </div>
-  
-      <div className="grid grid-cols-12 gap-4">
-        
-        {/* Type of Expense */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="type_of_expense"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type of Expense</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 w-full mx-auto py-4"
+      >
+        <div className="grid grid-cols-12 gap-4">
+          {/* Expense Title */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="expense_title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Expense Title</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
+                    <Input placeholder="Enter expense title" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    {[
-                      "Electric Bill", "Water Bill", "Internet Bill",
-                      "Medical Kit", "Cleaning Kit", "AC Service",
-                      "Rent", "Employee Salary", "Other"
-                    ].map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-  
-        {/* Expense Date */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="expense_date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel>Expense Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Amount */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter amount"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))} // Ensure number type
                     />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-  
-      </div>
-  
-      <div className="grid grid-cols-12 gap-4">
-        
-        {/* Payment Mode */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="payment_mode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Payment Mode</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment mode" />
-                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    {["Cash", "Cheque", "Paytm", "Bank Transfer", "UPI", "Card"].map((mode) => (
-                      <SelectItem key={mode} value={mode}>
-                        {mode}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
-  
-        {/* Center */}
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="center"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Center</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a center" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {centers.map(center => (
-                      <SelectItem key={center._id} value={center._id}>
-                        {center.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+        <div className="grid grid-cols-12 gap-4">
+          {/* Type of Expense */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="type_of_expense"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Type of Expense</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {[
+                        "Electric Bill",
+                        "Water Bill",
+                        "Internet Bill",
+                        "Medical Kit",
+                        "Cleaning Kit",
+                        "AC Service",
+                        "Rent",
+                        "Employee Salary",
+                        "Other",
+                      ].map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Expense Date */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="expense_date"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-2">
+                  <FormLabel required>Expense Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
-  
-      </div>
-  
-      {/* Comment */}
-      <FormField
-        control={form.control}
-        name="comment"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Comment</FormLabel>
-            <FormControl>
-              <Textarea placeholder="Enter any additional comments..." {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-  
-      <div className="w-full flex">
-        <Button type="submit">Submit</Button>
-      </div>
-  
-    </form>
-  </Form>
-  
+
+        <div className="grid grid-cols-12 gap-4">
+          {/* Payment Mode */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="payment_mode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Payment Mode</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select payment mode" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {[
+                        "Cash",
+                        "Cheque",
+                        "Paytm",
+                        "Bank Transfer",
+                        "UPI",
+                        "Card",
+                      ].map((mode) => (
+                        <SelectItem key={mode} value={mode}>
+                          {mode}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Center */}
+          <div className="col-span-6">
+            <FormField
+              control={form.control}
+              name="center"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Center</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a center" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {centers.map((center) => (
+                        <SelectItem key={center._id} value={center._id}>
+                          {center.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        {/* Comment */}
+        <FormField
+          control={form.control}
+          name="comment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Comment</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Enter any additional comments..."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="w-full flex">
+          <Button type="submit">Submit</Button>
+        </div>
+      </form>
+    </Form>
   );
 }

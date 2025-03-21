@@ -1,22 +1,43 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { createSession, getSessionById, updateSession } from "../../actions/sessions.action"
-import { getCenters } from "../../actions/centers.action"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import {
+  createSession,
+  getSessionById,
+  updateSession,
+} from "../../actions/sessions.action";
+import { getCenters } from "../../actions/centers.action";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = z.object({
   _id: z.string().optional(),
@@ -28,7 +49,13 @@ const formSchema = z.object({
   member_capacity: z.number().min(1, "Member capacity must be at least 1"),
 });
 
-export default function AddAndEditSession({ id, onClose }: { id?: string; onClose?: () => void }) {
+export default function AddAndEditSession({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const router = useRouter();
 
@@ -74,8 +101,8 @@ export default function AddAndEditSession({ id, onClose }: { id?: string; onClos
         ...values,
         center: {
           _id: values.center,
-          name: '',
-          centerCode: '',
+          name: "",
+          centerCode: "",
         },
       };
       let response;
@@ -115,41 +142,52 @@ export default function AddAndEditSession({ id, onClose }: { id?: string; onClos
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-2">
-        <FormField control={form.control} name="title" render={({ field }) => (
-          <FormItem>
-            <FormLabel>Session Title</FormLabel>
-            <FormControl>
-              <Input type="text" placeholder="Session Title" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-
-        <FormField control={form.control} name="center" render={({ field }) => (
-          <FormItem>
-            <FormLabel>Center</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-full mx-auto py-2"
+      >
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel required>Session Title</FormLabel>
               <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a center" />
-                </SelectTrigger>
+                <Input type="text" placeholder="Session Title" {...field} />
               </FormControl>
-              <SelectContent>
-                {centers.map(center => (
-                  <SelectItem key={center._id} value={center._id}>
-                    {center.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )} />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="center"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel required>Center</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a center" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {centers.map((center) => (
+                    <SelectItem key={center._id} value={center._id}>
+                      {center.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* <FormField control={form.control} name="session_date" render={({ field }) => (
           <FormItem>
-            <FormLabel>Session Date</FormLabel>
+            <FormLabel required>Session Date</FormLabel>
             <FormControl>
               <Input type="date" {...field} />
             </FormControl>
@@ -162,7 +200,7 @@ export default function AddAndEditSession({ id, onClose }: { id?: string; onClos
           name="session_date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Session Date</FormLabel>
+              <FormLabel required>Session Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -195,35 +233,54 @@ export default function AddAndEditSession({ id, onClose }: { id?: string; onClos
           )}
         />
 
-        <FormField control={form.control} name="start_time" render={({ field }) => (
-          <FormItem>
-            <FormLabel>Start Time</FormLabel>
-            <FormControl>
-              <Input type="time" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
+        <FormField
+          control={form.control}
+          name="start_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel required>Start Time</FormLabel>
+              <FormControl>
+                <Input type="time" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <FormField control={form.control} name="end_time" render={({ field }) => (
-          <FormItem>
-            <FormLabel>End Time</FormLabel>
-            <FormControl>
-              <Input type="time" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-        <FormField control={form.control} name="member_capacity" render={({ field }) => (
-          <FormItem>
-            <FormLabel>Member Capacity</FormLabel>
-            <FormControl>
-              <Input type="number" placeholder="Capacity" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-        <Button type="submit" className="w-full sm:w-auto float-end">Submit</Button>
+        <FormField
+          control={form.control}
+          name="end_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel required>End Time</FormLabel>
+              <FormControl>
+                <Input type="time" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="member_capacity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel required>Member Capacity</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Capacity"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full sm:w-auto float-end">
+          Submit
+        </Button>
       </form>
     </Form>
   );

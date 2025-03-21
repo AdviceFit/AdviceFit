@@ -55,7 +55,6 @@ export default function AddAndEditAttendance({
 
   const router = useRouter();
 
-  
   // const [timeOut, setTimeOut] = useState("10:00");
   // const [timeIn, setTimeIn] = useState<string>(
   //   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -67,7 +66,6 @@ export default function AddAndEditAttendance({
   // const hourRef = useRef<HTMLInputElement>(null);
   // const secondRef = useRef<HTMLInputElement>(null);
   // const periodRef = useRef<HTMLButtonElement>(null);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -152,8 +150,7 @@ export default function AddAndEditAttendance({
       router.replace("/dashboard/attendance");
     } catch (error) {
       toast.error("Failed to submit attendance.");
-    }
-    finally {
+    } finally {
       onClose && onClose();
     }
   }
@@ -167,7 +164,7 @@ export default function AddAndEditAttendance({
           name="member"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Member</FormLabel>
+              <FormLabel required>Member</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -193,7 +190,7 @@ export default function AddAndEditAttendance({
           name="time_in"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Time In</FormLabel>
+              <FormLabel required>Time In</FormLabel>
               <FormControl>
                 <Input placeholder="Enter In Time" {...field} />
               </FormControl>
@@ -206,7 +203,7 @@ export default function AddAndEditAttendance({
           name="time_out"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Time Out</FormLabel>
+              <FormLabel required>Time Out</FormLabel>
               <FormControl>
                 <Input placeholder="Enter Out Time" {...field} />
               </FormControl>

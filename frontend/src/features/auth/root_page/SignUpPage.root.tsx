@@ -24,7 +24,7 @@ import Link from "next/link";
 const formSchema = z.object({
   gym_name: z.string().min(2).max(50),
   gym_owner_name: z.string().min(2).max(50),
-  email: z.string(),
+  email: z.string().email("Invalid email format"),
   number: z.number(),
   password: z.string(),
   describe: z.string(),
@@ -101,7 +101,7 @@ const SignUpPage = () => {
               name="gym_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gym Name</FormLabel>
+                  <FormLabel required>Gym Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Fit Gym" type="text" {...field} />
                   </FormControl>
@@ -117,7 +117,7 @@ const SignUpPage = () => {
               name="gym_owner_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Owner Name</FormLabel>
+                  <FormLabel required>Owner Name</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" type="text" {...field} />
                   </FormControl>
@@ -135,7 +135,7 @@ const SignUpPage = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel required>Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="johndoe@example.com"
@@ -155,7 +155,7 @@ const SignUpPage = () => {
               name="number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel required>Phone</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="0000000000"
@@ -176,7 +176,7 @@ const SignUpPage = () => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel required>Password</FormLabel>
               <FormControl>
                 <PasswordInput placeholder="" {...field} />
               </FormControl>
@@ -190,7 +190,7 @@ const SignUpPage = () => {
           name="describe"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel required>Description</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="type here ..."
@@ -208,7 +208,7 @@ const SignUpPage = () => {
           name="country"
           render={({}) => (
             <FormItem>
-              <FormLabel>Select Country</FormLabel>
+              <FormLabel required>Select Country</FormLabel>
               <FormControl>
                 <LocationSelector
                   onCountryChange={(country) => {
@@ -234,7 +234,7 @@ const SignUpPage = () => {
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>City</FormLabel>
+                  <FormLabel required>City</FormLabel>
                   <FormControl>
                     <Input placeholder="xyz" type="text" {...field} />
                   </FormControl>
@@ -250,7 +250,7 @@ const SignUpPage = () => {
               name="pincode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pincode</FormLabel>
+                  <FormLabel required>Pincode</FormLabel>
                   <FormControl>
                     <Input placeholder="111111" type="text" {...field} />
                   </FormControl>

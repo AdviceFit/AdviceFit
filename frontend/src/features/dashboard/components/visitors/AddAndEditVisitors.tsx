@@ -1,21 +1,11 @@
-"use client"
+"use client";
 
-import {
-  toast
-} from "sonner"
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {
-  cn
-} from "@/lib/utils"
-import {
-  Button
-} from "@/components/ui/button"
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -24,11 +14,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import {
-  Input
-} from "@/components/ui/input"
-
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 import {
   Command,
@@ -36,41 +23,37 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
-} from "@/components/ui/command"
+  CommandList,
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Check,
-  ChevronsUpDown
-} from "lucide-react"
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
-import {
-  format
-} from "date-fns"
+  SelectValue,
+} from "@/components/ui/select";
+import { format } from "date-fns";
 
-
+import { Calendar as CalendarIcon } from "lucide-react";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { Calendar } from "@/components/ui/calendar";
+import { DatePickerDemo } from "@/components/ui/DatePickerDemo";
+import { SmartDatetimeInput } from "@/components/ui/smart-date-time-input";
+import { getCenters } from "../../actions/centers.action";
+import { useEffect, useState } from "react";
+import LocationSelector from "@/components/ui/location-input";
+import { useRouter } from "next/navigation";
 import {
-  Calendar as CalendarIcon
-} from "lucide-react"
-import { PhoneInput } from "@/components/ui/phone-input"
-import { Calendar } from "@/components/ui/calendar"
-import { DatePickerDemo } from "@/components/ui/DatePickerDemo"
-import { SmartDatetimeInput } from "@/components/ui/smart-date-time-input"
-import { getCenters } from "../../actions/centers.action"
-import { useEffect, useState } from "react"
-import LocationSelector from "@/components/ui/location-input"
-import { useRouter } from "next/navigation"
-import { createVisitor, getVisitorById, updateVisitor } from "../../actions/visitors.action"
+  createVisitor,
+  getVisitorById,
+  updateVisitor,
+} from "../../actions/visitors.action";
 
 const formSchema = z.object({
   _id: z.string().optional(),
@@ -80,30 +63,45 @@ const formSchema = z.object({
   tentative_visiting_date: z.coerce.date().optional(),
   email: z.string().email("Enter a valid email address").optional(),
   visiting_center: z.string().min(1, "Center is required"),
-  gender: z.enum(["Male", "Female", "Other"], { required_error: "Gender is required" }),
+  gender: z.enum(["Male", "Female", "Other"], {
+    required_error: "Gender is required",
+  }),
   source: z.string().optional(),
   occupation: z.string().optional(),
   dob: z.coerce.date().optional(),
   health_conditions: z.string().optional(),
-  marital_status: z.enum(["Single", "Married"], { required_error: "Marital status is required" }),
+  marital_status: z.enum(["Single", "Married"], {
+    required_error: "Marital status is required",
+  }),
   remarks: z.string().optional(),
-  enquire_mode: z.enum(["Talking", "Walking", "Any"], { required_error: "Select at least one enquiry mode" }),
+  enquire_mode: z.enum(["Talking", "Walking", "Any"], {
+    required_error: "Select at least one enquiry mode",
+  }),
   address: z
     .object({
       addressLine1: z.string().optional(),
       addressLine2: z.string().optional(),
       state: z.string().optional(),
       city: z.string().optional(),
-      pincode: z.string().regex(/^\d{6}$/, "Pincode must be a valid 6-digit number").optional(),
+      pincode: z
+        .string()
+        .regex(/^\d{6}$/, "Pincode must be a valid 6-digit number")
+        .optional(),
     })
     .optional(),
 });
 
-export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClose?: () => void }) {
-  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);  
-  const router = useRouter()
-  const [countryName, setCountryName] = useState<string>('');
-  const [stateName, setStateName] = useState<string>('');
+export default function AddAndEditVisitors({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
+  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
+  const router = useRouter();
+  const [countryName, setCountryName] = useState<string>("");
+  const [stateName, setStateName] = useState<string>("");
   const formatVisitorData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     name: data.name || "",
@@ -111,16 +109,25 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
     visiting_date: data.visiting_date || new Date().toISOString().slice(0, 10),
     tentative_visiting_date: data.tentative_visiting_date || undefined,
     email: data.email || "",
-    visiting_center: typeof data.visiting_center === "string" ? data.visiting_center : data.visiting_center._id,
+    visiting_center:
+      typeof data.visiting_center === "string"
+        ? data.visiting_center
+        : data.visiting_center._id,
     gender: data.gender as "Male" | "Female" | "Other",
     source: data.source || "Banner",
     occupation: data.occupation || "Student",
     dob: data.dob || new Date(),
-    health_conditions: data.health_conditions || 'None',
+    health_conditions: data.health_conditions || "None",
     marital_status: data.marital_status as "Single" | "Married",
     remarks: data.remarks || "Medium",
     enquire_mode: data.enquire_mode as "Talking" | "Walking" | "Any",
-    address: data.address || { addressLine1: "", addressLine2: "", state: "", city: "", pincode: "" },
+    address: data.address || {
+      addressLine1: "",
+      addressLine2: "",
+      state: "",
+      city: "",
+      pincode: "",
+    },
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -138,7 +145,13 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       marital_status: "Single",
       remarks: "Medium",
       enquire_mode: "Talking",
-      address: { addressLine1: "", addressLine2: "", state: "", city: "", pincode: "" },
+      address: {
+        addressLine1: "",
+        addressLine2: "",
+        state: "",
+        city: "",
+        pincode: "",
+      },
     },
   });
 
@@ -172,7 +185,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
           toast.error("Failed to update visitor.");
         }
       } else {
-        response = await createVisitor(values as VisitorParams);        
+        response = await createVisitor(values as VisitorParams);
         if (response.visitor) {
           toast.success("Visitor added successfully!");
         } else {
@@ -183,7 +196,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     } finally {
-      router.replace("/dashboard/visitors")
+      router.replace("/dashboard/visitors");
     }
   }
   useEffect(() => {
@@ -200,7 +213,10 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 w-full mx-auto py-4"
+      >
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-6">
             <FormField
@@ -208,12 +224,9 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel required>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="john Doe"
-                      type="text"
-                      {...field} />
+                    <Input placeholder="john Doe" type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -226,11 +239,9 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="mobile"
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start">
-                  <FormLabel>Mobile</FormLabel>
+                  <FormLabel required>Mobile</FormLabel>
                   <FormControl className="w-full">
-
                     <PhoneInput placeholder="1234567890" {...field} />
-
                   </FormControl>
 
                   <FormMessage />
@@ -299,24 +310,22 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               )}
             />
           </div>
-
         </div>
 
         <div className="grid grid-cols-12 gap-4">
-
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel required>Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="john123@web.com"
                       type="email"
-                      {...field} />
+                      {...field}
+                    />
                   </FormControl>
 
                   <FormMessage />
@@ -331,26 +340,25 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="visiting_center"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Visiting Center</FormLabel>
+                  <FormLabel required>Visiting Center</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a center" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {centers.map(center => (
-                            <SelectItem key={center._id} value={center._id}>
-                              {center.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a center" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {centers.map((center) => (
+                        <SelectItem key={center._id} value={center._id}>
+                          {center.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
           </div>
         </div>
         <FormField
@@ -358,7 +366,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
           name="gender"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Gender</FormLabel>
+              <FormLabel required>Gender</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -445,9 +453,11 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                         "Psychologist",
                         "Real Estate Agent",
                         "Sales Representative",
-                        "Other"
+                        "Other",
                       ].map((occ, index) => (
-                        <SelectItem key={index} value={occ}>{occ}</SelectItem>
+                        <SelectItem key={index} value={occ}>
+                          {occ}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -459,7 +469,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
           </div>
 
           <div className="col-span-6">
-
             <FormField
               control={form.control}
               name="source"
@@ -473,10 +482,20 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {["Walk-In", "Search Engine", "Social Media", "Referral", "Website", "Banner", "Ads", "Newspapers"].map(src => (
-                        <SelectItem key={src} value={src}>{src}</SelectItem>
+                      {[
+                        "Walk-In",
+                        "Search Engine",
+                        "Social Media",
+                        "Referral",
+                        "Website",
+                        "Banner",
+                        "Ads",
+                        "Newspapers",
+                      ].map((src) => (
+                        <SelectItem key={src} value={src}>
+                          {src}
+                        </SelectItem>
                       ))}
-
                     </SelectContent>
                   </Select>
 
@@ -493,7 +512,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="dob"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date of birth</FormLabel>
+                  <FormLabel required>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -535,7 +554,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="marital_status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Marital Status</FormLabel>
+                  <FormLabel required>Marital Status</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -543,8 +562,10 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {["Single", "Married"].map(src => (
-                        <SelectItem key={src} value={src}>{src}</SelectItem>
+                      {["Single", "Married"].map((src) => (
+                        <SelectItem key={src} value={src}>
+                          {src}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -556,7 +577,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
           </div>
 
           <div className="col-span-4">
-
             <FormField
               control={form.control}
               name="remarks"
@@ -570,8 +590,10 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {["High", "Medium", "Low"].map(src => (
-                        <SelectItem key={src} value={src}>{src}</SelectItem>
+                      {["High", "Medium", "Low"].map((src) => (
+                        <SelectItem key={src} value={src}>
+                          {src}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -587,7 +609,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               name="enquire_mode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Enquire Mode</FormLabel>
+                  <FormLabel required>Enquire Mode</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -595,8 +617,10 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {["Talking", "Walking", "Any"].map(src => (
-                        <SelectItem key={src} value={src}>{src}</SelectItem>
+                      {["Talking", "Walking", "Any"].map((src) => (
+                        <SelectItem key={src} value={src}>
+                          {src}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -606,7 +630,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
               )}
             />
           </div>
-
         </div>
 
         <FormField
@@ -616,11 +639,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
             <FormItem>
               <FormLabel>Address Line 1</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="123 Main St"
-
-                  type="text"
-                  {...field} />
+                <Input placeholder="123 Main St" type="text" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -635,11 +654,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
             <FormItem>
               <FormLabel>Address Line 2</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Apt 101"
-
-                  type="text"
-                  {...field} />
+                <Input placeholder="Apt 101" type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -656,16 +671,19 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                   <FormControl>
                     <LocationSelector
                       onCountryChange={(country) => {
-                        setCountryName(country?.name || '');
-                        form.setValue('address.state', country?.name || ''); // Set country directly as a string
+                        setCountryName(country?.name || "");
+                        form.setValue("address.state", country?.name || ""); // Set country directly as a string
                       }}
                       onStateChange={(state) => {
-                        setStateName(state?.name || '');
-                        form.setValue('address.city', state?.name || ''); // Set state separately
+                        setStateName(state?.name || "");
+                        form.setValue("address.city", state?.name || ""); // Set state separately
                       }}
                     />
                   </FormControl>
-                  <FormDescription>If your country has states, it will appear after selecting the country.</FormDescription>
+                  <FormDescription>
+                    If your country has states, it will appear after selecting
+                    the country.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -679,10 +697,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                 <FormItem>
                   <FormLabel>Pincode</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="12345"
-                      {...field} />
+                    <Input type="number" placeholder="12345" {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -691,8 +706,10 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
             />
           </div>
         </div>
-        <Button type="submit" className="sm:w-auto ms-auto float-end">Submit</Button>
+        <Button type="submit" className="sm:w-auto ms-auto float-end">
+          Submit
+        </Button>
       </form>
     </Form>
-  )
+  );
 }

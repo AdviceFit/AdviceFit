@@ -65,15 +65,15 @@ export default function AddAndEditPackage({
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
   const searchParams = useSearchParams();
   const centerIdFromParams = searchParams.get("centerId");
-  
-  console.log('centerIdFromParams', centerIdFromParams);
+
+  console.log("centerIdFromParams", centerIdFromParams);
 
   const router = useRouter();
   const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     packageName: data.packageName || "",
     price: data.price || 0,
-    center: data.center?._id || centerIdFromParams || "", 
+    center: data.center?._id || centerIdFromParams || "",
     productType: data.productType as
       | "General"
       | "Gift"
@@ -85,8 +85,6 @@ export default function AddAndEditPackage({
     packageType: data.packageType as "Main" | "Add On",
     showAtAdviceFit: data.showAtAdviceFit || false,
   });
-  
-  
 
   //To-do temp fix for center populate
 
@@ -95,7 +93,7 @@ export default function AddAndEditPackage({
     defaultValues: {
       packageName: "",
       price: 0,
-      center: centerIdFromParams || "", 
+      center: centerIdFromParams || "",
       productType: "General",
       noOfDays: 0,
       packageTiming: "Normal Hours",
@@ -146,14 +144,14 @@ export default function AddAndEditPackage({
     const fetchPackageDetails = async () => {
       if (!id) return;
       try {
-        const data = await getPackageById(id);  
-        const formattedData = formatPackageData(data.packages);  
-        form.reset(formattedData); 
+        const data = await getPackageById(id);
+        const formattedData = formatPackageData(data.packages);
+        form.reset(formattedData);
       } catch (error) {
         toast.error("Failed to fetch package details.");
       }
     };
-  
+
     fetchPackageDetails();
   }, [id, form]);
   return (
@@ -169,7 +167,7 @@ export default function AddAndEditPackage({
             name="packageName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Package Name</FormLabel>
+                <FormLabel required>Package Name</FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Package Name" {...field} />
                 </FormControl>
@@ -184,7 +182,7 @@ export default function AddAndEditPackage({
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price</FormLabel>
+                <FormLabel required>Price</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -205,7 +203,7 @@ export default function AddAndEditPackage({
           name="center"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Center</FormLabel>
+              <FormLabel required>Center</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={field.value} // Ensure selected value updates dynamically
@@ -228,14 +226,13 @@ export default function AddAndEditPackage({
           )}
         />
 
-
         {/* Product Type */}
         <FormField
           control={form.control}
           name="productType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Product Type</FormLabel>
+              <FormLabel required>Product Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -267,7 +264,7 @@ export default function AddAndEditPackage({
           name="noOfDays"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Number of Days</FormLabel>
+              <FormLabel required>Number of Days</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -287,7 +284,7 @@ export default function AddAndEditPackage({
           name="packageTiming"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Package Timing</FormLabel>
+              <FormLabel required>Package Timing</FormLabel>
               <div className="flex space-x-4">
                 <label className="flex items-center">
                   <input
@@ -321,7 +318,7 @@ export default function AddAndEditPackage({
           name="trainingType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Training Type</FormLabel>
+              <FormLabel required>Training Type</FormLabel>
               <div className="flex space-x-4">
                 <label className="flex items-center">
                   <input
@@ -355,7 +352,7 @@ export default function AddAndEditPackage({
           name="packageType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Package Type</FormLabel>
+              <FormLabel required>Package Type</FormLabel>
               <div className="flex space-x-4">
                 <label className="flex items-center">
                   <input

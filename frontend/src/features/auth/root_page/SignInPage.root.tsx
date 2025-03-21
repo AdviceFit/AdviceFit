@@ -47,8 +47,8 @@ export default function MyForm() {
       await axios.post(`${BASE_URL + "/api/users/login"}`, dataToSend, {
         withCredentials: true,
       });
-      
-      const responseOfMe = await getUserInfo();      
+
+      const responseOfMe = await getUserInfo();
       if (responseOfMe.user) {
         localStorage.setItem("user", JSON.stringify(responseOfMe.user));
       }
@@ -102,7 +102,7 @@ export default function MyForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel required>Email</FormLabel>
               <FormControl>
                 <Input
                   placeholder="johndoe@example.com"
@@ -122,7 +122,7 @@ export default function MyForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel required>Password</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder="password"

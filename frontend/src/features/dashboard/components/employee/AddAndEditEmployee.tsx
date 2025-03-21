@@ -49,7 +49,7 @@ const formSchema = z.object({
     .string()
     .min(1)
     .max(15, "Mobile number must be between 1 and 15 characters"),
-  email: z.string().email("Enter a valid email address").optional(),
+  email: z.string().email("Enter a valid email address"),
   gender: z.enum(["Male", "Female", "Other"], {
     required_error: "Gender is required",
   }),
@@ -187,7 +187,7 @@ export default function AddAndEditEmployee({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel required>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="john Doe" type="text" {...field} />
                   </FormControl>
@@ -203,7 +203,7 @@ export default function AddAndEditEmployee({
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile</FormLabel>
+                  <FormLabel required>Mobile</FormLabel>
                   <FormControl>
                     <PhoneInput placeholder="1234567890" {...field} />
                   </FormControl>
@@ -221,7 +221,7 @@ export default function AddAndEditEmployee({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel required>Email</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="john123@web.com"
@@ -241,7 +241,7 @@ export default function AddAndEditEmployee({
               name="gender"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender</FormLabel>
+                  <FormLabel required>Gender</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -268,7 +268,7 @@ export default function AddAndEditEmployee({
               name="dob"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date of birth</FormLabel>
+                  <FormLabel required>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -309,7 +309,7 @@ export default function AddAndEditEmployee({
               name="center"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Center</FormLabel>
+                  <FormLabel required>Center</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -378,7 +378,7 @@ export default function AddAndEditEmployee({
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel required>Role</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     {" "}
                     {/* Use value, not defaultValue */}
@@ -483,7 +483,9 @@ export default function AddAndEditEmployee({
             />
           </div>
         </div>
-        <Button type="submit" className="w-full sm:w-auto float-end">Submit</Button>
+        <Button type="submit" className="w-full sm:w-auto float-end">
+          Submit
+        </Button>
       </form>
     </Form>
   );

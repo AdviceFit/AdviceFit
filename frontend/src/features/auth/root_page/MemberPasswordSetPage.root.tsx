@@ -104,7 +104,7 @@ export default function MyForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel required>Password</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder="password"

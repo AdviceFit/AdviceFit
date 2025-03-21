@@ -27,17 +27,25 @@ type Props = {
   form: any;
   fieldName: string;
   label: string;
+  required?: boolean;
   onChange?: (value: unknown) => void;
 };
 
-const Dropdown = ({ options, form, onChange, fieldName, label }: Props) => {
+const Dropdown = ({
+  options,
+  form,
+  onChange,
+  fieldName,
+  label,
+  required,
+}: Props) => {
   return (
     <FormField
       control={form.control}
       name={fieldName}
       render={({ field }) => (
         <FormItem className="flex flex-col gap-2">
-          <FormLabel>{label}</FormLabel>
+          <FormLabel required>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>

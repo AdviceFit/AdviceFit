@@ -148,7 +148,7 @@ export default function EditSubscription({
               name="package"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Package</FormLabel>
+                  <FormLabel required>Package</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Package"
@@ -190,7 +190,7 @@ export default function EditSubscription({
               name="offerAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Offer Amount</FormLabel>
+                  <FormLabel required>Offer Amount</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Offer Amount"
@@ -210,7 +210,7 @@ export default function EditSubscription({
               name="paymentDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Payment Date</FormLabel>
+                  <FormLabel required>Payment Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -252,7 +252,7 @@ export default function EditSubscription({
               name="startDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel required>Start Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -293,7 +293,7 @@ export default function EditSubscription({
               name="paidAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Paid Amount</FormLabel>
+                  <FormLabel required>Paid Amount</FormLabel>
                   <FormControl>
                     <Input placeholder="Paid Amount" type="number" {...field} />
                   </FormControl>
@@ -310,7 +310,7 @@ export default function EditSubscription({
               name="paymentMode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Mode</FormLabel>
+                  <FormLabel required>Payment Mode</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
