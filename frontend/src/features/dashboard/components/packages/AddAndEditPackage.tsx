@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getCenters } from "../../actions/centers.action";
 
 import { toast } from "sonner";
@@ -57,23 +56,27 @@ const formSchema = z.object({
 
 export default function AddAndEditPackage({
   id,
+  centerId,
   onClose,
+  onPackageAdded
 }: {
   id?: string;
+  centerId?: string,
   onClose?: () => void;
+  onPackageAdded?: (newPackage: PackageParams) => void;
 }) {
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
-  const searchParams = useSearchParams();
-  const centerIdFromParams = searchParams.get("centerId");
 
-  console.log("centerIdFromParams", centerIdFromParams);
+  //TO-DO ( 1 - we create redirect flow then decided to open two modal on member so that's why)
+  // const searchParams = useSearchParams();
+  // const centerIdFromParams = searchParams.get("centerId");
 
   const router = useRouter();
   const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     packageName: data.packageName || "",
     price: data.price || 0,
-    center: data.center?._id || centerIdFromParams || "",
+    center: data.center?._id || centerId || "",
     productType: data.productType as
       | "General"
       | "Gift"
@@ -86,6 +89,8 @@ export default function AddAndEditPackage({
     showAtAdviceFit: data.showAtAdviceFit || false,
   });
 
+
+
   //To-do temp fix for center populate
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -93,7 +98,7 @@ export default function AddAndEditPackage({
     defaultValues: {
       packageName: "",
       price: 0,
-      center: centerIdFromParams || "",
+      center: centerId || "",
       productType: "General",
       noOfDays: 0,
       packageTiming: "Normal Hours",
@@ -102,7 +107,6 @@ export default function AddAndEditPackage({
       showAtAdviceFit: false,
     },
   });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       let response;
@@ -117,16 +121,21 @@ export default function AddAndEditPackage({
         response = await createPackage(values as PackageParams);
         if (response.package) {
           toast.success("Package created successfully!");
+  
+          // Call the callback to update the parent component
+          if (onPackageAdded) {
+            onPackageAdded(response.package);
+          }
         } else {
           toast.error("Failed to create the package.");
         }
       }
-      router.replace("/dashboard/packages");
       onClose?.();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     }
   }
+  
 
   useEffect(() => {
     async function fetchCenters() {
@@ -156,10 +165,8 @@ export default function AddAndEditPackage({
   }, [id, form]);
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 w-full mx-auto py-4"
-      >
+        <form className="space-y-6 w-full mx-auto py-4" onSubmit={form.handleSubmit(onSubmit)}>
+
         <div className="grid grid-cols-2 gap-4">
           {/* Package Name */}
           <FormField
@@ -398,7 +405,10 @@ export default function AddAndEditPackage({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full float-end sm:w-auto">
+        <Button
+          type="submit"
+          className="w-full float-end sm:w-auto"
+        >
           Submit
         </Button>
       </form>

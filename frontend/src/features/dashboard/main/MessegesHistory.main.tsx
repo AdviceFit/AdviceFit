@@ -26,7 +26,6 @@ const MessageHistoryMain = () => {
 
     fetchMessages();
   }, []);
-console.log('messages',messages);
 
   if (loading) {
     return <p>Loading messages...</p>;

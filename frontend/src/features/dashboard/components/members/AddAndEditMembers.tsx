@@ -56,7 +56,14 @@ import {
 } from "@/components/ui/select";
 import { getPackages } from "../../actions/packages.action";
 import { useRouter } from "next/navigation";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import AddAndEditPackage from "../packages/AddAndEditPackage";
 const AddAndEditMembers = ({
   setOpenState,
   centers = [],
@@ -72,7 +79,10 @@ const AddAndEditMembers = ({
   const [packages, setPackages] = useState<PackageParams[] | null>(null);
   const [showSubscription, setShowSubscription] = useState(false);
   const [loader, setLoader] = useState(false);
-  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
 
 
   const defaultValues = {
@@ -881,7 +891,7 @@ const AddAndEditMembers = ({
                   control={form.control}
                   name="subscription.package"
                   render={({ field }) => {
-                    const packageList = packages ?? []; // Ensure it's always an array
+                    const packageList = packages ?? [];
                     const selectedPackage = packageList.find((pkg) => pkg._id === field.value);
 
                     return (
@@ -907,7 +917,6 @@ const AddAndEditMembers = ({
                               <CommandInput placeholder="Search package..." />
                               <CommandList>
                                 {packageList.length === 0 && <CommandEmpty>No packages found.</CommandEmpty>}
-
                                 <CommandGroup>
                                   {packageList.map((pkg) => (
                                     <CommandItem
@@ -924,15 +933,7 @@ const AddAndEditMembers = ({
                                       {pkg.packageName}
                                     </CommandItem>
                                   ))}
-                                  <CommandItem
-                                    onSelect={() => {
-                                      if (selectedCenterId) {
-                                        router.push(`/dashboard/packages?centerId=${selectedCenterId}`);
-                                      } else {
-                                        router.push(`/dashboard/packages`);
-                                      }
-                                    }} className=" hover:bg-blue-100 cursor-pointer"
-                                  >
+                                  <CommandItem onSelect={handleOpen} className="hover:bg-blue-100 cursor-pointer">
                                     Create Package
                                   </CommandItem>
                                 </CommandGroup>
@@ -943,14 +944,13 @@ const AddAndEditMembers = ({
 
                         <FormMessage />
 
-                        {/* Show details below only if a package is selected */}
                         {selectedPackage && (
                           <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
                             <p>
                               <strong>Package Amount:</strong> ${selectedPackage.price}
                             </p>
                             <p>
-                              <strong> Number of Days:</strong> {selectedPackage.noOfDays} days
+                              <strong>Number of Days:</strong> {selectedPackage.noOfDays} days
                             </p>
                           </div>
                         )}
@@ -958,9 +958,7 @@ const AddAndEditMembers = ({
                     );
                   }}
                 />
-
               </div>
-
               <div>
                 <FormField
                   control={form.control}
@@ -1198,6 +1196,16 @@ const AddAndEditMembers = ({
           {loader ? "Loading ..." : "Submit"}
         </Button>
       </form>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Package </DialogTitle>
+          </DialogHeader>
+          <AddAndEditPackage centerId={selectedCenterId} onClose={handleClose} onPackageAdded={(newPackage) => {
+            setPackages((prevPackages) => [...(prevPackages || []), newPackage]); 
+          }} />
+        </DialogContent>
+      </Dialog>
     </Form>
   );
 };
