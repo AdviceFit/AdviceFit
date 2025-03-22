@@ -933,7 +933,7 @@ const AddAndEditMembers = ({
                                       {pkg.packageName}
                                     </CommandItem>
                                   ))}
-                                  <CommandItem onSelect={handleOpen} className="hover:bg-blue-100 cursor-pointer">
+                                  <CommandItem onSelect={handleOpen} className="hover:bg-blue-100 cursor-pointer ml-8">
                                   <Plus className="mr-2 h-4 w-4" /> Create Package
                                   </CommandItem>
                                 </CommandGroup>
@@ -947,7 +947,7 @@ const AddAndEditMembers = ({
                         {selectedPackage && (
                           <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
                             <p>
-                              <strong>Package Amount:</strong> ${selectedPackage.price}
+                              <strong>Package Amount:</strong> ₹{selectedPackage.price}
                             </p>
                             <p>
                               <strong>Number of Days:</strong> {selectedPackage.noOfDays} days

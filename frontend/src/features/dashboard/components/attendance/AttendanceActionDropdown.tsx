@@ -42,7 +42,7 @@ const AttendanceActionDropdown =  ({ id }: { id: string }) => {
       try {
         await deleteAttendance(id);
         toast.success("Attendance deleted successfully!");
-        router.push("/dashboard/attendace");
+        router.push("/dashboard/attendance");
       } catch (error) {
         toast.error("Failed to delete attendance.");
       } finally {

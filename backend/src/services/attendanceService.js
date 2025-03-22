@@ -6,7 +6,7 @@ exports.createAttendance = async (attendanceData) => {
 };
 
 exports.getAllAttendance = async () => {
-    return await Attendance.find().populate('member', 'name'); // Populate member's name
+    return await Attendance.find({ isDeleted: false }).populate('member', 'name'); // Only fetch non-deleted records
 };
 
 exports.getAttendanceByUser = async (userId) => {
