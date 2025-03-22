@@ -7,7 +7,7 @@ exports.findMemberById = async (id) => {
 
 // Find all members
 exports.findAllMembers = async () => {
-  return await Member.find().populate("center", "_id name");
+  return await Member.find().populate("center", "_id name").sort({ createdAt: 1 });
 };
 
 // Create a new member
@@ -25,7 +25,7 @@ exports.findMembersByUser = async (userId) => {
   return await Member.find({ createdBy: userId, isDeleted: false }).populate(
     "center",
     "_id name"
-  );
+  ).sort({ createdAt: -1 });
 };
 
 // Update a member by ID

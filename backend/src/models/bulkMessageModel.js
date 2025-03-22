@@ -12,4 +12,10 @@ const BulkMessageSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+BulkMessageSchema.pre("find", function (next) {
+    this.where({ isDeleted: false });
+    this.sort({ createdAt: -1 });
+    next();
+  });
+
 module.exports = mongoose.model('BulkMessage', BulkMessageSchema);

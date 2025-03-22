@@ -2,8 +2,9 @@ const Subscription = require("../models/subscriptionModel");
 
 // Create a new subscription
 exports.createSubscription = async (subscriptionData) => {
-  const subscription = new Subscription(subscriptionData);
-  return await subscription.save();
+  console.log(subscriptionData);
+  const subscription = await Subscription.create(subscriptionData);
+  return subscription;
 };
 
 exports.getAllSubscriptions = async (userId) => {

@@ -293,6 +293,7 @@ export default function AddAndEditEmployee({
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        isDOB={true}
                       />
                     </PopoverContent>
                   </Popover>

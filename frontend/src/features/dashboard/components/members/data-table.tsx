@@ -64,9 +64,9 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  if (!columns || columns.length === 0 || !data || data.length === 0) {
-    return <div>No data available</div>;
-  }
+  // if ((!columns || columns.length === 0 || !data || data.length === 0) && !loading) {
+  //   return <div>No data available</div>;
+  // }
 
   return (
     <div className="rounded-md border px-4 py-2">

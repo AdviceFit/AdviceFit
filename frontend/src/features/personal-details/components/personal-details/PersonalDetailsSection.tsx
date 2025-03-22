@@ -195,6 +195,7 @@ const PersonalDetailsSection = () => {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
+                            isDOB={true}
                             initialFocus
                           />
                         </PopoverContent>

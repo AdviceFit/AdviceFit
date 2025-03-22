@@ -529,6 +529,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        isDOB={true}
                       />
                     </PopoverContent>
                   </Popover>

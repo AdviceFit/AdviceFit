@@ -76,4 +76,10 @@ const packageSchema = new mongoose.Schema(
   }
 );
 
+packageSchema.pre("find", function (next) {
+  this.where({ isDeleted: false });
+  this.sort({ createdAt: -1 });
+  next();
+});
+
 module.exports = mongoose.model("Package", packageSchema);

@@ -133,7 +133,7 @@ const getInvoiceHTML = (invoice) => {
                 </tr>
                 <tr>
                     <td>1</td>
-                    <td>${invoice.subscriptionId.package}</td>
+                    <td>${invoice?.subscriptionId?.package ?? "-"}</td>
                     <td>${invoice.offerAmount}</td>
                     <td>${invoice.offerAmount}</td>
                     <td>${invoice.paidAmount}</td>

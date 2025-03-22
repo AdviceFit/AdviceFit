@@ -13,8 +13,9 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  isDOB,
   ...props
-}: CalendarProps) {
+}: CalendarProps & { isDOB?: boolean }) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -69,6 +70,7 @@ function Calendar({
           <ChevronRight className={cn("h-4 w-4", className)} {...props} />
         ),
       }}
+      hidden={isDOB ? { after : new Date() } : undefined}
       {...props}
     />
   )

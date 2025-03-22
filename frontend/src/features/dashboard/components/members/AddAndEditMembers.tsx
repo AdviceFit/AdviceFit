@@ -55,15 +55,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getPackages } from "../../actions/packages.action";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import AddAndEditPackage from "../packages/AddAndEditPackage";
+import { Plus } from 'lucide-react';
+
 const AddAndEditMembers = ({
   setOpenState,
   centers = [],
@@ -934,7 +934,7 @@ const AddAndEditMembers = ({
                                     </CommandItem>
                                   ))}
                                   <CommandItem onSelect={handleOpen} className="hover:bg-blue-100 cursor-pointer">
-                                    Create Package
+                                  <Plus className="mr-2 h-4 w-4" /> Create Package
                                   </CommandItem>
                                 </CommandGroup>
                               </CommandList>
