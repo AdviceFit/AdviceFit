@@ -117,7 +117,7 @@ const AddAndEditMembers = ({
     paymentDueDate:
       columnData?.subscriptionDetails?.paymentDueDate || new Date(),
     comments: columnData?.subscriptionDetails?.comments || "",
-    subscription: !showSubscription
+    subscription: showSubscription
       ? {
         package: columnData?.subscriptionDetails?.package || "",
         promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
@@ -213,7 +213,7 @@ const AddAndEditMembers = ({
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {    
     try {
       setLoader(true);
       const formattedPayload = {

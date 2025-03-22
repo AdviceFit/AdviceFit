@@ -194,6 +194,7 @@ export default function AddAndEditAttendance({
               <FormControl>
                 <Input placeholder="Enter In Time" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -207,6 +208,7 @@ export default function AddAndEditAttendance({
               <FormControl>
                 <Input placeholder="Enter Out Time" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

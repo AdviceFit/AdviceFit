@@ -11,7 +11,7 @@ exports.createVisitor = async (req, res) => {
         res.status(201).json({ message: 'Visitor created successfully', visitor: newVisitor });
     } catch (error) {
         if (error.code === 11000) {
-            res.status(400).json({ message: 'Duplicate key error', details: error.keyValue });
+            res.status(400).json({ error: 'Visitor already exists!', details: error.keyValue });
         } else {
             res.status(500).json({ message: error.message });
         }
@@ -22,7 +22,6 @@ exports.createVisitor = async (req, res) => {
 exports.getAllVisitors = async (req, res) => {
     try {
         const visitors = await VisitorService.findAllVisitors();
-
         res.status(200).json({ visitors });
     } catch (error) {
         res.status(500).json({ message: error.message });

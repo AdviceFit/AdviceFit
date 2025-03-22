@@ -16,9 +16,11 @@ export const handleFileDownload = (
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     }[payload.format] || "application/octet-stream";
 
-  const fileName = `${payload.reportName || "report"}.${payload.format}`;
+  const fileName = `${payload.reportName || "report"}.${
+    payload.format == "excel" ? "xlsx" : "pdf"
+  }`;
 
-  try {    
+  try {
     const fileURL = URL.createObjectURL(new Blob([blob], { type: mimeType }));
 
     const link = document.createElement("a");

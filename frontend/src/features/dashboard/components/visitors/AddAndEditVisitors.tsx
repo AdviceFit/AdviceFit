@@ -58,7 +58,7 @@ import {
 const formSchema = z.object({
   _id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  mobile: z.string().min(1).max(15),
+  mobile: z.string().min(10 , "Mobile number must be between 10 and 16 characters").max(16),
   visiting_date: z.coerce.date().optional(),
   tentative_visiting_date: z.coerce.date().optional(),
   email: z.string().email("Enter a valid email address").optional(),
@@ -91,17 +91,10 @@ const formSchema = z.object({
     .optional(),
 });
 
-export default function AddAndEditVisitors({
-  id,
-  onClose,
-}: {
-  id?: string;
-  onClose?: () => void;
-}) {
-  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
+export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClose?: () => void }) {
+  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);  
   const router = useRouter();
-  const [countryName, setCountryName] = useState<string>("");
-  const [stateName, setStateName] = useState<string>("");
+
   const formatVisitorData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     name: data.name || "",
@@ -189,7 +182,7 @@ export default function AddAndEditVisitors({
         if (response.visitor) {
           toast.success("Visitor added successfully!");
         } else {
-          toast.error("Failed to create visitor.");
+          toast.error(response.error ?? "Failed to create visitor.");
         }
       }
       onClose?.();
@@ -243,7 +236,6 @@ export default function AddAndEditVisitors({
                   <FormControl className="w-full">
                     <PhoneInput placeholder="1234567890" {...field} />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -256,7 +248,7 @@ export default function AddAndEditVisitors({
               control={form.control}
               name="visiting_date"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel>Visiting Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -671,12 +663,10 @@ export default function AddAndEditVisitors({
                   <FormControl>
                     <LocationSelector
                       onCountryChange={(country) => {
-                        setCountryName(country?.name || "");
-                        form.setValue("address.state", country?.name || ""); // Set country directly as a string
+                        form.setValue('address.state', country?.name || ''); // Set country directly as a string
                       }}
                       onStateChange={(state) => {
-                        setStateName(state?.name || "");
-                        form.setValue("address.city", state?.name || ""); // Set state separately
+                        form.setValue('address.city', state?.name || ''); // Set state separately
                       }}
                     />
                   </FormControl>
