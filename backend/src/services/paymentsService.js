@@ -20,6 +20,9 @@ exports.getAllPayments = async (userId) => {
     })
     .populate({
       path: "subscriptionId",
+      populate: {
+        path: "packageId",
+      },
     });
 };
 
@@ -38,6 +41,9 @@ exports.findPaymentById = async (id) => {
     })
     .populate({
       path: "subscriptionId",
+      populate: {
+        path: "packageId",
+      },
     });
 };
 

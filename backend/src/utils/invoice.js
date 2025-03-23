@@ -2,6 +2,18 @@ const { v4 } = require("uuid");
 const { numberToWords } = require("./common.utils");
 
 const getInvoiceHTML = (invoice) => {
+  const formatAddress = (address) => {
+    const parts = [];
+    if (address?.addressLine1) parts.push(address.addressLine1);
+    if (address?.addressLine2) parts.push(address.addressLine2);
+    if (address?.city) parts.push(address.city);
+    if (address?.state) parts.push(address.state);
+    if (address?.country) parts.push(address.country);
+    if (address?.pincode) parts.push(address.pincode);
+
+    return parts.length > 0 ? parts.join(", ") : "Address not available";
+  };
+
   return `
     <!DOCTYPE html>
         <html>
@@ -82,15 +94,9 @@ const getInvoiceHTML = (invoice) => {
                     <span class="block">GST No : ${
                       invoice.memberId.gst ?? ""
                     }</span>
-                    <span class="block">Address : .memberId${
-                      invoice.memberId.address.addressLine1 +
-                      ", " +
-                      invoice.memberId.address.addressLine2 +
-                      ", " +
-                      invoice.memberId.address.city +
-                      ", " +
-                      invoice.memberId.address.pincode
-                    }</span>
+                    <span class="block">Address: ${formatAddress(
+                      invoice.memberId.address
+                    )}</span>
                 </td>
             </tr>
             <tr>
@@ -105,15 +111,9 @@ const getInvoiceHTML = (invoice) => {
                       invoice.memberId.mobile
                     }</span>
                     <span class="block">Email : ${invoice.memberId.email}</span>
-                    <span class="block">Address :  ${
-                      invoice.memberId.address.addressLine1 +
-                      ", " +
-                      invoice.memberId.address.addressLine2 +
-                      ", " +
-                      invoice.memberId.address.city +
-                      ", " +
-                      invoice.memberId.address.pincode
-                    }</span>
+                    <span class="block">Address: ${formatAddress(
+                      invoice.memberId.address
+                    )}</span>
                 </td>
                 <td style="width: 50%;">
                     <span class="block">Invoice No. : ${v4()}</span>
@@ -133,7 +133,11 @@ const getInvoiceHTML = (invoice) => {
                 </tr>
                 <tr>
                     <td>1</td>
-                    <td>${invoice?.subscriptionId?.package ?? "-"}</td>
+                    <td>${
+                      invoice?.subscriptionId?.packageId.packageName ?? "-"
+                    }<br>(${
+    invoice.subscriptionId.packageId.noOfDays ?? "-"
+  } Days)</td>
                     <td>${invoice.offerAmount}</td>
                     <td>${invoice.offerAmount}</td>
                     <td>${invoice.paidAmount}</td>

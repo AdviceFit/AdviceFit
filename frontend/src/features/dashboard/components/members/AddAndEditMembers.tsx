@@ -62,7 +62,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AddAndEditPackage from "../packages/AddAndEditPackage";
-import { Plus } from 'lucide-react';
+import { Plus } from "lucide-react";
 
 const AddAndEditMembers = ({
   setOpenState,
@@ -83,7 +83,6 @@ const AddAndEditMembers = ({
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
-
 
   const defaultValues = {
     joining_date: columnData?.joining_date
@@ -119,19 +118,19 @@ const AddAndEditMembers = ({
     comments: columnData?.subscriptionDetails?.comments || "",
     subscription: showSubscription
       ? {
-        package: columnData?.subscriptionDetails?.package || "",
-        promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-        offerAmount: columnData?.subscriptionDetails?.offerAmount,
-        paymentDate: columnData?.subscriptionDetails?.paymentDate
-          ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-          : new Date(),
-        startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-        paidAmount: columnData?.subscriptionDetails?.paidAmount,
-        paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-        paymentDueDate:
-          columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-        comments: columnData?.subscriptionDetails?.comments || "",
-      }
+          package: columnData?.subscriptionDetails?.package || "",
+          promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+          offerAmount: columnData?.subscriptionDetails?.offerAmount,
+          paymentDate: columnData?.subscriptionDetails?.paymentDate
+            ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+            : new Date(),
+          startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+          paidAmount: columnData?.subscriptionDetails?.paidAmount,
+          paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+          paymentDueDate:
+            columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+          comments: columnData?.subscriptionDetails?.comments || "",
+        }
       : undefined,
   };
 
@@ -180,25 +179,25 @@ const AddAndEditMembers = ({
     subscription: !showSubscription
       ? z.undefined()
       : z.object({
-        package: z.string().nonempty({ message: "Package is required" }),
-        promoCoupon: z.string().optional(),
-        offerAmount: z.coerce
-          .number()
-          .min(0, { message: "Offer Amount must be positive" }),
-        paymentDate: z.coerce.date(),
-        startDate: z.coerce.date(),
-        paidAmount: z.coerce
-          .number()
-          .min(0, { message: "Paid Amount must be positive" }),
-        paymentMode: z.enum(
-          ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
-          {
-            message: "Marital Status must be valid  method",
-          }
-        ),
-        paymentDueDate: z.coerce.date().optional(),
-        comments: z.string().optional(),
-      }),
+          package: z.string().nonempty({ message: "Package is required" }),
+          promoCoupon: z.string().optional(),
+          offerAmount: z.coerce
+            .number()
+            .min(0, { message: "Offer Amount must be positive" }),
+          paymentDate: z.coerce.date(),
+          startDate: z.coerce.date(),
+          paidAmount: z.coerce
+            .number()
+            .min(0, { message: "Paid Amount must be positive" }),
+          paymentMode: z.enum(
+            ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
+            {
+              message: "Invalid payment method. Please choose a valid option.",
+            }
+          ),
+          paymentDueDate: z.coerce.date().optional(),
+          comments: z.string().optional(),
+        }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -213,7 +212,7 @@ const AddAndEditMembers = ({
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {    
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setLoader(true);
       const formattedPayload = {
@@ -464,9 +463,9 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? centers
-                              .map((c) => ({ label: c.name, value: c._id }))
-                              .find((center) => center.value === field.value)
-                              ?.label
+                                .map((c) => ({ label: c.name, value: c._id }))
+                                .find((center) => center.value === field.value)
+                                ?.label
                             : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -535,8 +534,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? MEMBERS_SOURCES.find(
-                              (source) => source.value === field.value
-                            )?.label
+                                (source) => source.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -599,8 +598,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? OCCUPATIONS.find(
-                              (occupation) => occupation.value === field.value
-                            )?.label
+                                (occupation) => occupation.value === field.value
+                              )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -892,7 +891,9 @@ const AddAndEditMembers = ({
                   name="subscription.package"
                   render={({ field }) => {
                     const packageList = packages ?? [];
-                    const selectedPackage = packageList.find((pkg) => pkg._id === field.value);
+                    const selectedPackage = packageList.find(
+                      (pkg) => pkg._id === field.value
+                    );
 
                     return (
                       <FormItem className="flex flex-col gap-1">
@@ -905,9 +906,14 @@ const AddAndEditMembers = ({
                               <Button
                                 variant="outline"
                                 role="combobox"
-                                className={cn("justify-between", !field.value && "text-muted-foreground")}
+                                className={cn(
+                                  "justify-between",
+                                  !field.value && "text-muted-foreground"
+                                )}
                               >
-                                {selectedPackage ? selectedPackage.packageName : "Select Package"}
+                                {selectedPackage
+                                  ? selectedPackage.packageName
+                                  : "Select Package"}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </FormControl>
@@ -916,7 +922,11 @@ const AddAndEditMembers = ({
                             <Command>
                               <CommandInput placeholder="Search package..." />
                               <CommandList>
-                                {packageList.length === 0 && <CommandEmpty>No packages found.</CommandEmpty>}
+                                {packageList.length === 0 && (
+                                  <CommandEmpty>
+                                    No packages found.
+                                  </CommandEmpty>
+                                )}
                                 <CommandGroup>
                                   {packageList.map((pkg) => (
                                     <CommandItem
@@ -924,17 +934,29 @@ const AddAndEditMembers = ({
                                       value={pkg.packageName}
                                       onSelect={() => {
                                         field.onChange(pkg._id);
-                                        form.setValue("subscription.package", pkg._id);
+                                        form.setValue(
+                                          "subscription.package",
+                                          pkg._id
+                                        );
                                       }}
                                     >
                                       <Check
-                                        className={cn("mr-2 h-4 w-4", pkg._id === field.value ? "opacity-100" : "opacity-0")}
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          pkg._id === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
                                       />
                                       {pkg.packageName}
                                     </CommandItem>
                                   ))}
-                                  <CommandItem onSelect={handleOpen} className="hover:bg-blue-100 cursor-pointer ml-8">
-                                  <Plus className="mr-2 h-4 w-4" /> Create Package
+                                  <CommandItem
+                                    onSelect={handleOpen}
+                                    className="hover:bg-blue-100 cursor-pointer ml-8"
+                                  >
+                                    <Plus className="mr-2 h-4 w-4" /> Create
+                                    Package
                                   </CommandItem>
                                 </CommandGroup>
                               </CommandList>
@@ -947,10 +969,12 @@ const AddAndEditMembers = ({
                         {selectedPackage && (
                           <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
                             <p>
-                              <strong>Package Amount:</strong> ₹{selectedPackage.price}
+                              <strong>Package Amount:</strong> ₹
+                              {selectedPackage.price}
                             </p>
                             <p>
-                              <strong>Number of Days:</strong> {selectedPackage.noOfDays} days
+                              <strong>Number of Days:</strong>{" "}
+                              {selectedPackage.noOfDays} days
                             </p>
                           </div>
                         )}
@@ -1201,9 +1225,16 @@ const AddAndEditMembers = ({
           <DialogHeader>
             <DialogTitle>Add Package </DialogTitle>
           </DialogHeader>
-          <AddAndEditPackage centerId={selectedCenterId} onClose={handleClose} onPackageAdded={(newPackage) => {
-            setPackages((prevPackages) => [...(prevPackages || []), newPackage]); 
-          }} />
+          <AddAndEditPackage
+            centerId={selectedCenterId}
+            onClose={handleClose}
+            onPackageAdded={(newPackage) => {
+              setPackages((prevPackages) => [
+                ...(prevPackages || []),
+                newPackage,
+              ]);
+            }}
+          />
         </DialogContent>
       </Dialog>
     </Form>
