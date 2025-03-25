@@ -11,12 +11,10 @@ const DashboardLayout = ({
     <main className="h-screen flex flex-col max-w-[1920px] mx-auto">
       {/* Navbar */}
       <DashboardNavbar />
-
       {/* Main Layout */}
       <div className="h-[calc(100vh-4rem)] grid grid-cols-12 overflow-hidden">
         {/* Sidebar with independent scrolling */}
         <section className="col-span-2 h-full overflow-y-auto border-r">{sidebar}</section>
-
         {/* Content area with independent scrolling */}
         <section className="col-span-10 h-full overflow-y-auto p-6 flex flex-col">
           {elements}

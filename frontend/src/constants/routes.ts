@@ -8,6 +8,8 @@ type Routes = {
     attendance: string;
     centers: string;
     members: string;
+    addMember: string;
+    updateMember : string;
     visitors: string;
     reports: string;
     subscriptions: string;
@@ -45,6 +47,8 @@ const APP_ROUTES: Routes = {
     "attendance",
     "centers",
     "members",
+    'add-member',
+    'update-member',
     "visitors",
     "reports",
     "subscriptions",
@@ -73,6 +77,8 @@ const APP_ROUTES: Routes = {
     attendance: `/dashboard/attendance`,
     centers: `/dashboard/centers`,
     members: `/dashboard/members`,
+    addMember: `dashboard/add-member`,
+    updateMember: `dashboard/update-member`,
     visitors: `/dashboard/visitors`,
     reports: `/dashboard/reports`,
     subscriptions: `/dashboard/subscriptions`,

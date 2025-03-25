@@ -17,6 +17,7 @@ import { redirect } from "next/navigation";
 import MessageHistoryMain from "@/features/dashboard/main/MessegesHistory.main";
 import LoginHistoryMain from "@/features/dashboard/main/LoginHistory.main";
 import DownloadReportsMain from "@/features/dashboard/main/DownloadReports.main";
+import AddAndEditMembers from "@/features/dashboard/components/members/AddAndEditMembers";
 
 const DashboardElementsRoute = async function ({
   params,
@@ -28,7 +29,6 @@ const DashboardElementsRoute = async function ({
   if (!APP_ROUTES.allowRoutes.includes(slug)) {
     redirect(APP_ROUTES.dasboard.attendance);
   }
-
   switch (slug) {
     case "attendance":
       return <AttendanceMain />;
@@ -36,6 +36,10 @@ const DashboardElementsRoute = async function ({
       return <CentersMain />;
     case "members":
       return <MembersMain />;
+    case "add-member":
+      return <AddAndEditMembers />;
+    case "update-member":
+      return <AddAndEditMembers />;
     case "visitors":
       return <VisitorsMain />;
     case "reports":

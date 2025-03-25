@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Router } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -63,15 +63,14 @@ import {
 } from "@/components/ui/dialog";
 import AddAndEditPackage from "../packages/AddAndEditPackage";
 import { Plus } from "lucide-react";
+import { getCenters } from "../../actions/centers.action";
+import { useRouter } from "next/navigation";
 
 const AddAndEditMembers = ({
-  setOpenState,
-  centers = [],
   columnData,
   setMemberState,
 }: {
-  setOpenState: Dispatch<SetStateAction<boolean>>;
-  centers: CenterParams[];
+  centers?: CenterParams[];
   columnData?: Record<string, any>;
   setMemberState?: any;
 }) => {
@@ -80,7 +79,8 @@ const AddAndEditMembers = ({
   const [showSubscription, setShowSubscription] = useState(false);
   const [loader, setLoader] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
+  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
+  const router = useRouter();
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
 
@@ -118,19 +118,19 @@ const AddAndEditMembers = ({
     comments: columnData?.subscriptionDetails?.comments || "",
     subscription: showSubscription
       ? {
-          package: columnData?.subscriptionDetails?.package || "",
-          promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-          offerAmount: columnData?.subscriptionDetails?.offerAmount,
-          paymentDate: columnData?.subscriptionDetails?.paymentDate
-            ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-            : new Date(),
-          startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-          paidAmount: columnData?.subscriptionDetails?.paidAmount,
-          paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-          paymentDueDate:
-            columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-          comments: columnData?.subscriptionDetails?.comments || "",
-        }
+        package: columnData?.subscriptionDetails?.package || "",
+        promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
+        offerAmount: columnData?.subscriptionDetails?.offerAmount,
+        paymentDate: columnData?.subscriptionDetails?.paymentDate
+          ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+          : new Date(),
+        startDate: columnData?.subscriptionDetails?.startDate || new Date(),
+        paidAmount: columnData?.subscriptionDetails?.paidAmount,
+        paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+        paymentDueDate:
+          columnData?.subscriptionDetails?.paymentDueDate || new Date(),
+        comments: columnData?.subscriptionDetails?.comments || "",
+      }
       : undefined,
   };
 
@@ -179,25 +179,25 @@ const AddAndEditMembers = ({
     subscription: !showSubscription
       ? z.undefined()
       : z.object({
-          package: z.string().nonempty({ message: "Package is required" }),
-          promoCoupon: z.string().optional(),
-          offerAmount: z.coerce
-            .number()
-            .min(0, { message: "Offer Amount must be positive" }),
-          paymentDate: z.coerce.date(),
-          startDate: z.coerce.date(),
-          paidAmount: z.coerce
-            .number()
-            .min(0, { message: "Paid Amount must be positive" }),
-          paymentMode: z.enum(
-            ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
-            {
-              message: "Invalid payment method. Please choose a valid option.",
-            }
-          ),
-          paymentDueDate: z.coerce.date().optional(),
-          comments: z.string().optional(),
-        }),
+        package: z.string().nonempty({ message: "Package is required" }),
+        promoCoupon: z.string().optional(),
+        offerAmount: z.coerce
+          .number()
+          .min(0, { message: "Offer Amount must be positive" }),
+        paymentDate: z.coerce.date(),
+        startDate: z.coerce.date(),
+        paidAmount: z.coerce
+          .number()
+          .min(0, { message: "Paid Amount must be positive" }),
+        paymentMode: z.enum(
+          ["Cash", "Card", "Cheque", "Paytm", "Bank Transfer", "UPI"],
+          {
+            message: "Invalid payment method. Please choose a valid option.",
+          }
+        ),
+        paymentDueDate: z.coerce.date().optional(),
+        comments: z.string().optional(),
+      }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -234,6 +234,7 @@ const AddAndEditMembers = ({
           return;
         }
         toast.success(TOAST_MESSAGES.memberUpdated);
+        router.push("/dashboard/members")
       } else {
         const response = await addMembers(formattedPayload);
         if (response?.error) {
@@ -241,14 +242,28 @@ const AddAndEditMembers = ({
           return;
         }
         toast.success(TOAST_MESSAGES.memberAdded);
+        router.push("/dashboard/members")
       }
       const { members } = await getAllMembers();
       setMemberState((prev: any) => ({ ...prev, members }));
-      setOpenState(false);
+      // setOpenState(false);
     } finally {
       setLoader(false);
     }
   }
+
+
+  useEffect(() => {
+    async function fetchCenters() {
+      try {
+        const data = await getCenters();
+        setCenters(data?.centers || []);
+      } catch (error) {
+        toast.error("Failed to load centers.");
+      }
+    }
+    fetchCenters();
+  }, []);
 
   return (
     <Form {...form}>
@@ -463,9 +478,9 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? centers
-                                .map((c) => ({ label: c.name, value: c._id }))
-                                .find((center) => center.value === field.value)
-                                ?.label
+                              .map((c) => ({ label: c.name, value: c._id }))
+                              .find((center) => center.value === field.value)
+                              ?.label
                             : "Select Center"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -534,8 +549,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? MEMBERS_SOURCES.find(
-                                (source) => source.value === field.value
-                              )?.label
+                              (source) => source.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -598,8 +613,8 @@ const AddAndEditMembers = ({
                         >
                           {field.value
                             ? OCCUPATIONS.find(
-                                (occupation) => occupation.value === field.value
-                              )?.label
+                              (occupation) => occupation.value === field.value
+                            )?.label
                             : "Select language"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>

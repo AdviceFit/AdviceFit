@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import AddAndEditMembers from "./AddAndEditMembers";
 import { deleteMembers, getAllMembers } from "../../actions/members.action";
+import { useRouter } from "next/navigation";
 
 const MemberActionDropdown = ({
   columnData,
@@ -27,6 +28,7 @@ const MemberActionDropdown = ({
   setMemberState: any;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const handleOpen = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent dropdown from closing
@@ -51,7 +53,7 @@ const MemberActionDropdown = ({
       <DropdownMenuContent className="w-40">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Button variant="ghost" onClick={handleOpen}>
+            <Button variant="ghost" onClick={() => router.push("/dashboard/update-member")}>
               Edit members
             </Button>
           </DropdownMenuItem>
@@ -73,9 +75,7 @@ const MemberActionDropdown = ({
             <DialogTitle>Edit Members</DialogTitle>
           </DialogHeader>
           <AddAndEditMembers
-            centers={centers}
             columnData={columnData}
-            setOpenState={setIsOpen}
             setMemberState={setMemberState}
           />
         </DialogContent>
