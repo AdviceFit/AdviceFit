@@ -675,6 +675,7 @@ const AddAndEditMembers = ({
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        isDOB={true}
                         initialFocus
                       />
                     </PopoverContent>
@@ -963,9 +964,7 @@ const AddAndEditMembers = ({
                             </Command>
                           </PopoverContent>
                         </Popover>
-
                         <FormMessage />
-
                         {selectedPackage && (
                           <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
                             <p>
