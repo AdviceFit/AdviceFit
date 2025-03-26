@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,41 +9,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import AddAndEditMembers from "./AddAndEditMembers";
-import { deleteMembers, getAllMembers } from "../../actions/members.action";
 import { useRouter } from "next/navigation";
+import { deleteMembers } from "../../actions/members.action";
+import { toast } from "sonner";
 
-const MemberActionDropdown = ({
-  columnData,
-  centers,
-  setMemberState,
-}: {
-  columnData: Record<string, unknown>;
-  centers: CenterParams[];
-  setMemberState: any;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
+const MemberActionDropdown = ({ id }: { id: string }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
-  const handleOpen = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent dropdown from closing
-    setIsOpen(true);
-  };
+  const handleDeleteMember = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteMembers(id);
+      toast.success("Member deleted successfully!");
+      //for re-render page
+      router.push("/dashboard/members");
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-
-  const handleDeleteMember = async (id: string) => {
-    await deleteMembers(id);
-    const { members } = await getAllMembers();
-    setMemberState((prev: any) => ({ ...prev, members }));
+    } catch (error) {
+      toast.error("Failed to delete member.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -53,33 +40,22 @@ const MemberActionDropdown = ({
       <DropdownMenuContent className="w-40">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Button variant="ghost" onClick={() => router.push("/dashboard/update-member")}>
-              Edit members
+            <Button variant="ghost"
+              onClick={() => router.push(`/dashboard/update-member?action=edit&id=${id}`)}>
+              Edit Member
             </Button>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Button
               variant="ghost"
-              onClick={() => handleDeleteMember(columnData._id as string)}
+              onClick={handleDeleteMember}
+              disabled={isDeleting}
             >
-              Delete members
+              {isDeleting ? "Deleting..." : "Delete Member"}
             </Button>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
-
-      {/* Controlled Dialog Component */}
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Members</DialogTitle>
-          </DialogHeader>
-          <AddAndEditMembers
-            columnData={columnData}
-            setMemberState={setMemberState}
-          />
-        </DialogContent>
-      </Dialog>
     </DropdownMenu>
   );
 };

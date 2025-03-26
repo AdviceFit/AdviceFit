@@ -24,5 +24,9 @@ const getAllMembers = async () => {
   const res = await apiClient.get(`${API_URL}`);
   return res.data;
 };
+const getMemberById = async (id: string) => {
+  const res = await apiClient.get(`${API_URL}/${id}`);
+  return res.data;
+};
 
-export { deleteMembers, getAllMembers, addMembers, editMember };
+export { deleteMembers, getAllMembers, addMembers, editMember,getMemberById };

@@ -38,6 +38,7 @@ import {
   addMembers,
   editMember,
   getAllMembers,
+  getMemberById,
 } from "../../actions/members.action";
 import {
   MEMBERS_SOURCES,
@@ -64,17 +65,15 @@ import {
 import AddAndEditPackage from "../packages/AddAndEditPackage";
 import { Plus } from "lucide-react";
 import { getCenters } from "../../actions/centers.action";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const AddAndEditMembers = ({
-  columnData,
-  setMemberState,
-}: {
-  centers?: CenterParams[];
-  columnData?: Record<string, any>;
-  setMemberState?: any;
-}) => {
+
+export default function AddAndEditMembers() {
+  const searchParams = useSearchParams();
+  const memberId = searchParams.get("id");
+  const action = searchParams.get("action");
   const [stateName, setStateName] = useState<string>("");
+  const [columnData, setColumnData] = useState<any>(null);
   const [packages, setPackages] = useState<PackageParams[] | null>(null);
   const [showSubscription, setShowSubscription] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -84,55 +83,44 @@ const AddAndEditMembers = ({
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
 
-  const defaultValues = {
-    joining_date: columnData?.joining_date
-      ? new Date(columnData.joining_date.toString())
+  // const defaultValues = {
+  const formatMemberData = (data: any): z.infer<typeof formSchema> => ({
+    joining_date: data?.joining_date
+      ? new Date(data.joining_date.toString())
       : new Date(),
-    dob: columnData?.dob ? new Date(columnData.dob.toString()) : new Date(),
-    marital_status: columnData?.marital_status || "",
-    gender: columnData?.gender || "",
-    name: columnData?.name || "",
-    mobile: columnData?.mobile || "",
-    gym_member_code: columnData?.gym_member_code || "",
-    email: columnData?.email || "",
-    center: columnData?.center?._id || "",
-    source: columnData?.source || "",
-    occupation: columnData?.occupation || "",
-    health_conditions: columnData?.health_conditions || "",
-    addressLine1: columnData?.address?.addressLine1 || "",
-    addressLine2: columnData?.address?.addressLine2 || "",
-    address: [columnData?.address?.country, columnData?.address?.state] as any,
-    city: columnData?.address?.city || "",
-    pincode: columnData?.address?.pincode || "",
-    package: columnData?.subscriptionDetails?.package || "",
-    promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-    offerAmount: columnData?.subscriptionDetails?.offerAmount,
-    paymentDate: columnData?.subscriptionDetails?.paymentDate
-      ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
-      : new Date(),
-    startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-    paidAmount: columnData?.subscriptionDetails?.paidAmount,
-    paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
-    paymentDueDate:
-      columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-    comments: columnData?.subscriptionDetails?.comments || "",
+    dob: data?.dob ? new Date(data.dob.toString()) : new Date(),
+    marital_status: data?.marital_status || "",
+    gender: data?.gender || "",
+    name: data?.name || "",
+    mobile: data?.mobile || "",
+    gym_member_code: data?.gym_member_code || "",
+    email: data?.email || "",
+    center: data?.center?._id || "",
+    source: data?.source || "",
+    occupation: data?.occupation || "",
+    health_conditions: data?.health_conditions || "",
+    addressLine1: data?.address?.addressLine1 || "",
+    addressLine2: data?.address?.addressLine2 || "",
+    address: [data?.address?.country, data?.address?.state] as any,
+    city: data?.address?.city || "",
+    pincode: data?.address?.pincode || "",
     subscription: showSubscription
       ? {
-        package: columnData?.subscriptionDetails?.package || "",
-        promoCoupon: columnData?.subscriptionDetails?.promoCoupon || "",
-        offerAmount: columnData?.subscriptionDetails?.offerAmount,
-        paymentDate: columnData?.subscriptionDetails?.paymentDate
-          ? new Date(columnData?.subscriptionDetails?.paymentDate?.toString())
+        package: data?.subscriptionDetails?.package || "",
+        promoCoupon: data?.subscriptionDetails?.promoCoupon || "",
+        offerAmount: data?.subscriptionDetails?.offerAmount,
+        paymentDate: data?.subscriptionDetails?.paymentDate
+          ? new Date(data?.subscriptionDetails?.paymentDate?.toString())
           : new Date(),
-        startDate: columnData?.subscriptionDetails?.startDate || new Date(),
-        paidAmount: columnData?.subscriptionDetails?.paidAmount,
-        paymentMode: columnData?.subscriptionDetails?.paymentMode || "",
+        startDate: data?.subscriptionDetails?.startDate || new Date(),
+        paidAmount: data?.subscriptionDetails?.paidAmount,
+        paymentMode: data?.subscriptionDetails?.paymentMode || "",
         paymentDueDate:
-          columnData?.subscriptionDetails?.paymentDueDate || new Date(),
-        comments: columnData?.subscriptionDetails?.comments || "",
+          data?.subscriptionDetails?.paymentDueDate || new Date(),
+        comments: data?.subscriptionDetails?.comments || "",
       }
       : undefined,
-  };
+  });
 
   const formSchema = z.object({
     name: z
@@ -202,7 +190,7 @@ const AddAndEditMembers = ({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues,
+    defaultValues: formatMemberData(columnData),
   });
   const selectedCenterId = form.watch("center");
   const packagesHandle = async (centerId: string) => {
@@ -244,14 +232,30 @@ const AddAndEditMembers = ({
         toast.success(TOAST_MESSAGES.memberAdded);
         router.push("/dashboard/members")
       }
-      const { members } = await getAllMembers();
-      setMemberState((prev: any) => ({ ...prev, members }));
-      // setOpenState(false);
     } finally {
       setLoader(false);
     }
   }
 
+  useEffect(() => {
+    async function fetchMemberDetails() {
+      if (!memberId) return;
+
+      try {
+        const memberData = await getMemberById(memberId);
+        if (memberData?.member) {
+          setColumnData(memberData.member);
+          form.reset(formatMemberData(memberData.member));
+        } else {
+          toast.error("Member not found.");
+        }
+      } catch (error) {
+        toast.error("Failed to fetch member details.");
+      }
+    }
+
+    fetchMemberDetails();
+  }, [memberId]);
 
   useEffect(() => {
     async function fetchCenters() {
@@ -266,464 +270,473 @@ const AddAndEditMembers = ({
   }, []);
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 w-full mx-auto pt-4 pb-4"
-      >
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 py-1 items-start">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John doe" type="text" {...field} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="mobile"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>Mobile</FormLabel>
-                <FormControl>
-                  <Input placeholder="0000000000" type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>Gender</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    {...field}
-                    onValueChange={(value) => field.onChange(value)}
-                    defaultValue="Male"
-                    className="flex flex-row gap-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Male" id="r1" />
-                      <Label htmlFor="r1">Male</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Female" id="r2" />
-                      <Label htmlFor="r2">Female</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Other" id="r3" />
-                      <Label htmlFor="r3">Other</Label>
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="marital_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>Marital Status</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    {...field}
-                    onValueChange={(value) => field.onChange(value)}
-                    defaultValue="Single"
-                    className="flex flex-row gap-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Single" id="marital_status_r1" />
-                      <Label htmlFor="marital_status_r1">Single</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Married" id="marital_status_r2" />
-                      <Label htmlFor="marital_status_r2">Married</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Divorced" id="marital_status_r3" />
-                      <Label htmlFor="marital_status_r3">Divorced</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Widowed" id="marital_status_r4" />
-                      <Label htmlFor="marital_status_r4">Widowed</Label>
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <div>
+    <>
+      <Button className="w-24" variant="outline" onClick={() => router.back()}>
+        ← Back
+      </Button>
+      <div className="flex items-center justify-start py-5">
+      <h3 className="">
+        {action === "edit" ? "Update Member" : "Add Member"}
+      </h3>
+      </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4 w-full mx-auto pt-4 pb-4"
+        >
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 py-1 items-start">
             <FormField
               control={form.control}
-              name="gym_member_code"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gym member code</FormLabel>
+                  <FormLabel required>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="GYM Member Code .."
-                      type="text"
-                      {...field}
-                    />
+                    <Input placeholder="John doe" type="text" {...field} />
                   </FormControl>
 
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-
-          <div>
             <FormField
               control={form.control}
-              name="joining_date"
+              name="mobile"
               render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel required>Joining Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            " pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      {/* <DatePicker selected={field.value} setSelected={field.onChange} /> */}
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
+                <FormItem>
+                  <FormLabel required>Mobile</FormLabel>
+                  <FormControl>
+                    <Input placeholder="0000000000" type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Gender</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      {...field}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue="Male"
+                      className="flex flex-row gap-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Male" id="r1" />
+                        <Label htmlFor="r1">Male</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Female" id="r2" />
+                        <Label htmlFor="r2">Female</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Other" id="r3" />
+                        <Label htmlFor="r3">Other</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="marital_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Marital Status</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      {...field}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue="Single"
+                      className="flex flex-row gap-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Single" id="marital_status_r1" />
+                        <Label htmlFor="marital_status_r1">Single</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Married" id="marital_status_r2" />
+                        <Label htmlFor="marital_status_r2">Married</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Divorced" id="marital_status_r3" />
+                        <Label htmlFor="marital_status_r3">Divorced</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Widowed" id="marital_status_r4" />
+                        <Label htmlFor="marital_status_r4">Widowed</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+            <div>
+              <FormField
+                control={form.control}
+                name="gym_member_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gym member code</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="GYM Member Code .."
+                        type="text"
+                        {...field}
                       />
-                    </PopoverContent>
-                  </Popover>
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div>
+              <FormField
+                control={form.control}
+                name="joining_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2">
+                    <FormLabel required>Joining Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              " pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        {/* <DatePicker selected={field.value} setSelected={field.onChange} /> */}
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <div>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel required>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="johndoe@example.com"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+            <div>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="johndoe@example.com"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div>
-            <FormField
-              control={form.control}
-              name="center"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel required>Center</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? centers
-                              .map((c) => ({ label: c.name, value: c._id }))
-                              .find((center) => center.value === field.value)
-                              ?.label
-                            : "Select Center"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search center..." />
-                        <CommandList>
-                          <CommandEmpty>No Center found.</CommandEmpty>
-                          <CommandGroup>
-                            {centers &&
-                              centers
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div>
+              <FormField
+                control={form.control}
+                name="center"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2">
+                    <FormLabel required>Center</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? centers
                                 .map((c) => ({ label: c.name, value: c._id }))
-                                .map((center) => (
-                                  <CommandItem
-                                    value={center.label}
-                                    key={center.value}
-                                    onSelect={() => {
-                                      field.onChange(center.value);
-                                      form.setValue("center", center.value);
-                                      packagesHandle(center.value);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        center.value === field.value
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                    {center.label}
-                                  </CommandItem>
-                                ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <div>
-            <FormField
-              control={form.control}
-              name="source"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Source</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? MEMBERS_SOURCES.find(
-                              (source) => source.value === field.value
-                            )?.label
-                            : "Select language"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search Member..." />
-                        <CommandList>
-                          <CommandEmpty>No Members found.</CommandEmpty>
-                          <CommandGroup>
-                            {MEMBERS_SOURCES.map((source, idx) => (
-                              <CommandItem
-                                value={source.label}
-                                key={idx + 1}
-                                onSelect={() => {
-                                  form.setValue("source", source.value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    source.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {source.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                                .find((center) => center.value === field.value)
+                                ?.label
+                              : "Select Center"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search center..." />
+                          <CommandList>
+                            <CommandEmpty>No Center found.</CommandEmpty>
+                            <CommandGroup>
+                              {centers &&
+                                centers
+                                  .map((c) => ({ label: c.name, value: c._id }))
+                                  .map((center) => (
+                                    <CommandItem
+                                      value={center.label}
+                                      key={center.value}
+                                      onSelect={() => {
+                                        field.onChange(center.value);
+                                        form.setValue("center", center.value);
+                                        packagesHandle(center.value);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          center.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {center.label}
+                                    </CommandItem>
+                                  ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
-          <div>
-            <FormField
-              control={form.control}
-              name="occupation"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Occupation</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value
-                            ? OCCUPATIONS.find(
-                              (occupation) => occupation.value === field.value
-                            )?.label
-                            : "Select language"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search Occupation..." />
-                        <CommandList>
-                          <CommandEmpty>No Occupation found.</CommandEmpty>
-                          <CommandGroup>
-                            {OCCUPATIONS.map((occupation, idx) => (
-                              <CommandItem
-                                value={occupation.label}
-                                key={idx + 1}
-                                onSelect={() => {
-                                  form.setValue("occupation", occupation.value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    occupation.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {occupation.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+            <div>
+              <FormField
+                control={form.control}
+                name="source"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Source</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? MEMBERS_SOURCES.find(
+                                (source) => source.value === field.value
+                              )?.label
+                              : "Select language"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search Member..." />
+                          <CommandList>
+                            <CommandEmpty>No Members found.</CommandEmpty>
+                            <CommandGroup>
+                              {MEMBERS_SOURCES.map((source, idx) => (
+                                <CommandItem
+                                  value={source.label}
+                                  key={idx + 1}
+                                  onSelect={() => {
+                                    form.setValue("source", source.value);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      source.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {source.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div>
+              <FormField
+                control={form.control}
+                name="occupation"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Occupation</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? OCCUPATIONS.find(
+                                (occupation) => occupation.value === field.value
+                              )?.label
+                              : "Select language"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Command>
+                          <CommandInput placeholder="Search Occupation..." />
+                          <CommandList>
+                            <CommandEmpty>No Occupation found.</CommandEmpty>
+                            <CommandGroup>
+                              {OCCUPATIONS.map((occupation, idx) => (
+                                <CommandItem
+                                  value={occupation.label}
+                                  key={idx + 1}
+                                  onSelect={() => {
+                                    form.setValue("occupation", occupation.value);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      occupation.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {occupation.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <div>
-            <FormField
-              control={form.control}
-              name="dob"
-              render={({ field }) => (
-                <FormItem className="flex flex-col gap-2">
-                  <FormLabel required>Date of birth</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        isDOB={true}
-                        initialFocus
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+            <div>
+              <FormField
+                control={form.control}
+                name="dob"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-2">
+                    <FormLabel required>Date of birth</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          isDOB={true}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div>
+              <FormField
+                control={form.control}
+                name="health_conditions"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Health condition</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Your health condition"
+                        type="text"
+                        {...field}
                       />
-                    </PopoverContent>
-                  </Popover>
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-
-          <div>
-            <FormField
-              control={form.control}
-              name="health_conditions"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel required>Health condition</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Your health condition"
-                      type="text"
-                      {...field}
-                    />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-        {/* <FormField
+          {/* <FormField
           control={form.control}
           name="member_id_proof"
           render={({ field }) => (
@@ -785,474 +798,474 @@ const AddAndEditMembers = ({
           )}
         /> */}
 
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <FormField
-            control={form.control}
-            name="addressLine1"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>Address line 1</FormLabel>
-                <FormControl>
-                  <Input placeholder="Address line 1" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="addressLine2"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address line 2</FormLabel>
-                <FormControl>
-                  <Input placeholder="Address line 2" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel required>Select Country</FormLabel>
-              <FormControl>
-                <LocationSelector
-                  formState={form.formState.isSubmitted}
-                  value={field.value}
-                  onCountryChange={(country) => {
-                    field.onChange([country?.name || "", stateName || ""]);
-                    form.setValue(field.name, [
-                      country?.name || "",
-                      stateName || "",
-                    ]);
-                  }}
-                  onStateChange={(state) => {
-                    setStateName(state?.name || "");
-                    form.setValue(field.name, [
-                      form.getValues(field.name)[0] || "",
-                      state?.name || "",
-                    ]);
-                  }}
-                />
-              </FormControl>
-              <FormDescription>
-                If your country has states, it will be appear after selecting
-                country
-              </FormDescription>
-            </FormItem>
-          )}
-        />
-
-        <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-          <div>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
             <FormField
               control={form.control}
-              name="city"
+              name="addressLine1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>City</FormLabel>
+                  <FormLabel required>Address line 1</FormLabel>
                   <FormControl>
-                    <Input placeholder="Delhi" type="" {...field} />
+                    <Input placeholder="Address line 1" {...field} />
                   </FormControl>
-
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="addressLine2"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address line 2</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Address line 2" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
 
-          <div>
-            <FormField
-              control={form.control}
-              name="pincode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pincode</FormLabel>
-                  <FormControl>
-                    <Input placeholder="000000" type="number" {...field} />
-                  </FormControl>
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel required>Select Country</FormLabel>
+                <FormControl>
+                  <LocationSelector
+                    formState={form.formState.isSubmitted}
+                    value={field.value}
+                    onCountryChange={(country) => {
+                      field.onChange([country?.name || "", stateName || ""]);
+                      form.setValue(field.name, [
+                        country?.name || "",
+                        stateName || "",
+                      ]);
+                    }}
+                    onStateChange={(state) => {
+                      setStateName(state?.name || "");
+                      form.setValue(field.name, [
+                        form.getValues(field.name)[0] || "",
+                        state?.name || "",
+                      ]);
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>
+                  If your country has states, it will be appear after selecting
+                  country
+                </FormDescription>
+              </FormItem>
+            )}
+          />
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        {!columnData && (
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="subscription"
-              checked={showSubscription}
-              onChange={(e) => setShowSubscription(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <label htmlFor="subscription" className="text-sm font-medium">
-              Add Subscription Details
-            </label>
-          </div>
-        )}
-        {showSubscription && (
-          <>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.package"
-                  render={({ field }) => {
-                    const packageList = packages ?? [];
-                    const selectedPackage = packageList.find(
-                      (pkg) => pkg._id === field.value
-                    );
-
-                    return (
-                      <FormItem className="flex flex-col gap-1">
-                        <FormLabel className="mt-[6px]" required>
-                          Package
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                className={cn(
-                                  "justify-between",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {selectedPackage
-                                  ? selectedPackage.packageName
-                                  : "Select Package"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-0">
-                            <Command>
-                              <CommandInput placeholder="Search package..." />
-                              <CommandList>
-                                {packageList.length === 0 && (
-                                  <CommandEmpty>
-                                    No packages found.
-                                  </CommandEmpty>
-                                )}
-                                <CommandGroup>
-                                  {packageList.map((pkg) => (
-                                    <CommandItem
-                                      key={pkg._id}
-                                      value={pkg.packageName}
-                                      onSelect={() => {
-                                        field.onChange(pkg._id);
-                                        form.setValue(
-                                          "subscription.package",
-                                          pkg._id
-                                        );
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          pkg._id === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                      {pkg.packageName}
-                                    </CommandItem>
-                                  ))}
-                                  <CommandItem
-                                    onSelect={handleOpen}
-                                    className="hover:bg-blue-100 cursor-pointer ml-8"
-                                  >
-                                    <Plus className="mr-2 h-4 w-4" /> Create
-                                    Package
-                                  </CommandItem>
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                        {selectedPackage && (
-                          <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
-                            <p>
-                              <strong>Package Amount:</strong> ₹
-                              {selectedPackage.price}
-                            </p>
-                            <p>
-                              <strong>Number of Days:</strong>{" "}
-                              {selectedPackage.noOfDays} days
-                            </p>
-                          </div>
-                        )}
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.promoCoupon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Promo / Coupon</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Promo / Coupon"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.offerAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required>Offer Amount</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Offer Amount"
-                          type="number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.paymentDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel required>Payment Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={new Date(field.value?.toString() ?? "")}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel required>Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={new Date(field.value?.toString() ?? "")}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.paidAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required>Paid Amount</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Paid Amount"
-                          type="number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.paymentMode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required>Payment Mode</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Payment Mode" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {PAYMENT_METHODS.map((method, idx) => (
-                            <SelectItem key={idx + 1} value={method}>
-                              {method}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div>
-                <FormField
-                  control={form.control}
-                  name="subscription.paymentDueDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Payment Due Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={new Date(field.value?.toString() ?? "")}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
             <div>
               <FormField
                 control={form.control}
-                name="subscription.comments"
+                name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Comments</FormLabel>
+                    <FormLabel required>City</FormLabel>
                     <FormControl>
-                      <Input placeholder="Comments" type="text" {...field} />
+                      <Input placeholder="Delhi" type="" {...field} />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </>
-        )}
-        <Button type="submit" className="w-full sm:w-auto float-end">
-          {loader ? "Loading ..." : "Submit"}
-        </Button>
-      </form>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Package </DialogTitle>
-          </DialogHeader>
-          <AddAndEditPackage
-            centerId={selectedCenterId}
-            onClose={handleClose}
-            onPackageAdded={(newPackage) => {
-              setPackages((prevPackages) => [
-                ...(prevPackages || []),
-                newPackage,
-              ]);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </Form>
+
+            <div>
+              <FormField
+                control={form.control}
+                name="pincode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pincode</FormLabel>
+                    <FormControl>
+                      <Input placeholder="000000" type="number" {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {!columnData && (
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="subscription"
+                checked={showSubscription}
+                onChange={(e) => setShowSubscription(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="subscription" className="text-sm font-medium">
+                Add Subscription Details
+              </label>
+            </div>
+          )}
+          {showSubscription && (
+            <>
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.package"
+                    render={({ field }) => {
+                      const packageList = packages ?? [];
+                      const selectedPackage = packageList.find(
+                        (pkg) => pkg._id === field.value
+                      );
+
+                      return (
+                        <FormItem className="flex flex-col gap-1">
+                          <FormLabel className="mt-[6px]" required>
+                            Package
+                          </FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className={cn(
+                                    "justify-between",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {selectedPackage
+                                    ? selectedPackage.packageName
+                                    : "Select Package"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0">
+                              <Command>
+                                <CommandInput placeholder="Search package..." />
+                                <CommandList>
+                                  {packageList.length === 0 && (
+                                    <CommandEmpty>
+                                      No packages found.
+                                    </CommandEmpty>
+                                  )}
+                                  <CommandGroup>
+                                    {packageList.map((pkg) => (
+                                      <CommandItem
+                                        key={pkg._id}
+                                        value={pkg.packageName}
+                                        onSelect={() => {
+                                          field.onChange(pkg._id);
+                                          form.setValue(
+                                            "subscription.package",
+                                            pkg._id
+                                          );
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            pkg._id === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {pkg.packageName}
+                                      </CommandItem>
+                                    ))}
+                                    <CommandItem
+                                      onSelect={handleOpen}
+                                      className="hover:bg-blue-100 cursor-pointer ml-8"
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" /> Create
+                                      Package
+                                    </CommandItem>
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                          {selectedPackage && (
+                            <div className="mt-2 p-3 bg-gray-100 rounded-md text-sm">
+                              <p>
+                                <strong>Package Amount:</strong> ₹
+                                {selectedPackage.price}
+                              </p>
+                              <p>
+                                <strong>Number of Days:</strong>{" "}
+                                {selectedPackage.noOfDays} days
+                              </p>
+                            </div>
+                          )}
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </div>
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.promoCoupon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Promo / Coupon</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Promo / Coupon"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.offerAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Offer Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Offer Amount"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.paymentDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel required>Payment Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={new Date(field.value?.toString() ?? "")}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.startDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel required>Start Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={new Date(field.value?.toString() ?? "")}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.paidAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Paid Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Paid Amount"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 grid-cols-1 gap-6 items-start py-1">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.paymentMode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Payment Mode</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Payment Mode" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {PAYMENT_METHODS.map((method, idx) => (
+                              <SelectItem key={idx + 1} value={method}>
+                                {method}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="subscription.paymentDueDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col gap-2">
+                        <FormLabel>Payment Due Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={new Date(field.value?.toString() ?? "")}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div>
+                <FormField
+                  control={form.control}
+                  name="subscription.comments"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Comments</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Comments" type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
+          )}
+          <Button type="submit" className="w-full sm:w-auto float-end">
+            {loader ? "Loading ..." : "Submit"}
+          </Button>
+        </form>
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+          <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add Package </DialogTitle>
+            </DialogHeader>
+            <AddAndEditPackage
+              centerId={selectedCenterId}
+              onClose={handleClose}
+              onPackageAdded={(newPackage) => {
+                setPackages((prevPackages) => [
+                  ...(prevPackages || []),
+                  newPackage,
+                ]);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </Form>
+    </>
+
   );
 };
-
-export default AddAndEditMembers;

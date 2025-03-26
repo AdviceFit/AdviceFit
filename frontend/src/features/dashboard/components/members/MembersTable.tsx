@@ -2,7 +2,7 @@
 
 import React from "react";
 import { DataTable } from "./data-table";
-import { getColumns } from "./coulmns";
+import { columns } from "./coulmns";
 
 const MembersTable = ({
   centers,
@@ -17,7 +17,7 @@ const MembersTable = ({
   return (
     <div className="container py-6 mx-auto">
       <DataTable
-        columns={getColumns(adviceFitMembers, centers, setMemberState)}
+        columns={columns}
         data={adviceFitMembers}
       />
     </div>
