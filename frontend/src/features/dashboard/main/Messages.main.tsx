@@ -25,6 +25,8 @@ import { getCenters } from "../actions/centers.action";
 import { getTemplates } from "../actions/template.action";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PaymentButton from "@/components/shared/PaymentButton";
+import { getUserInfo } from "@/features/auth/actions/auth.action";
 
 const formSchema = z.object({
   center: z.string().min(1, "Center is required"),
@@ -59,6 +61,8 @@ const MessagesMain = () => {
     },
   });
 
+  const [user, setUser] = useState<any>(null);
+  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
   const [centers, setCenters] = useState<{ label: string; value: string }[]>(
     []
   );
@@ -84,6 +88,18 @@ const MessagesMain = () => {
     fetchCenters();
     fetchTemplates();
   }, []);
+
+  const handleUserInfo = async () => {
+    const responseOfMe = await getUserInfo();
+    if (responseOfMe.user) {
+      setUser(responseOfMe.user);
+      localStorage.setItem("user", JSON.stringify(responseOfMe.user));
+    }
+  };
+
+  useEffect(() => {
+    handleUserInfo();
+  }, [isPaymentCompleted]);
 
   const recipientOptions = [
     "Employees",
@@ -151,9 +167,14 @@ const MessagesMain = () => {
     <div className="w-full">
       <div className="flex justify-between">
         <h1 className="text-xl font-bold">Send Bulk Message</h1>
-        <div>
-          <h5 className="text-sm font-medium">WhatsApp Credit (0)</h5>
-          <h5 className="text-sm font-medium">SMS Credit (0)</h5>
+        <div className="flex gap-2 flex-col">
+          <h5 className="text-sm font-medium">
+            WhatsApp Credit ({user?.credits?.whatsapp ?? 0})
+          </h5>
+          <h5 className="text-sm font-medium">
+            SMS Credit ({user?.credits?.sms ?? 0})
+          </h5>
+          <PaymentButton isPaymentCompleted={isPaymentCompleted} setIsPaymentCompleted={setIsPaymentCompleted} />
         </div>
       </div>
 

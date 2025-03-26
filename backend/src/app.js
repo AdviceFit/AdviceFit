@@ -18,7 +18,8 @@ const adminRightsRoutes = require("./routes/adminRightsRoutes");
 const bulkMessageRoutes = require("./routes/bulkMessageRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const templateRoutes = require("./routes/templateRoutes");
-const reportRoutes = require("./routes/reportRoutes");
+const reportRoutes = require("./routes/reportRoutes")
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/messages", bulkMessageRoutes);
 app.use("/email", emailRoutes);
 app.use("/templates", templateRoutes);
 app.use("/reports", reportRoutes);
+app.use("/order" , orderRoutes);
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');

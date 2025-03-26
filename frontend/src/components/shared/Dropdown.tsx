@@ -37,14 +37,13 @@ const Dropdown = ({
   onChange,
   fieldName,
   label,
-  required,
 }: Props) => {
   return (
     <FormField
       control={form.control}
       name={fieldName}
       render={({ field }) => (
-        <FormItem className="flex flex-col gap-2">
+        <FormItem className="flex flex-col gap-2 w-full">
           <FormLabel required>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>

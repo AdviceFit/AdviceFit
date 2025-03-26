@@ -56,6 +56,16 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  credits: {
+    whatsApp: {
+      type: Number,
+      default: 0,
+    },
+    sms: {
+      type: Number,
+      default: 0,
+    },
+  },
   password: {
     type: String,
     required: true,
@@ -66,7 +76,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.methods.generateTokens = async function (role , refresh) {
+userSchema.methods.generateTokens = async function (role, refresh) {
   const accessToken = jwt.sign(
     { id: this._id, email: this.email, role, expires: "24h" },
     process.env.JWT_SECRET,
