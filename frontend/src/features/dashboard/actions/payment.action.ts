@@ -13,7 +13,7 @@ export const intializeOrder = async (
   return response.data;
 };
 
-export const verifyOrder = async (payload: Record<string, string>): Promise<any> => {
+export const verifyOrder = async (payload: Record<string, string| undefined>): Promise<any> => {
   const url = API_URL + "/verify-payment";
   const response = await apiClient.post(url, payload);
   return response.data;

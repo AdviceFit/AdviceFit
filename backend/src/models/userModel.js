@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
     },
   ],
   credits: {
-    whatsApp: {
+    whatsapp: {
       type: Number,
       default: 0,
     },

@@ -174,7 +174,7 @@ const MessagesMain = () => {
           <h5 className="text-sm font-medium">
             SMS Credit ({user?.credits?.sms ?? 0})
           </h5>
-          <PaymentButton isPaymentCompleted={isPaymentCompleted} setIsPaymentCompleted={setIsPaymentCompleted} />
+          <PaymentButton setIsPaymentCompleted={setIsPaymentCompleted} />
         </div>
       </div>
 

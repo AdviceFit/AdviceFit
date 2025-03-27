@@ -21,13 +21,13 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import Dropdown from "./Dropdown";
+import { toast } from "sonner";
 
 type Props = {
-  isPaymentCompleted: boolean;
   setIsPaymentCompleted: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PaymentButton = (props: Props) => {
+const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
   const [openState, setOpenState] = React.useState(false);
 
   const handleClose = () => {
@@ -68,7 +68,7 @@ const PaymentButton = (props: Props) => {
     },
   });
 
-  const handleClick = async () => {
+  const handleClick = async (payload: z.infer<typeof formSchema>) => {
     // Ensure Razorpay script is loaded before proceeding
     const scriptLoaded = await loadRazorpayScript();
     if (!scriptLoaded) {
@@ -77,33 +77,40 @@ const PaymentButton = (props: Props) => {
     }
 
     try {
-      const payload = {
-        amount: 100,
-        currency: "INR",
-      };
       const response = await intializeOrder(payload);
 
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
       // Configure Razorpay checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_CLIENT_ID ?? "",
-        amount: response.order.amount,
+        amount: response.order?.amount,
         currency: response.order.currency,
-        name: "Test Razorpay Payment",
+        name: "Advice Fit",
         order_id: response.order.id,
         handler: async function (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
           razorpay_signature: string;
         }) {
-          console.log(response);
-          await verifyOrder({
+          const res = await verifyOrder({
             signature: response.razorpay_signature,
             payment_id: response.razorpay_payment_id,
             order_id: response.razorpay_order_id,
+            mediaType: payload?.media,
             status: "success",
           });
+          toast.success(res.message);
+          setIsPaymentCompleted((prev : boolean) => !prev);
         },
         theme: { color: "#F37254" },
+        modal: {
+          ondismiss: function () {
+            toast.error("Payment process was cancelled.");
+          },
+        },
       };
 
       if (typeof window !== "undefined") {

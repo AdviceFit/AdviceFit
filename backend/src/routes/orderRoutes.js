@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post('/initialize', authMiddleware.authenticate, OrderController.createOrder);
 
-router.post('/verify-payment', OrderController.verifyPayment);  
+router.post('/verify-payment', authMiddleware.authenticate, OrderController.verifyPayment);  
 
 module.exports = router;

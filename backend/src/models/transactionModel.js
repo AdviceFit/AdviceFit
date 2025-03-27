@@ -5,6 +5,7 @@ const TransactionSchema = new mongoose.Schema({
   paymentId: { type: String },
   status: { type: String, enum: ["pending", "success", "failed"], default: "pending" },
   amount: { type: Number, required: true },
+  user : { type: String, ref: "User", required: true },
   currency: { type: String, default: "INR" },
 });
 

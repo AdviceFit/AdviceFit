@@ -18,6 +18,11 @@ exports.createUser = async (userData) => {
     return await user.save();
 };
 
+exports.updatedUser = async (userData) => {
+    const user = await User.findOneAndUpdate({ _id: userData._id }, userData, { new: true });
+    return user;
+};
+
 exports.getHistory = async () => {
     return await LoginHistory.find({ isDeleted: false }).populate('userId', 'email gym_owner_name');
 };
