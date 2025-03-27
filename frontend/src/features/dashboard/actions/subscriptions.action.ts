@@ -28,7 +28,9 @@ export const deleteSubscription = async (id: string) => {
 };
 
 // Fetch a single Subscription by ID (GET request)
-export const getSubscriptionById = async (id: string) => {
-  const response = await apiClient.get(`${API_URL}/${id}`);
+export const getSubscriptionById = async (id: string, options?: { searchByMemberId?: boolean }) => { // set searchByMemberId option as we need to get data direct from id insted of member id
+  const response = await apiClient.get(`${API_URL}/${id}`, {
+    params: options?.searchByMemberId ? { searchByMemberId: true } : {},
+  });  
   return response.data;
 };

@@ -66,6 +66,7 @@ import AddAndEditPackage from "../packages/AddAndEditPackage";
 import { Plus } from "lucide-react";
 import { getCenters } from "../../actions/centers.action";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getSubscriptionById } from "../../actions/subscriptions.action";
 
 
 export default function AddAndEditMembers() {
@@ -240,22 +241,32 @@ export default function AddAndEditMembers() {
   useEffect(() => {
     async function fetchMemberDetails() {
       if (!memberId) return;
-
       try {
         const memberData = await getMemberById(memberId);
+        // Fetch subscription details using memberId
+        const subscriptionData = await getSubscriptionById(memberId, { searchByMemberId: true });
+          const hasSubscription = !!subscriptionData?.subscription;
+        setShowSubscription(hasSubscription);
+  
         if (memberData?.member) {
-          setColumnData(memberData.member);
-          form.reset(formatMemberData(memberData.member));
-        } else {
+          console.log("Fetched Member Data:", memberData.member);
+            const formattedData = formatMemberData({
+            ...memberData.member, 
+            subscriptionDetails: hasSubscription ? subscriptionData.subscription : undefined
+          });
+            setColumnData(memberData.member);
+            form.reset(formatMemberData(memberData.member));
+          } else {
           toast.error("Member not found.");
         }
       } catch (error) {
         toast.error("Failed to fetch member details.");
       }
     }
-
+  
     fetchMemberDetails();
   }, [memberId]);
+  
 
   useEffect(() => {
     async function fetchCenters() {
@@ -275,9 +286,9 @@ export default function AddAndEditMembers() {
         ← Back
       </Button>
       <div className="flex items-center justify-start py-5">
-      <h3 className="">
-        {action === "edit" ? "Update Member" : "Add Member"}
-      </h3>
+        <h3 className="">
+          {action === "edit" ? "Update Member" : "Add Member"}
+        </h3>
       </div>
       <Form {...form}>
         <form

@@ -120,7 +120,8 @@ export default function EditSubscription({
     try {
       let response;
       if (id) {
-        response = await updateSubscription(id, values as SubscriptionsParams);
+        //Handle Ts Here (to-do)
+        response = await updateSubscription(id, values as unknown as SubscriptionsParams);
         if (response.subscription) {
           toast.success("Subscription updated successfully!");
         } else {

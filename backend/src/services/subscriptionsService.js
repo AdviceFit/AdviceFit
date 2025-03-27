@@ -24,10 +24,10 @@ exports.getAllSubscriptions = async (userId) => {
     });
 };
 
-// Get a subscription by ID
-exports.findSubscriptionById = async (id) => {
+// Get a subscription by ID Or with member id we flag true
+exports.findSubscriptionById = async (id, searchByMemberId = false) => {
   return await Subscription.findOne({
-    _id: id,
+    [searchByMemberId ? "memberId" : "_id"]: id,
     isDeleted: false,
   })
     .populate({

@@ -17,8 +17,12 @@ exports.getAllSubscriptions = async (req, res) => {
 exports.getSubscriptionById = async (req, res) => {
   try {
     const { id } = req.params;
+    const { searchByMemberId } = req.query; 
 
-    const subscription = await subscriptionsService.findSubscriptionById(id);
+    const subscription = await subscriptionsService.findSubscriptionById(
+      id,
+      searchByMemberId === "true" 
+    );
 
     if (!subscription) {
       return res.status(404).json({ message: "Subscription not found" });
