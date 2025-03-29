@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Button } from "../ui/button";
 import {
   intializeOrder,
@@ -22,6 +22,8 @@ import {
 import { Input } from "../ui/input";
 import Dropdown from "./Dropdown";
 import { toast } from "sonner";
+import { RAZORPAY_KEY, RAZORPAY_URL } from "@/constants/constant";
+import LogoIcon from "../../../public/favicon-32x32.png";
 
 type Props = {
   setIsPaymentCompleted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -43,7 +45,7 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
       }
       const script = document.createElement("script");
       script.id = "razorpay-script";
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.src = RAZORPAY_URL!;
       script.onload = () => {
         resolve(true);
       };
@@ -55,8 +57,8 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
   const formSchema = z.object({
     amount: z
       .number()
-      .min(10, { message: "Amount must be at least 10" })
-      .max(100, { message: "Amount must be at least 100" }),
+      .min(100, { message: "Amount must be at least 100" })
+      .max(10000, { message: "Amount must be at most 10000" }),
     media: z.string().optional(),
   });
 
@@ -78,18 +80,21 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
 
     try {
       const response = await intializeOrder(payload);
-
       if (response.error) {
         toast.error(response.error);
         return;
       }
+
       // Configure Razorpay checkout
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_CLIENT_ID ?? "",
+        key: RAZORPAY_KEY,
         amount: response.order?.amount,
         currency: response.order.currency,
         name: "Advice Fit",
         order_id: response.order.id,
+        image: LogoIcon,
+        description: "Advice Fit",
+        partial_payment: false,
         handler: async function (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
@@ -103,10 +108,13 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
             status: "success",
           });
           toast.success(res.message);
-          setIsPaymentCompleted((prev : boolean) => !prev);
+          setIsPaymentCompleted((prev: boolean) => !prev);
         },
-        theme: { color: "#F37254" },
+        theme: {
+          color: "dark",
+        },
         modal: {
+          backdropclose: false,
           ondismiss: function () {
             toast.error("Payment process was cancelled.");
           },
@@ -118,11 +126,16 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
         razorpay.open();
       }
     } catch (error) {
-      console.error("Error creating order:", error);
+      toast.error("Somehting went wrong. Please try again.");
     } finally {
       handleClose();
     }
   };
+
+  const totalCredits = useMemo(() => {
+    // The Credits would be half of the amount
+    return Math.round(form.watch("amount") / 2);
+  }, [form.watch("amount")]);
 
   return (
     <>
@@ -136,13 +149,24 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
         </Button>
         <DialogContent
           onInteractOutside={(e) => e.preventDefault()}
-          className="sm:max-w-[720px] h-2/5 overflow-y-auto py-0"
+          className="sm:max-w-[720px] min-h-[420px] h-2/5 overflow-y-auto py-0"
           customClose={true}
         >
           <DialogHeader className=" bg-white pt-4 pb-2 flex flex-row justify-between">
-            <DialogTitle>Create Payment</DialogTitle>
+            <DialogTitle>Buy Credits</DialogTitle>
             <X className="h-4 w-4 hover:cursor-pointer" onClick={handleClose} />
           </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">
+            Choose the desired number of credits, complete the secure payment
+            process, and instantly boost your balance. Credits can be used for
+            WhatsApp messages, SMS, and other supported features.
+          </p>
+
+          <p className="text-sm font-bold">
+            Credits to be added :{" "}
+            {Number.isNaN(totalCredits) ? 0 : totalCredits}
+          </p>
 
           <Form {...form}>
             <form className="space-y-6">
@@ -156,10 +180,15 @@ const PaymentButton = ({ setIsPaymentCompleted }: Props) => {
                       <Input
                         {...field}
                         placeholder="Enter the amount"
-                        onChange={(e) =>
-                          form.setValue("amount", parseInt(e.target.value))
-                        }
-                        type="number"
+                        onChange={(e) => {
+                          form.setValue(
+                            "amount",
+                            Number.isNaN(parseInt(e.target.value))
+                              ? 0
+                              : parseInt(e.target.value)
+                          );
+                        }}
+                        type="string"
                       />
                     </FormControl>
                     <FormMessage />

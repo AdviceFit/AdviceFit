@@ -1,4 +1,6 @@
 export const BASE_URL = "http://localhost:9000";
+export const RAZORPAY_KEY = process.env.NEXT_PUBLIC_RAZORPAY_CLIENT_ID;
+export const RAZORPAY_URL = process.env.NEXT_PUBLIC_RAZORPAY_URL;
 
 export const TOAST_MESSAGES = {
   memberAdded: "Member added successfully ..",
