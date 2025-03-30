@@ -12,7 +12,7 @@ const DashboardLayout = ({
       {/* Navbar */}
       <DashboardNavbar />
       {/* Main Layout */}
-      <div className="h-[calc(100vh-4rem)] grid grid-cols-12 overflow-hidden">
+      <div className="grid grid-cols-12">
         {/* Sidebar with independent scrolling */}
         <section className="col-span-2 h-full overflow-y-auto border-r">{sidebar}</section>
         {/* Content area with independent scrolling */}
