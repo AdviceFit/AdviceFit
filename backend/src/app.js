@@ -20,6 +20,8 @@ const emailRoutes = require("./routes/emailRoutes");
 const templateRoutes = require("./routes/templateRoutes");
 const reportRoutes = require("./routes/reportRoutes")
 const orderRoutes = require("./routes/orderRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
 
 const app = express();
 
@@ -55,6 +57,9 @@ app.use("/email", emailRoutes);
 app.use("/templates", templateRoutes);
 app.use("/reports", reportRoutes);
 app.use("/order" , orderRoutes);
+app.use("/order" , orderRoutes);
+app.use("/dashboard", dashboardRoutes);
+
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');

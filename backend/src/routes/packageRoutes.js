@@ -13,7 +13,7 @@ router.get("/", authMiddleware.authenticate, packageController.getPackages);
 router.get("/:id", authMiddleware.authenticate, packageController.getPackageById);
 
 // Update a package
-router.put("/:id", authMiddleware.authenticate, packageController.updatePackage);
+router.patch("/:id", authMiddleware.authenticate, packageController.updatePackage);
 
 // Delete a package (soft delete)
 router.delete("/:id", authMiddleware.authenticate, packageController.deletePackage);
