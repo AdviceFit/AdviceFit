@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   const cookie = await cookies();
   if (cookie.get("authToken")) {
-    redirect("/dashboard/attendance");
+    redirect("/dashboard");
   }
   return (
     <main className="wrapper grid grid-cols-2">

@@ -23,7 +23,7 @@ const DashboardNavbar: React.FC = () => {
   const userDetails = localStorageHook.userDetails;
 
   const handleSignOut = async () => {
-    await axios.get(`${BASE_URL}/api/users/logout` , { withCredentials: true });    
+    await axios.get(`${BASE_URL}/api/users/logout`, { withCredentials: true });
     localStorageHook.clearLocalStorage();
     router.push("/sign-in");
     toast.success("Logout successful!");

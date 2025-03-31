@@ -26,8 +26,9 @@ type Props = {
   }[];
   form: any;
   fieldName: string;
-  label: string;
+  label?: string;
   required?: boolean;
+  hideTopLabel?: boolean;
   onChange?: (value: unknown) => void;
 };
 
@@ -37,6 +38,8 @@ const Dropdown = ({
   onChange,
   fieldName,
   label,
+  hideTopLabel,
+  required,
 }: Props) => {
   return (
     <FormField
@@ -44,7 +47,7 @@ const Dropdown = ({
       name={fieldName}
       render={({ field }) => (
         <FormItem className="flex flex-col gap-2 w-full">
-          <FormLabel required>{label}</FormLabel>
+          {!hideTopLabel && <FormLabel required>{label}</FormLabel>}
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -59,14 +62,14 @@ const Dropdown = ({
                   {field.value
                     ? options.find((option) => option.value === field.value)
                         ?.label
-                    : "Select " + label}
+                    : "Select " + (label ?? "Option")}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="p-0">
               <Command>
-                <CommandInput placeholder={`Search ${label}`} />
+                <CommandInput placeholder={`Search ${label ?? "Option"}`} />
                 <CommandList>
                   <CommandEmpty>No {fieldName} found.</CommandEmpty>
                   <CommandGroup>
