@@ -153,12 +153,16 @@ exports.getMemberById = async (req, res) => {
     const { id } = req.params;
 
     const member = await MemberService.findMemberById(id);
-
     if (!member) {
       return res.status(404).json({ message: "Member not found" });
     }
 
-    res.status(200).json({ member });
+    const subscription = await SubscriptionService.findSubscriptionById(id, true);
+
+    res.status(200).json({
+      ...member.toObject(), 
+      subscription, 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -167,25 +171,73 @@ exports.getMemberById = async (req, res) => {
 // Update Member
 exports.updateMember = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; 
     const updateData = req.body;
 
     // Add the updatedBy field from the logged-in user's ID
     updateData.updatedBy = req.user._id;
 
     const updatedMember = await MemberService.updateMember(id, updateData);
-
     if (!updatedMember) {
       return res.status(404).json({ message: "Member not found" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Member updated successfully", member: updatedMember });
+    // Find existing subscription details using memberId
+    const existingSubscription = await SubscriptionService.findSubscriptionById(id, true);
+
+    if (existingSubscription) {
+      // Prepare subscription update data
+      let subscriptionUpdateData = {
+        updatedBy: req.user._id, // Assign updatedBy field
+      };
+
+      if (updateData.subscription) {
+        // Update subscription fields only if they are provided in request
+        const {
+          package: packageId,
+          promoCoupon,
+          offerAmount,
+          paymentDate,
+          startDate,
+          paidAmount,
+          paymentMode,
+          paymentDueDate,
+          comments,
+        } = updateData.subscription;
+
+        if (packageId) subscriptionUpdateData.packageId = packageId;
+        if (promoCoupon) subscriptionUpdateData.promoCoupon = promoCoupon;
+        if (offerAmount !== undefined) subscriptionUpdateData.offerAmount = offerAmount;
+        if (paymentDate) subscriptionUpdateData.paymentDate = paymentDate;
+        if (startDate) subscriptionUpdateData.startDate = startDate;
+        if (paidAmount !== undefined) subscriptionUpdateData.paidAmount = paidAmount;
+        if (paymentMode) subscriptionUpdateData.paymentMode = paymentMode;
+        if (paymentDueDate) subscriptionUpdateData.paymentDueDate = paymentDueDate;
+        if (comments) subscriptionUpdateData.comments = comments;
+
+        // Update Subscription details
+        const updatedSubscription = await SubscriptionService.updateSubscription(
+          req.user._id,
+          existingSubscription._id,
+          subscriptionUpdateData
+        );
+
+        if (!updatedSubscription) {
+          return res.status(404).json({ message: "Subscription update failed" });
+        }
+      }
+    }
+
+    res.status(200).json({
+      message: "Member updated successfully",
+      member: updatedMember,
+    });
   } catch (error) {
+    console.error("Error updating member:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Delete Member
 exports.deleteMember = async (req, res) => {

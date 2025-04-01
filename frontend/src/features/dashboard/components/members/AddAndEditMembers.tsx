@@ -85,43 +85,45 @@ export default function AddAndEditMembers() {
   const handleClose = () => setIsOpen(false);
 
   // const defaultValues = {
-  const formatMemberData = (data: any): z.infer<typeof formSchema> => ({
-    joining_date: data?.joining_date
-      ? new Date(data.joining_date.toString())
-      : new Date(),
-    dob: data?.dob ? new Date(data.dob.toString()) : new Date(),
-    marital_status: data?.marital_status || "",
-    gender: data?.gender || "",
-    name: data?.name || "",
-    mobile: data?.mobile || "",
-    gym_member_code: data?.gym_member_code || "",
-    email: data?.email || "",
-    center: data?.center?._id || "",
-    source: data?.source || "",
-    occupation: data?.occupation || "",
-    health_conditions: data?.health_conditions || "",
-    addressLine1: data?.address?.addressLine1 || "",
-    addressLine2: data?.address?.addressLine2 || "",
-    address: [data?.address?.country, data?.address?.state] as any,
-    city: data?.address?.city || "",
-    pincode: data?.address?.pincode || "",
-    subscription: showSubscription
-      ? {
-        package: data?.subscriptionDetails?.package || "",
-        promoCoupon: data?.subscriptionDetails?.promoCoupon || "",
-        offerAmount: data?.subscriptionDetails?.offerAmount,
-        paymentDate: data?.subscriptionDetails?.paymentDate
-          ? new Date(data?.subscriptionDetails?.paymentDate?.toString())
-          : new Date(),
-        startDate: data?.subscriptionDetails?.startDate || new Date(),
-        paidAmount: data?.subscriptionDetails?.paidAmount,
-        paymentMode: data?.subscriptionDetails?.paymentMode || "",
-        paymentDueDate:
-          data?.subscriptionDetails?.paymentDueDate || new Date(),
-        comments: data?.subscriptionDetails?.comments || "",
-      }
-      : undefined,
-  });
+    const formatMemberData = (data: any): z.infer<typeof formSchema> => ({
+      joining_date: data?.joining_date ? new Date(data.joining_date) : new Date(),
+      dob: data?.dob ? new Date(data.dob) : new Date(),
+      marital_status: data?.marital_status || "",
+      gender: data?.gender || "",
+      name: data?.name || "",
+      mobile: data?.mobile || "",
+      gym_member_code: data?.gym_member_code || "",
+      email: data?.email || "",
+      center: data?.center?._id || "",
+      source: data?.source || "",
+      occupation: data?.occupation || "",
+      health_conditions: data?.health_conditions || "",
+      addressLine1: data?.address?.addressLine1 || "",
+      addressLine2: data?.address?.addressLine2 || "",
+      address: [data?.address?.country, data?.address?.state] as any,
+      city: data?.address?.city || "",
+      pincode: data?.address?.pincode || "",  
+      subscription: data?.subscription
+        ? {
+          package: data?.subscription?.packageId?._id || "", // Store package ID
+          promoCoupon: data?.subscription?.promoCoupon || "",
+            offerAmount: data?.subscription?.offerAmount || 0,
+            paymentDate: data?.subscription?.paymentDate
+              ? new Date(data.subscription.paymentDate)
+              : new Date(),
+            startDate: data?.subscription?.startDate
+              ? new Date(data.subscription.startDate)
+              : new Date(),
+            paidAmount: data?.subscription?.paidAmount || 0,
+            paymentMode: data?.subscription?.paymentMode || "",
+            paymentDueDate: data?.subscription?.paymentDueDate
+              ? new Date(data.subscription.paymentDueDate)
+              : new Date(),
+            comments: data?.subscription?.comments || "",
+          }
+        : undefined,
+    });
+    
 
   const formSchema = z.object({
     name: z
@@ -243,20 +245,27 @@ export default function AddAndEditMembers() {
       if (!memberId) return;
       try {
         const memberData = await getMemberById(memberId);
-        // Fetch subscription details using memberId
-        const subscriptionData = await getSubscriptionById(memberId, { searchByMemberId: true });
-          const hasSubscription = !!subscriptionData?.subscription;
-        setShowSubscription(hasSubscription);
   
-        if (memberData?.member) {
-          console.log("Fetched Member Data:", memberData.member);
-            const formattedData = formatMemberData({
-            ...memberData.member, 
-            subscriptionDetails: hasSubscription ? subscriptionData.subscription : undefined
-          });
-            setColumnData(memberData.member);
-            form.reset(formatMemberData(memberData.member));
-          } else {
+        if (memberData) {
+          const formattedData = formatMemberData(memberData);
+          setColumnData(memberData);
+          form.reset(formattedData);
+  
+          // Check if the subscription exists and update the state
+          setShowSubscription(!!memberData.subscription);
+  
+          if (memberData.center?._id) {
+            const response = await getPackages(memberData.center._id);
+            if (response?.packages) {
+              setPackages(response.packages); // Set full package list
+            }
+          }
+  
+          // Set the pre-selected package for the user
+          if (memberData.subscription?.packageId?._id) {
+            form.setValue("subscription.package", memberData.subscription.packageId._id);
+          }
+        } else {
           toast.error("Member not found.");
         }
       } catch (error) {

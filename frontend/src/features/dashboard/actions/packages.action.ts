@@ -24,6 +24,8 @@ export const updatePackage = async (
   id: string,
   data: Partial<PackageParams>
 ) => {
+  console.log("updatePackage", id, data);
+  
   const response = await apiClient.patch(`${API_URL}/${id}`, data);
   return response.data;
 };

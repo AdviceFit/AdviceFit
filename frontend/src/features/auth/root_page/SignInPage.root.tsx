@@ -56,7 +56,7 @@ export default function MyForm() {
       toast.success("Login successful!"); // Show success message
 
       if (responseOfMe.user.role.name === "Admin") {
-        router.push("/dashboard/attendance");
+        router.push("/dashboard");
       } else if (responseOfMe.user.role.name === "Member") {
         router.push("/personal-details");
       }

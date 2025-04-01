@@ -71,7 +71,6 @@ export default function AddAndEditPackage({
   // const searchParams = useSearchParams();
   // const centerIdFromParams = searchParams.get("centerId");
 
-  const router = useRouter();
   const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
     _id: data._id || "",
     packageName: data.packageName || "",
@@ -111,7 +110,11 @@ export default function AddAndEditPackage({
     try {
       let response;
       if (id) {
+        console.log("values", values);
+        
         response = await updatePackage(id, values);
+        console.log('response', response);
+        
         if (response.success) {
           toast.success("Package updated successfully!");
         } else {

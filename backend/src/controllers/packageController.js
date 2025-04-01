@@ -50,7 +50,7 @@ exports.updatePackage = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-
+    console.log('updateData', updateData);
     const updatedPackage = await packageService.updatePackage(
       id,
       updateData,

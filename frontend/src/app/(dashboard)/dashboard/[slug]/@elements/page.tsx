@@ -27,7 +27,7 @@ const DashboardElementsRoute = async function ({
   const slug = (await params).slug;
 
   if (!APP_ROUTES.allowRoutes.includes(slug)) {
-    redirect(APP_ROUTES.dasboard.attendance);
+    redirect(APP_ROUTES.dashboardPath);
   }
   switch (slug) {
     case "attendance":
