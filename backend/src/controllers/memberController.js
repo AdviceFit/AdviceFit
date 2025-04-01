@@ -64,13 +64,10 @@ exports.createMember = async (req, res) => {
 
     await MemberService.updateMember(newMember?._id, updateData);
 
-    console.log(memberData);
-    
-
     if (memberData?.subscription) {
       const subscriptionData = {
         ...memberData?.subscription,
-        packageId : memberData?.subscription?.package,
+        packageId: memberData?.subscription?.package,
         memberId: newMember?._id,
         createdBy: userId,
         updatedBy: userId,
@@ -80,8 +77,6 @@ exports.createMember = async (req, res) => {
         subscriptionData
       );
 
-      console.log(newSubscription);
-      
       const {
         offerAmount,
         paidAmount,
@@ -107,10 +102,8 @@ exports.createMember = async (req, res) => {
         updatedBy: userId,
       };
 
-      console.log(paymentData);
-
       const newPayment = await PaymentService.createPayment(paymentData);
-      
+
       await SubscriptionService.updateSubscription(
         userId,
         newSubscription?._id,

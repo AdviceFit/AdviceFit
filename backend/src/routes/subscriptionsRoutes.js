@@ -5,6 +5,12 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.get(
+  "/group-subscriptions",
+  authMiddleware.authenticate,
+  subscriptionsController.getGroupedSubscriptions
+);
+
+router.get(
   "/",
   authMiddleware.authenticate,
   subscriptionsController.getAllSubscriptions

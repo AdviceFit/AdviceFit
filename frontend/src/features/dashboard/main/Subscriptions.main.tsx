@@ -1,15 +1,10 @@
-import { getSubscriptions } from "../actions/subscriptions.action";
-import SubscriptionsHeader from "../components/subscriptions/SubscriptionsHeader";
-import SubscriptionsTable from "../components/subscriptions/SubscriptionsTable";
+import Subscription from "../components/subscriptions/Subscription";
 
 const SubscriptionsMain = async () => {
-  const adviceFitSubscriptions = await getSubscriptions();
   return (
     <>
-      <SubscriptionsHeader />
-      <SubscriptionsTable
-        adviceFitSubscriptions={adviceFitSubscriptions?.subscriptions ?? []}
-      />
+      <h4 className="py-4">Subscriptions</h4>
+      <Subscription />
     </>
   );
 };

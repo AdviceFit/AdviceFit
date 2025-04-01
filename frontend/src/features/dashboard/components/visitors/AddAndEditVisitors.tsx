@@ -18,14 +18,6 @@ import {
 import { Input } from "@/components/ui/input";
 
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -43,7 +35,6 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Calendar } from "@/components/ui/calendar";
-import { DatePickerDemo } from "@/components/ui/DatePickerDemo";
 import { SmartDatetimeInput } from "@/components/ui/smart-date-time-input";
 import { getCenters } from "../../actions/centers.action";
 import { useEffect, useState } from "react";
@@ -95,17 +86,15 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);  
   const router = useRouter();
 
-  const formatVisitorData = (data: any): z.infer<typeof formSchema> => ({
+  const formatVisitorData = (data: any): z.infer<typeof formSchema> => {
+    return {
     _id: data._id || "",
     name: data.name || "",
     mobile: data.mobile || "",
     visiting_date: data.visiting_date || new Date().toISOString().slice(0, 10),
     tentative_visiting_date: data.tentative_visiting_date || undefined,
     email: data.email || "",
-    visiting_center:
-      typeof data.visiting_center === "string"
-        ? data.visiting_center
-        : data.visiting_center._id,
+    visiting_center: data.visiting_center._id.toString(),
     gender: data.gender as "Male" | "Female" | "Other",
     source: data.source || "Banner",
     occupation: data.occupation || "Student",
@@ -121,7 +110,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       city: "",
       pincode: "",
     },
-  });
+  }};
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -164,6 +153,16 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       }
     }
 
+    async function fetchCenters() {
+      try {
+        const data = await getCenters();
+        setCenters(data?.centers || []);
+      } catch (error) {
+        toast.error("Failed to load centers.");
+      }
+    }
+
+    fetchCenters();
     fetchVisitorDetails();
   }, [id]);
 
@@ -192,17 +191,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       router.replace("/dashboard/visitors");
     }
   }
-  useEffect(() => {
-    async function fetchCenters() {
-      try {
-        const data = await getCenters();
-        setCenters(data?.centers || []);
-      } catch (error) {
-        toast.error("Failed to load centers.");
-      }
-    }
-    fetchCenters();
-  }, []);
 
   return (
     <Form {...form}>

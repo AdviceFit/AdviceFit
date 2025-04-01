@@ -34,3 +34,8 @@ export const getSubscriptionById = async (id: string, options?: { searchByMember
   });  
   return response.data;
 };
+
+export const getGroupedSubscriptions = async () => {
+  const response = await apiClient.get(`${API_URL}/group-subscriptions`);
+  return response.data;
+};

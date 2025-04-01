@@ -19,37 +19,17 @@ const subscriptionSchema = new Schema(
       ref: "Package",
       required: true,
     },
-    promoCoupon: {
-      type: String,
-      trim: true,
-    },
-    offerAmount: {
+    subscriptionAmount: {
       type: Number,
       required: true,
     },
-    paymentDate: {
+    subscriptionDate: {
       type: Date,
       required: true,
     },
-    startDate: {
+    expiryDate: {
       type: Date,
       required: true,
-    },
-    paidAmount: {
-      type: Number,
-      required: true,
-    },
-    paymentMode: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    paymentDueDate: {
-      type: Date,
-    },
-    comments: {
-      type: String,
-      trim: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

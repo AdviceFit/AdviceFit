@@ -2,11 +2,18 @@ const subscriptionsService = require("../services/subscriptionsService");
 
 exports.getAllSubscriptions = async (req, res) => {
   try {
-    const userId = req.user._id;
+    // const userId = req.user._id;
+    const subscriptions = await subscriptionsService.getAllSubscriptions(userId);
+    res.status(200).json({ subscriptions });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
 
-    const subscriptions = await subscriptionsService.getAllSubscriptions(
-      userId
-    );
+exports.getGroupedSubscriptions = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const subscriptions = await subscriptionsService.getGroupedSubscriptions(userId);
     res.status(200).json({ subscriptions });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

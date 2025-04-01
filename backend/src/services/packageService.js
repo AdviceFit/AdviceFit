@@ -16,14 +16,19 @@ exports.getPackages = async (centerId, userId) => {
 };
 
 exports.getPackageById = async (id, userId) => {
-  return await Package.findOne({
+  const filters = {
     _id: id,
     isDeleted: false,
-    createdBy: userId, // Ensure the package belongs to the authenticated user
-  }).populate("center", "name centerCode");
+  };
+
+  if (userId) {
+    filters.createdBy = userId;
+  }
+
+  return await Package.findOne(filters).populate("center", "name centerCode");
 };
 
-exports.updatePackage = async (id, updateData, userId) => {  
+exports.updatePackage = async (id, updateData, userId) => {
   return await Package.findOneAndUpdate(
     { _id: id, createdBy: userId }, // Ensure the package belongs to the authenticated user
     { $set: updateData },
