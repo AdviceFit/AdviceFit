@@ -1,0 +1,63 @@
+name: Deploy Frontend & Backend
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
+      backend_changed: ${{ steps.filter.outputs.backend }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Check for Changes
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  deploy-frontend:
+    needs: check-changes
+    if: needs.check-changes.outputs.frontend_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Frontend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FRONTEND_AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd ~/repo || mkdir ~/repo && cd ~/repo
+            git pull origin development
+            cd frontend
+            npm install
+            npm run build
+            pm2 restart frontend || pm2 start npm --name "frontend" -- start
+
+  deploy-backend:
+    needs: check-changes
+    if: needs.check-changes.outputs.backend_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Backend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.BACKEND_AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd ~/repo || mkdir ~/repo && cd ~/repo
+            git pull origin development
+            cd backend
+            npm install
+            pm2 restart backend || pm2 start npm --name "backend" -- start
