@@ -18,10 +18,9 @@ const adminRightsRoutes = require("./routes/adminRightsRoutes");
 const bulkMessageRoutes = require("./routes/bulkMessageRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const templateRoutes = require("./routes/templateRoutes");
-const reportRoutes = require("./routes/reportRoutes")
+const reportRoutes = require("./routes/reportRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
-
 
 const app = express();
 
@@ -56,10 +55,16 @@ app.use("/messages", bulkMessageRoutes);
 app.use("/email", emailRoutes);
 app.use("/templates", templateRoutes);
 app.use("/reports", reportRoutes);
-app.use("/order" , orderRoutes);
-app.use("/order" , orderRoutes);
+app.use("/order", orderRoutes);
 app.use("/dashboard", dashboardRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is healthy 🚀",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Error Handling Middleware
 // const errorHandler = require('./middlewares/errorHandler');
