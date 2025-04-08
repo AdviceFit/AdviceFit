@@ -104,4 +104,4 @@ jobs:
             # npm i
 
             echo "🔁 Restarting backend with pm2..."
-            pm2 restart backend || pm2 start src/app.js --name "backend"
+            pm2 restart backend || pm2 start src/app.js --name backend --cwd ~/repo/backend
