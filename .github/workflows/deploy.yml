@@ -79,6 +79,7 @@ jobs:
           host: ${{ secrets.BACKEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
+          timeout: 1200
           script: |
             set -e
             echo "🚀 Deploying backend..."
@@ -100,7 +101,7 @@ jobs:
             cd ~/repo/backend
 
             echo "📥 Installing dependencies..."
-            npm ci
+            npm i
 
             echo "🔁 Restarting backend with pm2..."
             pm2 restart backend || pm2 start npm --name "backend" -- start
