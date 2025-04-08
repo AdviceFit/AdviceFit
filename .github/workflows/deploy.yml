@@ -79,7 +79,7 @@ jobs:
           host: ${{ secrets.BACKEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          timeout: 1200
+          timeout: 20m
           script: |
             set -e
             echo "🚀 Deploying backend..."
