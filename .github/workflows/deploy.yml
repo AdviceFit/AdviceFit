@@ -62,32 +62,32 @@ jobs:
             echo "Restarting frontend with pm2..."
             pm2 restart frontend || pm2 start npm --name "frontend" -- start --watch
 
-deploy-backend:
-  needs: check-changes
-  if: needs.check-changes.outputs.backend_changed == 'true'
-  runs-on: ubuntu-latest
-  steps:
-    - name: Deploy Backend
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.BACKEND_AWS_HOST }}
-        username: ${{ secrets.AWS_USER }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        script: |
-          set -e
-          echo "Deploying backend..."
+  deploy-backend:
+    needs: check-changes
+    if: needs.check-changes.outputs.backend_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Backend
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.BACKEND_AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            set -e
+            echo "Deploying backend..."
 
-          if [ ! -d "~/repo" ]; then
-            echo "Cloning repository..."
-            git clone git@github.com:AdviceFit/AdviceFit.git ~/repo
-          else
-            cd ~/repo
-            git pull origin development
-          fi
+            if [ ! -d "~/repo" ]; then
+              echo "Cloning repository..."
+              git clone git@github.com:AdviceFit/AdviceFit.git ~/repo
+            else
+              cd ~/repo
+              git pull origin development
+            fi
 
-          cd ~/repo/backend
-          echo "Installing dependencies..."
-          npm ci
+            cd ~/repo/backend
+            echo "Installing dependencies..."
+            npm ci
 
-          echo "Restarting backend with pm2..."
-          pm2 restart backend || pm2 start npm --name "backend" -- start
+            echo "Restarting backend with pm2..."
+            pm2 restart backend || pm2 start npm --name "backend" -- start
