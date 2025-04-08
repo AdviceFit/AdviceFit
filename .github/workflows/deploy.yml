@@ -43,23 +43,29 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
             set -e
-            echo "Deploying frontend..."
+            echo "🚀 Deploying frontend..."
 
             cd ~
-            if [ ! -d "repo" ]; then
-              echo "Cloning repository..."
+            if [ -d "repo/.git" ]; then
+              echo "✅ Repository exists. Pulling latest changes..."
+              cd repo
+              git reset --hard
+              git clean -fd
+              git checkout development
+              git pull origin development
+            else
+              echo "📦 Cloning repository..."
+              rm -rf repo
               git clone git@github.com:AdviceFit/AdviceFit.git repo
+              cd repo
             fi
 
-            cd repo
-            git pull origin development
-
             cd frontend
-            echo "Installing dependencies..."
+            echo "📥 Installing dependencies..."
             npm install
-            echo "Building the frontend..."
+            echo "🛠️ Building the frontend..."
             npm run build
-            echo "Restarting frontend with pm2..."
+            echo "🔁 Restarting frontend with pm2..."
             pm2 restart frontend || pm2 start npm --name "frontend" -- start --watch
 
   deploy-backend:
@@ -75,19 +81,26 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
             set -e
-            echo "Deploying backend..."
+            echo "🚀 Deploying backend..."
 
-            if [ ! -d "~/repo" ]; then
-              echo "Cloning repository..."
-              git clone git@github.com:AdviceFit/AdviceFit.git ~/repo
-            else
+            if [ -d "~/repo/.git" ]; then
+              echo "✅ Repository exists. Pulling latest changes..."
               cd ~/repo
+              git reset --hard
+              git clean -fd
+              git checkout development
               git pull origin development
+            else
+              echo "📦 Cloning repository..."
+              rm -rf ~/repo
+              git clone git@github.com:AdviceFit/AdviceFit.git ~/repo
             fi
 
+            echo "📂 Navigating to backend directory..."
             cd ~/repo/backend
-            echo "Installing dependencies..."
+
+            echo "📥 Installing dependencies..."
             npm ci
 
-            echo "Restarting backend with pm2..."
+            echo "🔁 Restarting backend with pm2..."
             pm2 restart backend || pm2 start npm --name "backend" -- start
