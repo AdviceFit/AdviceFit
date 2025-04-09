@@ -64,9 +64,6 @@ jobs:
             echo "📁 Navigating to frontend directory..."
             cd ~/repo/frontend
 
-            echo "📦 Installing dependencies (optional if already uploaded)..."
-            npm ci
-
             echo "🌐 Starting Next.js app with PM2..."
             pm2 delete frontend || true
             pm2 start "npm run start" --name "frontend"
