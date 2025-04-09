@@ -51,7 +51,7 @@ jobs:
           host: ${{ secrets.FRONTEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "frontend/build"
+          source: "frontend/.next"
           target: "~/repo/frontend"
 
       - name: Serve Build with pm2
