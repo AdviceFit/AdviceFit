@@ -54,19 +54,22 @@ jobs:
           source: "frontend/.next"
           target: "~/repo/frontend"
 
-      - name: Serve Build with pm2
+      - name: Serve Frontend with PM2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.FRONTEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
-            echo "📦 Ensuring 'serve' is installed globally..."
-            npm install -g serve
+            echo "📁 Navigating to frontend directory..."
+            cd ~/repo/frontend
 
-            echo "🔁 Restarting frontend using serve via pm2..."
+            echo "📦 Installing dependencies (optional if already uploaded)..."
+            npm ci
+
+            echo "🌐 Starting Next.js app with PM2..."
             pm2 delete frontend || true
-            pm2 start "npx serve -s ~/repo/frontend/build -l 3000" --name "frontend"
+            pm2 start "npm run start" --name "frontend"
 
   deploy-backend:
     needs: check-changes
