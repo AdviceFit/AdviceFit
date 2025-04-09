@@ -28,6 +28,7 @@ import {
   SquareUser,
   Tickets,
   ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 const SidebarLinks = () => {
