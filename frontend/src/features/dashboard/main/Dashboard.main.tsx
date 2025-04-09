@@ -2,7 +2,8 @@ import { getCenters } from "../actions/centers.action";
 import Dashboard from "../components/dashboard/Dashboard";
 
 const DashboardMain = async () => {
-  const { centers } = await getCenters();
+  const data = await getCenters();
+  const centers = data?.centers ?? [];
   return (
     <>
       <Dashboard centers={centers} />

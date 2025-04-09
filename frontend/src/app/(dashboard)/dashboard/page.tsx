@@ -3,11 +3,7 @@ import DashboardNavbar from "@/features/dashboard/components/DashboardNavbar";
 import SidebarLinks from "@/features/dashboard/components/SidebarLinks";
 import DashboardMain from "@/features/dashboard/main/Dashboard.main";
 
-type Props = {
-  centers: CenterParams[];
-};
-
-const DashboardRoute = (props: Props) => {
+const DashboardRoute = () => {
   return (
     <main className="h-screen flex flex-col max-w-[1920px] mx-auto">
       {/* Navbar */}
