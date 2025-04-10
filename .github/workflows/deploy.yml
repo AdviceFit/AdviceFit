@@ -47,11 +47,6 @@ jobs:
           rm -rf .next
           npm run build
 
-      - name: Transpile next.config.ts
-        run: |
-          cd frontend
-          npx tsc next.config.ts --outDir .
-
       - name: Upload Build to EC2
         uses: appleboy/scp-action@master
         with:
