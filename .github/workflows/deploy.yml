@@ -35,18 +35,16 @@ jobs:
         with:
           node-version: 18
 
-      - name: Clean npm cache and install dependencies
+      - name: Install Dependencies
         run: |
+          cd frontend
           rm -rf node_modules
           npm ci
-
-      - name: Clean Next.js build
-        run: |
-          rm -rf .next
 
       - name: Build Frontend
         run: |
           cd frontend
+          rm -rf .next
           npm run build
 
       - name: Transpile next.config.ts
