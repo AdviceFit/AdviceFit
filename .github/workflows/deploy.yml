@@ -47,23 +47,9 @@ jobs:
           rm -rf .next
           npm run build
 
-      - name: Debug List Files in Build Directory
+      - name: Upload Build to EC2 using rsync
         run: |
-          ls -al frontend/.next
-          ls -al frontend/public
-
-      - name: Upload Build to EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.FRONTEND_AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          source: |
-            frontend/.next
-            frontend/public
-            frontend/package.json
-            frontend/package-lock.json
-          target: "~/repo/frontend"
+          rsync -avz --delete frontend/.next frontend/public frontend/package.json frontend/package-lock.json ${{ secrets.AWS_USER }}@${{ secrets.FRONTEND_AWS_HOST }}:~/repo/frontend
 
       - name: Serve Frontend with PM2
         uses: appleboy/ssh-action@master
