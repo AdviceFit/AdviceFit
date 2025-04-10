@@ -47,6 +47,13 @@ jobs:
           rm -rf .next
           npm run build
 
+      - name: Add SSH Key and Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.FRONTEND_AWS_HOST }} >> ~/.ssh/known_hosts
+
       - name: Upload Build to EC2 using rsync
         run: |
           rsync -avz --delete frontend/.next frontend/public frontend/package.json frontend/package-lock.json ${{ secrets.AWS_USER }}@${{ secrets.FRONTEND_AWS_HOST }}:~/repo/frontend
