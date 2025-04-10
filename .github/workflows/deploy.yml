@@ -47,6 +47,11 @@ jobs:
           rm -rf .next
           npm run build
 
+      - name: Debug List Files in Build Directory
+        run: |
+          ls -al frontend/.next
+          ls -al frontend/public
+
       - name: Upload Build to EC2
         uses: appleboy/scp-action@master
         with:
