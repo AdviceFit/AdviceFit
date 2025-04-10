@@ -35,34 +35,47 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Dependencies & Build Locally
+      - name: Install Dependencies
         run: |
           cd frontend
           npm ci
-          npm run build
-          npx tsc next.config.ts --outDir .
-          mkdir -p ../build/frontend
-          cp -r .next public package.json package-lock.json next.config.js node_modules ../build/frontend
 
-      - name: Upload Full Frontend Build
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Transpile next.config.ts
+        run: |
+          cd frontend
+          npx tsc next.config.ts --outDir .
+
+      - name: Upload Build to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.FRONTEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "build/frontend"
-          target: "~/repo/"
+          source: |
+            frontend/.next
+            frontend/public
+            frontend/package.json
+            frontend/package-lock.json
+          target: "~/repo/frontend"
 
-      - name: Start PM2 (No Install Needed!)
+      - name: Serve Frontend with PM2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.FRONTEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
-            cd ~/repo/build/frontend
+            echo "📁 Navigating to frontend directory..."
+            cd ~/repo/frontend
+
+            echo "🌐 Starting Next.js app with PM2..."
             pm2 delete frontend || true
-            pm2 start "npm run start" --name frontend
+            pm2 start "npm run start" --name "frontend"
 
   deploy-backend:
     needs: check-changes
