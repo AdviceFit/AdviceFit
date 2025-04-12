@@ -99,6 +99,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.BACKEND_AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Add SSH Key and Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 22 -H ${{ secrets.BACKEND_AWS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Upload Backend to EC2 using rsync
