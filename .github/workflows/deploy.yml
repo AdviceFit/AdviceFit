@@ -110,7 +110,6 @@ jobs:
             backend/node_modules \
             ${{ secrets.AWS_USER }}@${{ secrets.BACKEND_AWS_HOST }}:~/repo/backend
 
-
       - name: Restart Backend with PM2
         uses: appleboy/ssh-action@master
         with:
