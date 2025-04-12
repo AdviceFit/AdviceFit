@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       frontend_changed: ${{ steps.filter.outputs.frontend }}
+      backend_changed: ${{ steps.filter.outputs.backend }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -21,6 +22,8 @@ jobs:
           filters: |
             frontend:
               - 'frontend/**'
+            backend:
+              - 'backend/**'
 
   deploy-frontend:
     needs: check-changes
