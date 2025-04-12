@@ -63,7 +63,6 @@ app.get("/health", (req, res) => {
     status: "OK",
     message: "Server is healthy 🚀",
     timestamp: new Date().toISOString(),
-    test: "test",
   });
 });
 
