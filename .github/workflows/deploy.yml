@@ -80,35 +80,47 @@ jobs:
     if: needs.check-changes.outputs.backend_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy Backend
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          rm -rf node_modules
+          npm ci
+
+      - name: Add SSH Key and Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.BACKEND_AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload Backend to EC2 using rsync
+        run: |
+          rsync -avz --delete \
+            backend/src \
+            backend/package.json \
+            backend/package-lock.json \
+            backend/node_modules \
+            ${{ secrets.AWS_USER }}@${{ secrets.BACKEND_AWS_HOST }}:~/repo/backend
+
+
+      - name: Restart Backend with PM2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.BACKEND_AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.PRIVATE_KEY }}
-          timeout: 20m
           script: |
-            set -e
-            echo "🚀 Deploying backend..."
-
-            if [ -d ~/repo/.git ]; then
-              echo "✅ Repository exists. Pulling latest changes..."
-              cd ~/repo
-              git reset --hard
-              git clean -fd
-              git checkout development
-              git pull origin development
-            else
-              echo "📦 Cloning repository..."
-              rm -rf ~/repo
-              git clone git@github.com:AdviceFit/AdviceFit.git ~/repo
-            fi
-
             echo "📂 Navigating to backend directory..."
             cd ~/repo/backend
 
-            echo "📥 Installing dependencies..."
-            npm ci
-
             echo "🔁 Restarting backend with pm2..."
             pm2 restart backend || pm2 start src/app.js --name backend --cwd ~/repo/backend
+
