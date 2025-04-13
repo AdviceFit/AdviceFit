@@ -36,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install Dependencies
         run: |
@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload Build to EC2 using rsync
         run: |
-          rsync -avz --delete frontend/.next frontend/public frontend/package.json frontend/package-lock.json ${{ secrets.AWS_USER }}@${{ secrets.FRONTEND_AWS_HOST }}:~/repo/frontend
+          rsync -avz --delete frontend/.next frontend/public frontend/node_modules frontend/package.json frontend/package-lock.json ${{ secrets.AWS_USER }}@${{ secrets.FRONTEND_AWS_HOST }}:~/repo/frontend
 
       - name: Serve Frontend with PM2
         uses: appleboy/ssh-action@master

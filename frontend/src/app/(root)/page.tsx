@@ -6,6 +6,7 @@ const HomepageRoute = () => {
     <main className="wrapper bg-gradient-to-r from-blue-500 to-green-500 flex-col center text-white">
       <section className="text-center">
         <h1>Welcome to AdviceFit</h1>
+        <h2>Test Deploy</h2>
         <p>Your personal guide to fitness and self-improvement.</p>
         <div className="space-x-4 mt-2 text-blue-600">
           <Link href="/dashboard">
