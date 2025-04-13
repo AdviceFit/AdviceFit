@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:9000";
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://3.110.207.146";
 export const RAZORPAY_KEY = process.env.NEXT_PUBLIC_RAZORPAY_CLIENT_ID;
 export const RAZORPAY_URL = process.env.NEXT_PUBLIC_RAZORPAY_URL;
 
