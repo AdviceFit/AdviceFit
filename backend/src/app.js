@@ -31,7 +31,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Adjust to your frontend URL
+    origin: process.env.CORS_ORIGINS.split(","), // Adjust to your frontend URL
     credentials: true, // Allow credentials (cookies) to be sent
   })
 );
