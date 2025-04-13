@@ -1,9 +1,7 @@
-import { BASE_URL } from "@/constants/constant";
 import SignInPage from "@/features/auth/root_page/SignInPage.root";
 
 const SignInRoute = () => {
-  console.log(BASE_URL);
-  
+  console.log("Base URL" , process.env.NEXT_PUBLIC_BASE_URL);
   return (
     <section className="p-8 w-full lg:w-2/3 mx-auto h-screen flex flex-col items-center justify-center">
       <div className="w-full">
