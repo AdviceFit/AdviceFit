@@ -77,11 +77,10 @@ exports.login = async (req, res) => {
     await loginHistory.addLoginHistory();
 
     res.cookie("authToken", accessToken, {
-      httpOnly: true,
-      // secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "none",
-      path: "/",
+      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      secure: false, // MUST be false for HTTP (only true for HTTPS)
+      sameSite: 'lax', // Lax is best for most use cases
+      path: '/', // Cookie is valid for the entire domain
     });
     
     res.status(200).json({ message: "Login successful" , token : accessToken });
