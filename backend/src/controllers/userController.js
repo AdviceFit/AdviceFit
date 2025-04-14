@@ -76,11 +76,20 @@ exports.login = async (req, res) => {
     const loginHistory = new LoginHistory({ userId: user._id , createdAt: new Date() });
     await loginHistory.addLoginHistory();
 
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
+
+    // Set the cookie
+    res.setHeader('Set-Cookie', [
+      `demo=yourValue; Path=/; Expires=${expires}; HttpOnly; Secure; SameSite=Strict`,
+    ]);
+  
+
     res.cookie("authToken", accessToken, {
       httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
       secure: false, // MUST be false for HTTP (only true for HTTPS)
       sameSite: 'lax', // Lax is best for most use cases
       path: '/', // Cookie is valid for the entire domain
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     
     res.status(200).json({ message: "Login successful" , token : accessToken });
