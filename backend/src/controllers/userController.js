@@ -78,11 +78,10 @@ exports.login = async (req, res) => {
 
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
 
-    // Set the cookie
+
     res.setHeader('Set-Cookie', [
-      `demo=yourValue; Path=/; Expires=${expires}; SameSite=Strict`,
+      `demo=yourValue; Path=/; Expires=${expires}; HttpOnly; SameSite=Strict`,
     ]);
-  
 
     res.cookie("authToken", accessToken, {
       httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
