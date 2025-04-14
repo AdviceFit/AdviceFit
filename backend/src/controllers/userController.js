@@ -79,7 +79,8 @@ exports.login = async (req, res) => {
     res.cookie("authToken", accessToken, {
       httpOnly: true,
       maxAge: 86400000,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "strict",
       path: "/",
     });
     
