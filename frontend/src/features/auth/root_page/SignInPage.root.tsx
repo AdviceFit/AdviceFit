@@ -49,7 +49,7 @@ export default function MyForm() {
       });
 
       const responseOfMe = await getUserInfo();
-      if (responseOfMe.user) {
+      if (responseOfMe?.user) {
         localStorage.setItem("user", JSON.stringify(responseOfMe.user));
       }
 
