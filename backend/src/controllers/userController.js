@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
 
     // Set the cookie
     res.setHeader('Set-Cookie', [
-      `demo=yourValue; Path=/; Expires=${expires}; HttpOnly; Secure; SameSite=Strict`,
+      `demo=yourValue; Path=/; Expires=${expires}; SameSite=Strict`,
     ]);
   
 
