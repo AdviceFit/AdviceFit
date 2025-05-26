@@ -4,12 +4,12 @@ type Routes = {
   sign_up: string;
   allowRoutes: string[];
   dashboardPath: string;
-  dasboard: {
+  dashboard: {
     attendance: string;
     centers: string;
     members: string;
     addMember: string;
-    updateMember : string;
+    updateMember: string;
     visitors: string;
     reports: string;
     subscriptions: string;
@@ -47,8 +47,8 @@ const APP_ROUTES: Routes = {
     "attendance",
     "centers",
     "members",
-    'add-member',
-    'update-member',
+    "add-member",
+    "update-member",
     "visitors",
     "reports",
     "subscriptions",
@@ -72,13 +72,13 @@ const APP_ROUTES: Routes = {
     "login-reports",
     "download-reports",
   ],
-  dashboardPath: dashboardPath,
-  dasboard: {
+  dashboardPath,
+  dashboard: {
     attendance: `/dashboard/attendance`,
     centers: `/dashboard/centers`,
     members: `/dashboard/members`,
-    addMember: `dashboard/add-member`,
-    updateMember: `dashboard/update-member`,
+    addMember: `/dashboard/add-member`,
+    updateMember: `/dashboard/update-member`,
     visitors: `/dashboard/visitors`,
     reports: `/dashboard/reports`,
     subscriptions: `/dashboard/subscriptions`,
