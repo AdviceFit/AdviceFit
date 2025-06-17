@@ -6,6 +6,7 @@ import { getCenters } from '../actions/centers.action';
 
 const CentersMain = async () => {
   const adviceFitCenters = await getCenters();  
+  console.log('adviceFitCenters',adviceFitCenters)
   return (
     <>
       <CentersHeader />

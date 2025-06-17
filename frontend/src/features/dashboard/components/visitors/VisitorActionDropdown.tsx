@@ -1,82 +1,59 @@
-"use client"
+"use client";
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import AddAndEditVisitors from "./AddAndEditVisitors";
 import { useRouter } from 'next/navigation';
 import { deleteVisitor } from '../../actions/visitors.action';
 import { toast } from 'sonner';
 
 const VisitorActionDropdown = ({ id }: { id: string }) => {
-    const [isDeleting, setIsDeleting] = useState(false);
-    const router = useRouter()
-    const [isOpen, setIsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
-    const handleOpen = (e: React.MouseEvent) => {
-        setIsOpen(true);
-    };
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteVisitor(id);
+      toast.success("Visitor deleted successfully!");
+      router.push("/dashboard/visitors");
+    } catch (error) {
+      toast.error("Failed to delete visitor.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-    const handleClose = () => {
-        setIsOpen(false);
-    };
-
-    const handleDelete = async (e: React.MouseEvent) => {
-        setIsDeleting(true);
-        try {
-            await deleteVisitor(id);
-            toast.success("Visitor deleted successfully!");
-            router.push("/dashboard/visitors");
-        } catch (error) {
-            toast.error("Failed to delete attendance.");
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild className="text-center">
-                <Button variant="ghost">•••</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <Button variant="ghost" onClick={handleOpen}>
-                            Edit Visitors
-                        </Button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Button variant="ghost" onClick={handleDelete} disabled={isDeleting}>
-                            {isDeleting ? "Deleting..." : "Delete Visitors"}
-                        </Button>
-                    </DropdownMenuItem>
-
-                </DropdownMenuGroup>
-            </DropdownMenuContent>
-
-            {/* Controlled Dialog Component */}
-            <Dialog open={isOpen} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[920px] lg:h-[90%] h-5/6 overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>Edit Visitors</DialogTitle>
-                    </DialogHeader>
-                    <AddAndEditVisitors id={id} onClose={handleClose} />
-                </DialogContent>
-            </Dialog>
-        </DropdownMenu>
-    );
-}
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild className="text-center">
+        <Button variant="ghost">•••</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-40">
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/dashboard/update-visitor?action=edit&id=${id}`)}
+            >
+              Edit Visitor
+            </Button>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Button variant="ghost" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete Visitor"}
+            </Button>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export default VisitorActionDropdown;

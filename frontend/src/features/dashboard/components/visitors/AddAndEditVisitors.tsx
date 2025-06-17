@@ -1,11 +1,15 @@
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+
 import {
   Form,
   FormControl,
@@ -15,15 +19,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-//import { Check, ChevronsUpDown } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -31,16 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
-
+import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SmartDatetimeInput } from "@/components/ui/smart-date-time-input";
-import { getCenters } from "../../actions/centers.action";
-import { useEffect, useState } from "react";
 import LocationSelector from "@/components/ui/location-input";
-import { useRouter } from "next/navigation";
+
+import { getCenters } from "../../actions/centers.action";
 import {
   createVisitor,
   getVisitorById,
@@ -50,7 +45,7 @@ import {
 const formSchema = z.object({
   _id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  mobile: z.string().min(10 , "Mobile number must be between 10 and 16 characters").max(16),
+  mobile: z.string().min(10, "Mobile number must be between 10 and 16 characters").max(16),
   visiting_date: z.coerce.date().optional(),
   tentative_visiting_date: z.coerce.date().optional(),
   email: z.string().email("Enter a valid email address").optional(),
@@ -83,35 +78,41 @@ const formSchema = z.object({
     .optional(),
 });
 
-export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClose?: () => void }) {
-  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);  
+export default function AddAndEditVisitors({ onClose }: { onClose?: () => void }) {
+  const searchParams = useSearchParams();
   const router = useRouter();
+
+  const id = searchParams.get("id") || undefined;
+  const action = searchParams.get("action");
+
+  const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
 
   const formatVisitorData = (data: any): z.infer<typeof formSchema> => {
     return {
-    _id: data._id || "",
-    name: data.name || "",
-    mobile: data.mobile || "",
-    visiting_date: data.visiting_date || new Date().toISOString().slice(0, 10),
-    tentative_visiting_date: data.tentative_visiting_date || undefined,
-    email: data.email || "",
-    visiting_center: data.visiting_center._id.toString(),
-    gender: data.gender as "Male" | "Female" | "Other",
-    source: data.source || "Banner",
-    occupation: data.occupation || "Student",
-    dob: data.dob || new Date(),
-    health_conditions: data.health_conditions || "None",
-    marital_status: data.marital_status as "Single" | "Married",
-    remarks: data.remarks || "Medium",
-    enquire_mode: data.enquire_mode as "Talking" | "Walking" | "Any",
-    address: data.address || {
-      addressLine1: "",
-      addressLine2: "",
-      state: "",
-      city: "",
-      pincode: "",
-    },
-  }};
+      _id: data._id || "",
+      name: data.name || "",
+      mobile: data.mobile || "",
+      visiting_date: data.visiting_date ? new Date(data.visiting_date) : new Date(),
+      tentative_visiting_date: data.tentative_visiting_date ? new Date(data.tentative_visiting_date) : undefined,
+      email: data.email || "",
+      visiting_center: data.visiting_center?._id?.toString() || "",
+      gender: data.gender as "Male" | "Female" | "Other",
+      source: data.source || "Banner",
+      occupation: data.occupation || "Student",
+      dob: data.dob ? new Date(data.dob) : new Date(),
+      health_conditions: data.health_conditions || "",
+      marital_status: data.marital_status as "Single" | "Married",
+      remarks: data.remarks || "",
+      enquire_mode: data.enquire_mode as "Talking" | "Walking" | "Any",
+      address: data.address || {
+        addressLine1: "",
+        addressLine2: "",
+        state: "",
+        city: "",
+        pincode: "",
+      },
+    };
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,7 +127,7 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
       occupation: "Student",
       health_conditions: "",
       marital_status: "Single",
-      remarks: "Medium",
+      remarks: "",
       enquire_mode: "Talking",
       address: {
         addressLine1: "",
@@ -141,7 +142,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
   useEffect(() => {
     async function fetchVisitorDetails() {
       if (!id) return;
-
       try {
         const visitorData = await getVisitorById(id);
         if (visitorData?.visitor) {
@@ -185,15 +185,23 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
           toast.error(response.error ?? "Failed to create visitor.");
         }
       }
+
       onClose?.();
+      router.replace("/dashboard/visitors");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
-    } finally {
-      router.replace("/dashboard/visitors");
     }
   }
-
   return (
+    <>
+   <Button className="w-24" variant="outline" onClick={() => router.back()}>
+           ← Back
+         </Button>
+         <div className="flex items-center justify-start py-5">
+           <h3 className="">
+             {action === "edit" ? "Update visitor" : "Add visitor" }
+           </h3>
+         </div>
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -691,5 +699,6 @@ export default function AddAndEditVisitors({ id, onClose }: { id?: string; onClo
         </Button>
       </form>
     </Form>
+     </>
   );
 }

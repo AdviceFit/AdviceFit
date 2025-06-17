@@ -75,7 +75,7 @@ const ExpenseHeader = () => {
             Add Expense
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[765px] lg:h-4/6 h-5/6 overflow-y-auto">
+        <DialogContent className=" h-[90vh] sm:max-w-[765px] lg:h-3/4 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Expense</DialogTitle>
           </DialogHeader>

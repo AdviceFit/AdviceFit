@@ -4,13 +4,18 @@ type Routes = {
   sign_up: string;
   allowRoutes: string[];
   dashboardPath: string;
+  personalDetailsPath?: string; // Optional, as it may not be used in all cases
   dashboard: {
     attendance: string;
     centers: string;
+    addCenter: string;  
+    updateCenter: string;
     members: string;
     addMember: string;
     updateMember: string;
     visitors: string;
+    addVisitors: string;
+    updateVisitor?: string; // Optional, as it may not be used in all cases
     reports: string;
     subscriptions: string;
     payments: string;
@@ -20,7 +25,11 @@ type Routes = {
     messagesHistory: string;
     setup: string;
     employee: string;
+    addEmployee: string;
+    updateEmployee: string;
     packages: string;
+    addPackage?: string; // Optional, as it may not be used in all cases
+    updatePackage?: string; // Optional, as it may not be used in all cases
     emails: string;
     loginReports: string;
     downloadReports: string;
@@ -38,18 +47,24 @@ type Routes = {
 };
 
 const dashboardPath = "/dashboard";
+const personalDetailsPath = "/personal-details";
 
 const APP_ROUTES: Routes = {
   home: "/",
   sign_in: "/sign-in",
   sign_up: "/sign-up",
+ 
   allowRoutes: [
     "attendance",
     "centers",
+    "add-center",
+    "update-center",
     "members",
     "add-member",
     "update-member",
     "visitors",
+    "add-visitors",
+    "update-visitor",
     "reports",
     "subscriptions",
     "payments",
@@ -60,8 +75,12 @@ const APP_ROUTES: Routes = {
     "message-history",
     "setup",
     "employees",
+    "add-employee",
+    "update-employee",
     "packages",
-    "personal-details",
+    "add-package",
+    "update-package",
+    
     "my-subscription",
     "payment-history",
     "order-history",
@@ -76,10 +95,14 @@ const APP_ROUTES: Routes = {
   dashboard: {
     attendance: `/dashboard/attendance`,
     centers: `/dashboard/centers`,
+    addCenter: `/dashboard/add-center`,
+    updateCenter: `/dashboard/update-center`,
     members: `/dashboard/members`,
     addMember: `/dashboard/add-member`,
     updateMember: `/dashboard/update-member`,
     visitors: `/dashboard/visitors`,
+    addVisitors: `/dashboard/add-visitor`,
+    updateVisitor: `/dashboard/update-visitor`,
     reports: `/dashboard/reports`,
     subscriptions: `/dashboard/subscriptions`,
     payments: `/dashboard/payments`,
@@ -90,7 +113,11 @@ const APP_ROUTES: Routes = {
     messagesHistory: `/dashboard/message-history`,
     setup: `/dashboard/setup`,
     employee: `/dashboard/employees`,
+    addEmployee: `/dashboard/add-employee`,
+    updateEmployee: `/dashboard/update-employee`,
     packages: `/dashboard/packages`,
+    addPackage: `/dashboard/add-package`,
+    updatePackage: `/dashboard/update-package`,
     loginReports: `/dashboard/login-reports`,
     downloadReports: `/dashboard/download-reports`,
   },

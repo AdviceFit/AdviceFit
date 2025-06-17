@@ -37,7 +37,8 @@ const Navbar = () => {
         ) : (
           <Link
             className={buttonVariants({ variant: "outline" })}
-            href={APP_ROUTES.dasboard.attendance}
+            href={APP_ROUTES.dashboard.attendance}
+
           >
             Dashboard
           </Link>

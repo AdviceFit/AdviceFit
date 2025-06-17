@@ -1,17 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import AddAndEditVisitors from "./AddAndEditVisitors";
 import { Plus, Download } from "lucide-react";
+import axios from "axios";
 import { toast } from "sonner";
 
 interface Visitor {
@@ -22,17 +14,14 @@ interface Visitor {
 }
 
 const VisitorsHeader = () => {
-  const [modal, setModal] = useState(false);
-
-  const handleClose = () => {
-    setModal(false);
-  };
+  const router = useRouter();
 
   const exportToCSV = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/visitors`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/visitors`,
+        { withCredentials: true }
+      );
 
       const visitors: Visitor[] = response.data.visitors;
 
@@ -48,8 +37,6 @@ const VisitorsHeader = () => {
         const row = headers.map((field) => `"${visitor[field] ?? ""}"`).join(",");
         csvRows.push(row);
       });
-      
-      toast.success("Visitors exported successfully!");
 
       const csvString = csvRows.join("\n");
       const blob = new Blob([csvString], { type: "text/csv" });
@@ -62,6 +49,7 @@ const VisitorsHeader = () => {
       link.click();
       document.body.removeChild(link);
 
+      toast.success("Visitors exported successfully!");
     } catch (error) {
       console.error("Export failed:", error);
       toast.error("Failed to export visitors.");
@@ -70,23 +58,17 @@ const VisitorsHeader = () => {
 
   return (
     <div className="flex justify-between items-center mb-4">
-      {/* Add Visitor (Left) */}
-      <Dialog open={modal} onOpenChange={setModal}>
-        <DialogTrigger asChild>
-          <Button className="w-36" variant="default">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Visitor
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Visitor</DialogTitle>
-          </DialogHeader>
-          <AddAndEditVisitors onClose={handleClose} />
-        </DialogContent>
-      </Dialog>
+      {/* Navigate to Add Visitor Page */}
+      <Button
+        className="w-36"
+        variant="default"
+        onClick={() => router.push("/dashboard/add-visitors")}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Visitor
+      </Button>
 
-      {/* Export Visitors (Right) */}
+      {/* Export Visitors */}
       <Button variant="outline" className="w-40" onClick={exportToCSV}>
         <Download className="mr-2 h-4 w-4" />
         Export Visitors

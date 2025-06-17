@@ -14,11 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCenters } from "../../actions/centers.action";
-
 import { toast } from "sonner";
-
 import {
   createPackage,
   getPackageById,
@@ -35,12 +33,16 @@ import {
 const formSchema = z.object({
   _id: z.string().optional(),
   packageName: z.string().min(1, "Package name is required"),
-  price: z.number().min(1, "Price must be greater than 0"),
+  price: z
+    .number({ invalid_type_error: "Price must be a number" })
+    .min(1, "Price must be greater than 0"),
   center: z.string().min(1, "Center is required"),
   productType: z.enum(["General", "Gift", "Registration", "Session"], {
     required_error: "Product type is required",
   }),
-  noOfDays: z.number().min(1, "Number of days must be greater than 0"),
+  noOfDays: z
+    .number({ invalid_type_error: "Number of days must be a number" })
+    .min(1, "Number of days must be greater than 0"),
   packageTiming: z.enum(["Normal Hours", "Sunny Hours"], {
     required_error: "Package timing is required",
   }),
@@ -50,7 +52,6 @@ const formSchema = z.object({
   packageType: z.enum(["Main", "Add On"], {
     required_error: "Package type is required",
   }),
-  // cafeSubscription: z.boolean().optional(),
   showAtAdviceFit: z.boolean().optional(),
 });
 
@@ -58,39 +59,20 @@ export default function AddAndEditPackage({
   id,
   centerId,
   onClose,
-  onPackageAdded
+  onPackageAdded,
 }: {
   id?: string;
-  centerId?: string,
+  centerId?: string;
   onClose?: () => void;
-  onPackageAdded?: (newPackage: PackageParams) => void;
+  onPackageAdded?: (newPackage: any) => void;
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramId = searchParams.get("id");
+  const finalId = id || paramId;
+  const action = searchParams.get("action");
+
   const [centers, setCenters] = useState<{ _id: string; name: string }[]>([]);
-
-  //TO-DO ( 1 - we create redirect flow then decided to open two modal on member so that's why)
-  // const searchParams = useSearchParams();
-  // const centerIdFromParams = searchParams.get("centerId");
-
-  const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
-    _id: data._id || "",
-    packageName: data.packageName || "",
-    price: data.price || 0,
-    center: data.center?._id || centerId || "",
-    productType: data.productType as
-      | "General"
-      | "Gift"
-      | "Registration"
-      | "Session",
-    noOfDays: data.noOfDays || 0,
-    packageTiming: data.packageTiming as "Normal Hours" | "Sunny Hours",
-    trainingType: data.trainingType as "General" | "Personal",
-    packageType: data.packageType as "Main" | "Add On",
-    showAtAdviceFit: data.showAtAdviceFit || false,
-  });
-
-
-
-  //To-do temp fix for center populate
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -106,29 +88,39 @@ export default function AddAndEditPackage({
       showAtAdviceFit: false,
     },
   });
+
+  const formatPackageData = (data: any): z.infer<typeof formSchema> => ({
+    _id: data._id || "",
+    packageName: data.packageName || "",
+    price: data.price || 0,
+    center: data.center?._id || centerId || "",
+    productType: data.productType || "General",
+    noOfDays: data.noOfDays || 0,
+    packageTiming: data.packageTiming || "Normal Hours",
+    trainingType: data.trainingType || "General",
+    packageType: data.packageType || "Main",
+    showAtAdviceFit: data.showAtAdviceFit || false,
+  });
+
+
+  
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       let response;
       if (id) {
-        console.log("values", values);
-        
         response = await updatePackage(id, values);
-        console.log('response', response);
-        
         if (response.success) {
           toast.success("Package updated successfully!");
         } else {
           toast.error("Failed to update the package.");
         }
       } else {
-        response = await createPackage(values as PackageParams);
+        
+        response = await createPackage(values);
         if (response.package) {
           toast.success("Package created successfully!");
-  
-          // Call the callback to update the parent component
-          if (onPackageAdded) {
-            onPackageAdded(response.package);
-          }
+          onPackageAdded?.(response.package);
         } else {
           toast.error("Failed to create the package.");
         }
@@ -138,35 +130,45 @@ export default function AddAndEditPackage({
       toast.error("Something went wrong. Please try again.");
     }
   }
-  
 
   useEffect(() => {
-    async function fetchCenters() {
+    const fetchCenters = async () => {
       try {
         const data = await getCenters();
         setCenters(data?.centers || []);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load centers.");
       }
-    }
+    };
     fetchCenters();
   }, []);
 
-  useEffect(() => {
-    const fetchPackageDetails = async () => {
-      if (!id) return;
-      try {
-        const data = await getPackageById(id);
-        const formattedData = formatPackageData(data.packages);
-        form.reset(formattedData);
-      } catch (error) {
-        toast.error("Failed to fetch package details.");
-      }
-    };
+useEffect(() => {
+  const fetchPackageDetails = async () => {
+    if (!finalId) return;
+    try {
+      const data = await getPackageById(finalId);
+      const formatted = formatPackageData(data.packages);
+      form.reset(formatted);
+    } catch {
+      toast.error("Failed to fetch package details.");
+    }
+  };
+  fetchPackageDetails();
+}, [finalId]);
 
-    fetchPackageDetails();
-  }, [id, form]);
+
+
   return (
+    <>
+          <Button className="w-24" variant="outline"  onClick={() => router.back()}>
+            ← Back
+          </Button>
+          <div className="flex items-center justify-start py-5">
+            <h3 className="">
+              {action === "edit" ? "Update package" : "Add package"}
+            </h3>
+          </div>
     <Form {...form}>
         <form className="space-y-6 w-full mx-auto py-4" onSubmit={form.handleSubmit(onSubmit)}>
 
@@ -416,5 +418,6 @@ export default function AddAndEditPackage({
         </Button>
       </form>
     </Form>
+    </>
   );
 }

@@ -9,7 +9,7 @@ const LoginHistory = require("../models/loginHistory");
 // Signup Controller
 exports.signup = async (req, res) => {
   try {
-    const { email, password, ...rest } = req.body;
+    const { email, password, role, ...rest } = req.body;
 
     // Check if the email already exists
     const existingUser = await UserService.findUserByEmail(email);
@@ -17,10 +17,11 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Email already in use" });
     }
 
-    const adminRole = await Role.findOne({ name: "Admin" });
+    const adminRole = await Role.findOne({ name: role ??  "Admin" });
     if (!adminRole) {
       return res.status(400).json({ message: "Admin role not found!" });
     }
+    
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,9 +45,11 @@ exports.signup = async (req, res) => {
 // Login Controller
 exports.login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;    
+    const { email, password, role } = req.body;
+
     let user;
-    
+
+    // Role-based user lookup
     if (role === "Admin") {
       user = await UserService.findUserByEmail(email);
       if (!user) {
@@ -61,39 +64,49 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid role provided" });
     }
 
-    // Check if the password is correct
-    const isPasswordValid = bcrypt.compare(password, user.password);
+    // Validate presence of password field
+    if (!user.password) {
+      return res.status(500).json({ message: "User has no password set" });
+    }
+
+    // ✅ Compare password (must await)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate a Tokens
-    const  { accessToken  } = await user.generateTokens(role);
-    // user.refreshTokens.push({ token: refreshToken, expires });
-    // await user.save();
+    // ✅ Generate access token
+    const { accessToken } = await user.generateTokens(role);
 
-    // Add login history
-    const loginHistory = new LoginHistory({ userId: user._id , createdAt: new Date() });
+    // ✅ Record login history
+    const loginHistory = new LoginHistory({
+      userId: user._id,
+      createdAt: new Date(),
+    });
     await loginHistory.addLoginHistory();
 
+    // ✅ Set cookies
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
 
-
-    res.setHeader('Set-Cookie', [
+    res.setHeader("Set-Cookie", [
       `demo=yourValue; Path=/; Expires=${expires}; HttpOnly; SameSite=Strict`,
     ]);
 
     res.cookie("authToken", accessToken, {
-      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      secure: false, // MUST be false for HTTP (only true for HTTPS)
-      sameSite: 'lax', // Lax is best for most use cases
-      path: '/', // Cookie is valid for the entire domain
+      httpOnly: true,
+      secure: false, // Set true only if using HTTPS
+      sameSite: "lax",
+      path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-    
-    res.status(200).json({ message: "Login successful" , token : accessToken });
+
+    return res.status(200).json({
+      message: "Login successful",
+      token: accessToken,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Login error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
 

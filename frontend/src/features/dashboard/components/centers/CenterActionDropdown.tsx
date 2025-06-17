@@ -54,9 +54,13 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
             <DropdownMenuContent className="w-40">
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        <Button variant="ghost" onClick={handleOpen}>
+                        <Button
+                            variant="ghost"
+                            onClick={() => router.push(`/dashboard/update-center?id=${id}&action=edit`)}
+                        >
                             Edit Center
                         </Button>
+
                     </DropdownMenuItem>
                     <DropdownMenuItem >
                         <Button variant="ghost" onClick={handleDelete} disabled={isDeleting}>
@@ -72,7 +76,7 @@ const CenterrActionDropdown = ({ id }: { id: string }) => {
                     <DialogHeader>
                         <DialogTitle>Edit Center</DialogTitle>
                     </DialogHeader>
-                    <AddAndEditCenters  id={id} onClose={handleClose} />
+                    <AddAndEditCenters id={id} onClose={handleClose} />
                 </DialogContent>
             </Dialog>
         </DropdownMenu>

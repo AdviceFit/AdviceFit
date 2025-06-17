@@ -38,33 +38,45 @@ export default function MyForm() {
 
   // Update onSubmit function to handle API call
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const dataToSend = {
-        ...values, // Includes email and password
-        role, // Adds the selected role (either 'Member' or 'Admin')
-      };
+  try {
+    const dataToSend = {
+      ...values,
+      role,
+    };
 
-      await axios.post(`${BASE_URL + "/api/users/login"}`, dataToSend, {
-        withCredentials: true,
-      });
+    // 1. Login call
+    await axios.post(`${BASE_URL}/api/users/login`, dataToSend, {
+      withCredentials: true,
+    });
 
-      const responseOfMe = await getUserInfo();
-      if (responseOfMe?.user) {
-        localStorage.setItem("user", JSON.stringify(responseOfMe.user));
-      }
+    // 2. Fetch user info
+    const responseOfMe = await getUserInfo();
+    console.log("Fetched user info:", responseOfMe);
 
-      toast.success("Login successful!"); // Show success message
+    if (responseOfMe?.user) {
+      localStorage.setItem("user", JSON.stringify(responseOfMe.user));
+      toast.success("Login successful!");
+      console.log("User Info Response:", responseOfMe.data);
 
-      if (responseOfMe.user.role.name === "Admin") {
+      // 3. Route based on role
+      const userRole = responseOfMe.user.role.name;
+
+      if (userRole === "Admin") {
         router.push("/dashboard");
-      } else if (responseOfMe.user.role.name === "Member") {
+      } else if (userRole === "Member") {
         router.push("/personal-details");
+      } else {
+        toast.error("Unknown role, cannot redirect");
       }
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+    } else {
+      toast.error("User data not found after login.");
     }
+  } catch (error: any) {
+    console.error("Login error:", error.response?.data || error.message);
+    toast.error("Login failed. Check credentials.");
   }
+}
+
 
   return (
     <Form {...form}>
@@ -142,8 +154,11 @@ export default function MyForm() {
 
         <div className="text-center mt-2">
           <p className="text-sm text-gray-500">
-            {"Don't have an account?"}{" "}
-            <Link href="/sign-up" className="text-black hover:underline">
+            Don't have an account?{" "}
+            <Link
+              href={`/sign-up?role=${role}`}
+              className="text-black hover:underline"
+            >
               Sign up
             </Link>
           </p>

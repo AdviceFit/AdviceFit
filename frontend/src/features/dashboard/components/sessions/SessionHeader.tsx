@@ -100,7 +100,7 @@ const SessionHeader = () => {
             Add Session
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
+        <DialogContent className="sm:max-w-[865px] h-[95vh] lg:h-3/4  overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Session</DialogTitle>
           </DialogHeader>

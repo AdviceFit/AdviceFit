@@ -1,4 +1,7 @@
+
+
 "use client";
+
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,16 +20,18 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Textarea } from "@/components/ui/textarea";
 import LocationSelector from "@/components/ui/location-input";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BASE_URL } from "@/constants/constant";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
+// Form schema
 const formSchema = z.object({
   gym_name: z.string().min(2).max(50),
   gym_owner_name: z.string().min(2).max(50),
   email: z.string().email("Invalid email format"),
   number: z.number(),
-  password: z.string(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   describe: z.string(),
   country: z.string(),
   city: z.string().min(2).max(50),
@@ -36,6 +41,17 @@ const formSchema = z.object({
 
 const SignUpPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [role, setRole] = useState<"Member" | "Admin">("Member");
+
+  useEffect(() => {
+    const roleFromParam = searchParams.get("role");
+    if (roleFromParam === "Admin" || roleFromParam === "Member") {
+      setRole(roleFromParam);
+      console.log("Role from query param:", roleFromParam);
+    }
+  }, [searchParams]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,43 +66,49 @@ const SignUpPage = () => {
       city: "",
       pincode: "",
       state: "",
+      
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload = {
-      gym_name: values.gym_name,
-      gym_owner_name: values.gym_owner_name,
-      number: values.number,
-      email: values.email,
-      describe: values.describe,
-      country: values.country,
-      state: values.state,
-      city: values.city,
-      pincode: values.pincode,
-      password: values.password,
-    };
+  const payload = {
+    gym_name: values.gym_name,
+    gym_owner_name: values.gym_owner_name,
+    email: values.email,
+    number: values.number,
+    password: values.password,
+    describe: values.describe,
+    country: values.country,
+    city: values.city,
+    pincode: values.pincode,
+    state: values.state,
+    role: role, // ✅ explicitly set the role
+  };
 
-    try {
-      const response = await fetch(`${BASE_URL}/api/users/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+  try {
+    const response = await fetch(`${BASE_URL}/api/users/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      toast.success("Signup successful!");
-      router.push("/sign-in");
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
     }
-  }
+
+    console.log("Signup successful:", payload);
+    toast.success("Signup successful!");
+    router.push("/sign-in");
+  }catch (error:any) {
+  console.error("Signup error:", error.message || error);
+  toast.error("Failed to sign up. Server might be unreachable.");
+}
+  console.log("Form values:", values);
+  console.log("Role:", payload);
+  console.log("URL:", `${BASE_URL}/api/users/signup`);
+}
 
   return (
     <Form {...form}>

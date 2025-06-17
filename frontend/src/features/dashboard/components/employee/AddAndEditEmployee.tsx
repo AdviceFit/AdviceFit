@@ -20,7 +20,7 @@ import { DatePickerDemo } from "@/components/ui/DatePickerDemo";
 import { SmartDatetimeInput } from "@/components/ui/smart-date-time-input";
 import { useState, useEffect } from "react";
 import LocationSelector from "@/components/ui/location-input";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import { getCenters } from "../../actions/centers.action";
 import { format } from "date-fns";
 import { ChevronsUpDown, Check } from "lucide-react";
@@ -41,6 +41,7 @@ import { PopoverContent } from "@radix-ui/react-popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { log } from "console";
 
 const formSchema = z.object({
   _id: z.string().optional(),
@@ -89,6 +90,12 @@ export default function AddAndEditEmployee({
   const [countryName, setCountryName] = useState<string>("");
   const [stateName, setStateName] = useState<string>("");
 
+  const searchParams = useSearchParams();
+  
+  const paramId = searchParams.get("id");
+      const finalId = id || paramId;
+    const action = searchParams.get("action"); // add/edi
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -118,26 +125,28 @@ export default function AddAndEditEmployee({
     description: data.description || "",
   });
 
-  useEffect(() => {
-    const fetchEmployeeDetails = async () => {
-      if (!id) return;
-      try {
-        const data = await getEmployeeById(id);
-        if (data?.employee) {
-          form.reset(formatEmployeeData(data.employee));
-        } else {
-          toast.error("Employee not found.");
-        }
-      } catch (error) {
-        toast.error("Failed to fetch employee details.");
-      } finally {
+ useEffect(() => {
+  const fetchEmployeeDetails = async () => {
+    if (!finalId) return;
+    try {
+      const data = await getEmployeeById(finalId);
+      console.log("Fetched employee data:", data);
+      if (data?.employee) {
+        form.reset(formatEmployeeData(data.employee));
+      } else {
+        toast.error("Employee not found.");
       }
-    };
+    } catch (error) {
+      toast.error("Failed to fetch employee details.");
+    }
+  };
 
-    fetchEmployeeDetails();
-  }, [id]);
+  fetchEmployeeDetails();
+}, [finalId]);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted with values:", values);
     try {
       let response;
       if (id) {
@@ -175,6 +184,15 @@ export default function AddAndEditEmployee({
   }, []);
 
   return (
+    <>
+    <Button className="w-24" variant="outline" onClick={() => router.back()}>
+        ← Back
+      </Button>
+      <br />
+    <h3 className="text-lg font-semibold">
+      {action === "edit" || id ? "Update Employess" : "Add Employess"}
+    </h3>
+    
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -489,5 +507,6 @@ export default function AddAndEditEmployee({
         </Button>
       </form>
     </Form>
+    </>
   );
 }

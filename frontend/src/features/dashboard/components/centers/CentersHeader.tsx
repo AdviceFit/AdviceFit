@@ -1,15 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import AddAndEditCenters from "./AddAndEditCenters";
 import { Download, Plus } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -19,7 +11,7 @@ interface Center {
 }
 
 const CentersHeader = () => {
-  const [modal, setModal] = useState(false);
+  const router = useRouter();
 
   const handleExport = async () => {
     try {
@@ -60,23 +52,17 @@ const CentersHeader = () => {
 
   return (
     <div className="flex justify-between items-center mb-4">
-      {/* Add Center (Left Side) */}
-      <Dialog open={modal} onOpenChange={setModal}>
-        <DialogTrigger asChild>
-          <Button variant="default" className="w-36">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Center
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Center</DialogTitle>
-          </DialogHeader>
-          <AddAndEditCenters />
-        </DialogContent>
-      </Dialog>
+      {/* Navigate to New Add Center Page */}
+      <Button
+        variant="default"
+        className="w-36"
+        onClick={() => router.push("/dashboard/add-center")}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add Center
+      </Button>
 
-      {/* Export Centers (Right Side) */}
+      {/* Export Button */}
       <Button variant="outline" className="w-44" onClick={handleExport}>
         <Download className="mr-2 h-4 w-4" />
         Export Centers

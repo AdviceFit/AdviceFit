@@ -170,7 +170,7 @@ export default function AddAndEditExpense({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-full mx-auto py-4"
+        className="space-y-8 w-full h-full mx-auto py-4"
       >
         <div className="grid grid-cols-12 gap-4">
           {/* Expense Title */}

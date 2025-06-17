@@ -256,6 +256,7 @@ export default function AddAndEditMembers() {
   
           if (memberData.center?._id) {
             const response = await getPackages(memberData.center._id);
+            console.log("Packages response:", response);
             if (response?.packages) {
               setPackages(response.packages); // Set full package list
             }

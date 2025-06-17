@@ -13,11 +13,21 @@ import SessionsMain from "@/features/dashboard/main/Sessions.main";
 import SetupMain from "@/features/dashboard/main/Setup.main";
 import SubscriptionsMain from "@/features/dashboard/main/Subscriptions.main";
 import VisitorsMain from "@/features/dashboard/main/Visitors.main";
-import { redirect } from "next/navigation";
 import MessageHistoryMain from "@/features/dashboard/main/MessegesHistory.main";
 import LoginHistoryMain from "@/features/dashboard/main/LoginHistory.main";
 import DownloadReportsMain from "@/features/dashboard/main/DownloadReports.main";
+
 import AddAndEditMembers from "@/features/dashboard/components/members/AddAndEditMembers";
+import AddAndEditVisitors from "@/features/dashboard/components/visitors/AddAndEditVisitors";
+import AddAndEditCenters from "@/features/dashboard/components/centers/AddAndEditCenters";
+import AddAndEditPackage from "@/features/dashboard/components/packages/AddAndEditPackage";
+import AddAndEditEmployee from "@/features/dashboard/components/employee/AddAndEditEmployee";
+
+import PersonalDetails from "@/features/personal-details/components/PersonalDetailsSectionHeader"; // ✅ Corrected import
+
+import { redirect } from "next/navigation";
+import PersonalDetailsSection from "@/features/personal-details/components/personal-details/PersonalDetailsSection";
+import MemberNavbar from "@/features/personal-details/components/MemberNavbar";
 
 const DashboardElementsRoute = async function ({
   params,
@@ -29,11 +39,16 @@ const DashboardElementsRoute = async function ({
   if (!APP_ROUTES.allowRoutes.includes(slug)) {
     redirect(APP_ROUTES.dashboardPath);
   }
+
   switch (slug) {
     case "attendance":
       return <AttendanceMain />;
     case "centers":
       return <CentersMain />;
+    case "add-center":
+      return <AddAndEditCenters />;
+    case "update-center":
+      return <AddAndEditCenters />;
     case "members":
       return <MembersMain />;
     case "add-member":
@@ -42,6 +57,10 @@ const DashboardElementsRoute = async function ({
       return <AddAndEditMembers />;
     case "visitors":
       return <VisitorsMain />;
+    case "add-visitors":
+      return <AddAndEditVisitors />;
+    case "update-visitor":
+      return <AddAndEditVisitors />;
     case "reports":
       return <ReportsMain />;
     case "subscriptions":
@@ -62,12 +81,21 @@ const DashboardElementsRoute = async function ({
       return <SetupMain />;
     case "employees":
       return <EmployeeMain />;
+    case "add-employee":
+      return <AddAndEditEmployee />;
+    case "update-employee":
+      return <AddAndEditEmployee />;
     case "packages":
       return <PackagesMain />;
+    case "add-package":
+      return <AddAndEditPackage />;
+    case "update-package":
+      return <AddAndEditPackage />;
     case "login-reports":
       return <LoginHistoryMain />;
     case "download-reports":
       return <DownloadReportsMain />;
+   // ✅ Corrected usage
     default:
       break;
   }

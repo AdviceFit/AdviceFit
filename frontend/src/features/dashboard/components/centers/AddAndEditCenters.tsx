@@ -1,153 +1,200 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod"
+import * as z from "zod";
+import { useEffect } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormDescription,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
-import { createCenter, getCenterById, updateCenter } from "../../actions/centers.action";
-import { useEffect } from "react";
 
+import {
+  createCenter,
+  getCenterById,
+  updateCenter,
+} from "../../actions/centers.action";
+
+// ------------------------------
+// Zod Schema
+// ------------------------------
 const centerSchema = z.object({
-    _id: z.string().optional(),
-    name: z.string().min(1, "Name is required"),
-    centerCode: z
+  _id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  centerCode: z
+    .string()
+    .regex(/^[a-zA-Z]/, "Center code should not start with a number")
+    .min(1, "Center code is required"),
+  centerEmail: z.string().email("A valid email address is required"),
+  mobileNo: z.string().refine((value) => /^[+][1-9][0-9]{1,14}$/.test(value), {
+    message: "Enter a valid international phone number (E.164 format)",
+  }),
+  workPhone: z.string().optional(),
+  gstNumber: z.string().optional(),
+  agency: z.string().optional(),
+  biometricSerialNumber: z.string().optional(),
+  address: z
+    .object({
+      addressLine1: z.string().optional(),
+      addressLine2: z.string().optional(),
+      state: z.string().optional(),
+      city: z.string().optional(),
+      pincode: z
         .string()
-        .regex(/^[a-zA-Z]/, "Center code should not start with a number")
-        .min(1, "Center code is required"),
-    centerEmail: z.string().email("A valid email address is required"),
-    mobileNo: z.string().refine((value) => /^[+][1-9][0-9]{1,14}$/.test(value), {
-        message: "Enter a valid international phone number (E.164 format)",
-    }),
-    workPhone: z.string().optional(),
-    gstNumber: z.string().optional(),
-    agency: z.string().optional(),
-    biometricSerialNumber: z.string().optional(),
-    address: z
-        .object({
-            addressLine1: z.string().optional(),
-            addressLine2: z.string().optional(),
-            state: z.string().optional(),
-            city: z.string().optional(),
-            pincode: z
-                .string()
-                .regex(/^[0-9]{6}$/, "Pincode must be a valid 6-digit number"),
-        })
-        .optional(),
-    aboutUs: z.string().optional(),
-    termsAndConditions: z.string().optional()
+        .regex(/^[0-9]{6}$/, "Pincode must be a valid 6-digit number"),
+    })
+    .optional(),
+  aboutUs: z.string().optional(),
+  termsAndConditions: z.string().optional(),
 });
 
 export type Center = z.infer<typeof centerSchema>;
 
-export default function AddAndEditCenters({ id, onClose }: { id?: string; onClose?: () => void }) {
-    const router = useRouter();
-    const form = useForm<z.infer<typeof centerSchema>>({
-        resolver: zodResolver(centerSchema),
-        defaultValues: {
-            name: "",
-            centerCode: "",
-            centerEmail: "",
-            mobileNo: "",
-            workPhone: "",
-            gstNumber: "",
-            agency: "",
-            biometricSerialNumber: "",
-            address: {
-                addressLine1: "",
-                addressLine2: "",
-                state: "",
-                city: "",
-                pincode: "",
-            },
-            aboutUs: '',
-            termsAndConditions: ''
-        },
-    });
+// ------------------------------
+// Component
+// ------------------------------
+export default function AddAndEditCenters({
+  id,
+  onClose,
+}: {
+  id?: string;
+  onClose?: () => void;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    // Format Center Data for Form Pre-filling
-    const formatCenterData = (data: any): z.infer<typeof centerSchema> => ({
-        _id: data._id || "",
-        name: data.name || "",
-        centerCode: data.centerCode || "",
-        centerEmail: data.centerEmail || "",
-        mobileNo: data.mobileNo || "",
-        workPhone: data.workPhone || "",
-        gstNumber: data.gstNumber || "",
-        agency: data.agency || "",
-        biometricSerialNumber: data.biometricSerialNumber || "",
-        address: {
-            addressLine1: data.address?.addressLine1 || "",
-            addressLine2: data.address?.addressLine2 || "",
-            state: data.address?.state || "",
-            city: data.address?.city || "",
-            pincode: data.address?.pincode || "",
-        },
-        aboutUs: data.aboutUs || "",
-        termsAndConditions: data.termsAndConditions || "",
-    });
+  const paramId = searchParams.get("id");
+  const finalId = id || paramId;
+  const action = searchParams.get("action"); // add/edit
 
-    // Fetch Center Details if Editing
-    useEffect(() => {
-        async function fetchCenterDetails() {
-            if (!id) return;
+  const form = useForm<z.infer<typeof centerSchema>>({
+    resolver: zodResolver(centerSchema),
+    defaultValues: {
+      name: "",
+      centerCode: "",
+      centerEmail: "",
+      mobileNo: "",
+      workPhone: "",
+      gstNumber: "",
+      agency: "",
+      biometricSerialNumber: "",
+      address: {
+        addressLine1: "",
+        addressLine2: "",
+        state: "",
+        city: "",
+        pincode: "",
+      },
+      aboutUs: "",
+      termsAndConditions: "",
+    },
+  });
 
-            try {
-                const response = await getCenterById(id);
-                if (response?.center) {
-                    form.reset(formatCenterData(response.center));
-                } else {
-                    toast.error("Center not found.");
-                }
-            } catch (error) {
-                toast.error("Failed to fetch center details.");
-            }
+  // ------------------------------
+  // Format center data for form reset
+  // ------------------------------
+  const formatCenterData = (data: any): z.infer<typeof centerSchema> => ({
+    _id: data._id || "",
+    name: data.name || "",
+    centerCode: data.centerCode || "",
+    centerEmail: data.centerEmail || "",
+    mobileNo: data.mobileNo || "",
+    workPhone: data.workPhone || "",
+    gstNumber: data.gstNumber || "",
+    agency: data.agency || "",
+    biometricSerialNumber: data.biometricSerialNumber || "",
+    address: {
+      addressLine1: data.address?.addressLine1 || "",
+      addressLine2: data.address?.addressLine2 || "",
+      state: data.address?.state || "",
+      city: data.address?.city || "",
+      pincode: data.address?.pincode || "",
+    },
+    aboutUs: data.aboutUs || "",
+    termsAndConditions: data.termsAndConditions || "",
+  });
+
+  // ------------------------------
+  // Fetch center details if in edit mode
+  // ------------------------------
+  useEffect(() => {
+    async function fetchCenterDetails() {
+      if (!finalId) return;
+
+      try {
+        const response = await getCenterById(finalId);
+        if (response?.center) {
+          form.reset(formatCenterData(response.center));
+        } else {
+          toast.error("Center not found.");
         }
+      } catch (error) {
+        toast.error("Failed to fetch center details.");
+      }
+    }
 
-        fetchCenterDetails();
-    }, [id]);
-    const onSubmit = async (values: z.infer<typeof centerSchema>) => {
-        try {
-            let response;
-            if (id) {
-                response = await updateCenter(id, values as CenterParams);
-                if (response.center) {
-                    toast.success("Center updated successfully!");
-                } else {
-                    toast.error("Failed to update Center.");
-                }
-            } else {
-                response = await createCenter(values as CenterParams);
-                if (response.center) {
-                    toast.success("Center added successfully!");
-                } else {
-                    toast.error("Failed to create Center.");
-                }
-            }
-            onClose?.();
-        } catch (error) {
-            toast.error("Something went wrong. Please try again.");
-        } finally {
-            router.push("/dashboard/centers");
+    fetchCenterDetails();
+  }, [finalId]);
+
+  // ------------------------------
+  // Submit Handler
+  // ------------------------------
+  const onSubmit = async (values: z.infer<typeof centerSchema>) => {
+    try {
+      let response;
+      if (finalId) {
+        response = await updateCenter(finalId, values);
+        if (response.center) {
+          toast.success("Center updated successfully!");
+        } else {
+          toast.error("Failed to update center.");
         }
-    };
+      } else {
+        response = await createCenter(values);
+        if (response.center) {
+          toast.success("Center added successfully!");
+        } else {
+          toast.error("Failed to create center.");
+        }
+      }
+
+      onClose?.();
+      router.push("/dashboard/centers");
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
 
 
     return (
-        <Form {...form}>
+        <>
+    
+  <Button className="w-24" variant="outline" onClick={() => router.back()}>
+    ← Back
+  </Button>
+  <br />
+<h3 className="text-lg font-semibold">
+  {action === "edit" || id ? "Update Center" : "Add Center"}
+</h3>
+  {/* Spacer to align center title */}
+
+        <Form {...form}> <div className="flex justify-between items-center">
+
+     
+    </div>
+
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-4">
                 <div className="grid grid-cols-2 gap-4">
                     {/* Name */}
@@ -421,6 +468,7 @@ export default function AddAndEditCenters({ id, onClose }: { id?: string; onClos
                 </Button>
             </form>
         </Form>
+        </>
     );
 }
 

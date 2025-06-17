@@ -13,19 +13,24 @@ import {
 import { Plus, Download } from "lucide-react";
 import AddAndEditPackage from "./AddAndEditPackage";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Package {
   [key: string]: any;
 }
 
 const PackageHeader = () => {
+  const router = useRouter(); // ✅ Moved inside component
   const [modal, setModal] = useState(false);
 
   const handleExport = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/packages`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/packages`,
+        {
+          withCredentials: true,
+        }
+      );
 
       const packages: Package[] = response.data.packages;
 
@@ -54,29 +59,21 @@ const PackageHeader = () => {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Export failed:", error);
-      alert("Failed to export packages.");
+      toast.error("Failed to export packages.");
     }
   };
 
   return (
     <div className="flex justify-between items-center mb-4">
-      {/* Add Package (Left) */}
-      <Dialog open={modal} onOpenChange={setModal}>
-        <DialogTrigger asChild>
-          <Button variant="default" className="w-36">
+      {/* Add Package (Left Button) */}
+      
+          <Button variant="default" className="w-36" onClick={() => router.push("/dashboard/add-package")}>
             <Plus className="mr-2 h-4 w-4" />
             Add Package
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[765px] lg:h-3/4 h-5/6 overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add Package</DialogTitle>
-          </DialogHeader>
-          <AddAndEditPackage />
-        </DialogContent>
-      </Dialog>
+        
 
-      {/* Export Packages (Right) */}
+      {/* Export Packages (Right Button) */}
       <Button variant="outline" className="w-44" onClick={handleExport}>
         <Download className="mr-2 h-4 w-4" />
         Export Packages

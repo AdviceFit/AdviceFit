@@ -57,7 +57,7 @@ const PackageActionDropdown = ({ id }: { id: string }) => {
             <DropdownMenuContent className="w-40">
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        <Button variant="ghost" onClick={handleOpen}>
+                        <Button variant="ghost" onClick={()=> router.push(`/dashboard/update-package?id=${id}&action=edit`)}>
                             Edit Package
                         </Button>
                     </DropdownMenuItem>
