@@ -4,7 +4,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.get("/", authMiddleware.authenticate,getDashboardData);
-
+// GET /api/dashboard?center=all&dateFilter=today&startDate=2025-06-01&endDate=2025-06-01
+router.get("/", authMiddleware.authenticate, getDashboardData);
 
 module.exports = router;

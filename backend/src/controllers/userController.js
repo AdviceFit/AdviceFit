@@ -64,28 +64,32 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid role provided" });
     }
 
-    // Validate presence of password field
+    // Validate password field
     if (!user.password) {
       return res.status(500).json({ message: "User has no password set" });
     }
 
-    // ✅ Compare password (must await)
+    // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Generate access token
+    // Generate access token
     const { accessToken } = await user.generateTokens(role);
+    
 
-    // ✅ Record login history
+    // ✅ Print token to console
+    console.log("Generated access token:", accessToken);
+
+    // Record login history
     const loginHistory = new LoginHistory({
       userId: user._id,
       createdAt: new Date(),
     });
     await loginHistory.addLoginHistory();
 
-    // ✅ Set cookies
+    // Set cookies
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toUTCString();
 
     res.setHeader("Set-Cookie", [
@@ -94,10 +98,10 @@ exports.login = async (req, res) => {
 
     res.cookie("authToken", accessToken, {
       httpOnly: true,
-      secure: false, // Set true only if using HTTPS
+      secure: false, // Set to true in production with HTTPS
       sameSite: "lax",
       path: "/",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({

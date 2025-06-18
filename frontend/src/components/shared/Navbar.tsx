@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import APP_ROUTES from "@/constants/routes";
@@ -6,12 +6,15 @@ import { buttonVariants } from "../ui/button";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoaggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // ✅ fixed typo
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("user");
-      if (token) {
-        setIsLoaggedIn(true);
+      const user = localStorage.getItem("user");
+      if (user) {
+        setIsLoggedIn(true); // ✅ corrected setter
+      } else {
+        setIsLoggedIn(false); // in case user logs out
       }
     }
   }, []);
@@ -38,7 +41,6 @@ const Navbar = () => {
           <Link
             className={buttonVariants({ variant: "outline" })}
             href={APP_ROUTES.dashboard.attendance}
-
           >
             Dashboard
           </Link>

@@ -23,42 +23,47 @@ import axios from "axios";
 import { BASE_URL } from "@/constants/constant";
 import Link from "next/link";
 
-// Define the schema for validation
+// Zod schema
 const formSchema = z.object({
-  email: z.string().email("Invalid email format"), // Validate email format
-  password: z.string().min(6, "Password must be at least 6 characters long"), // Minimum length for password
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-export default function MyForm() {
+export default function LoginForm() {
   const router = useRouter();
   const [role, setRole] = useState<"Member" | "Admin">("Member");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // Update onSubmit function to handle API call
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  // onSubmit handler
+ async function onSubmit(values: z.infer<typeof formSchema>) {
   try {
-    const dataToSend = {
-      ...values,
-      role,
-    };
+    const dataToSend = { ...values, role };
 
-    // 1. Login call
-    await axios.post(`${BASE_URL}/api/users/login`, dataToSend, {
+    // 1. Login user
+    const loginRes = await axios.post(`${BASE_URL}/api/users/login`, dataToSend, {
       withCredentials: true,
     });
 
-    // 2. Fetch user info
+    const { token } = loginRes.data;
+
+    if (!token) {
+      toast.error("Token not received. Login failed.");
+      return;
+    }
+
+    // ✅ 2. Save token in localStorage and print it
+    const tokenassess = localStorage.setItem("token", token);
+    console.log("Login token saved to localStorage:", tokenassess);
+
+    // 3. Get user info
     const responseOfMe = await getUserInfo();
-    console.log("Fetched user info:", responseOfMe);
 
     if (responseOfMe?.user) {
       localStorage.setItem("user", JSON.stringify(responseOfMe.user));
       toast.success("Login successful!");
-      console.log("User Info Response:", responseOfMe.data);
 
-      // 3. Route based on role
       const userRole = responseOfMe.user.role.name;
 
       if (userRole === "Admin") {
@@ -69,7 +74,7 @@ export default function MyForm() {
         toast.error("Unknown role, cannot redirect");
       }
     } else {
-      toast.error("User data not found after login.");
+      toast.error("User info not found.");
     }
   } catch (error: any) {
     console.error("Login error:", error.response?.data || error.message);
@@ -80,18 +85,13 @@ export default function MyForm() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 max-w-3xl mx-auto"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-3xl mx-auto">
         <div className="flex mt-4">
           <Button
             type="button"
             onClick={() => setRole("Member")}
-            className={`bg-white hover:bg-white text-black w-1/2 shadow-none rounded-none ${
-              role === "Member"
-                ? "border-b-2 border-black"
-                : "border-b text-gray-500"
+            className={`bg-white text-black w-1/2 shadow-none rounded-none ${
+              role === "Member" ? "border-b-2 border-black" : "border-b text-gray-500"
             }`}
           >
             Member
@@ -99,10 +99,8 @@ export default function MyForm() {
           <Button
             type="button"
             onClick={() => setRole("Admin")}
-            className={`bg-white hover:bg-white text-black w-1/2 shadow-none rounded-none ${
-              role === "Admin"
-                ? "border-b-2 border-black"
-                : "border-b text-gray-500"
+            className={`bg-white text-black w-1/2 shadow-none rounded-none ${
+              role === "Admin" ? "border-b-2 border-black" : "border-b text-gray-500"
             }`}
           >
             Partner
@@ -114,14 +112,9 @@ export default function MyForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>Email</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="johndoe@example.com"
-                  type="email"
-                  {...field}
-                  value={field.value || ""} // Ensure fallback to empty string
-                />
+                <Input type="email" placeholder="johndoe@example.com" {...field} value={field.value || ""} />
               </FormControl>
               <FormDescription>Enter your email to sign in.</FormDescription>
               <FormMessage />
@@ -134,13 +127,9 @@ export default function MyForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>Password</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput
-                  placeholder="password"
-                  {...field}
-                  value={field.value || ""} // Ensure fallback to empty string
-                />
+                <PasswordInput placeholder="Enter password" {...field} value={field.value || ""} />
               </FormControl>
               <FormDescription>Enter your password.</FormDescription>
               <FormMessage />
@@ -154,11 +143,8 @@ export default function MyForm() {
 
         <div className="text-center mt-2">
           <p className="text-sm text-gray-500">
-            Don't have an account?{" "}
-            <Link
-              href={`/sign-up?role=${role}`}
-              className="text-black hover:underline"
-            >
+            Don’t have an account?{" "}
+            <Link href={`/sign-up?role=${role}`} className="text-black hover:underline">
               Sign up
             </Link>
           </p>
