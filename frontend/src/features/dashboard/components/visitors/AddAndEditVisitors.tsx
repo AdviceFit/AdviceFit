@@ -180,8 +180,11 @@ export default function AddAndEditVisitors({ onClose }: { onClose?: () => void }
       } else {
         response = await createVisitor(values as VisitorParams);
         if (response.visitor) {
+          console.log("response", response);
+          form.reset();
           toast.success("Visitor added successfully!");
         } else {
+          console.log("Response error:", response.error);
           toast.error(response.error ?? "Failed to create visitor.");
         }
       }

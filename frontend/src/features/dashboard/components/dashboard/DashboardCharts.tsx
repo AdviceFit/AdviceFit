@@ -1,59 +1,95 @@
+"use client";
+
 import React from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
   CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 
-interface DashboardChartsProps {
-  data: Array<{ name: string; data: Record<string, number> }>;
-}
+type ChartData = {
+  name: string;
+  [key: string]: string | number;
+};
 
-const DEFAULT_COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#d88884"];
+type Props = {
+  data?: ChartData[]; // Optional to test fallback
+};
 
-const DashboardCharts: React.FC<DashboardChartsProps> = ({ data }) => {
-  const [activeSeries, setActiveSeries] = React.useState<Array<string>>([]);
+const DashboardCharts = ({ data }: Props) => {
+  // Fallback dummy data for testing
+  const fallbackData: ChartData[] = [
+    { name: "Today", Members: 30, Visitors: 12 },
+    { name: "Yesterday", Members: 20, Visitors: 10 },
+    { name: "2 Days Ago", Members: 15, Visitors: 8 },
+  ];
 
-  const handleLegendClick = (dataKey: string) => {
-    setActiveSeries((prev) =>
-      prev.includes(dataKey)
-        ? prev.filter((key) => key !== dataKey)
-        : [...prev, dataKey]
+  const chartData = data && data.length > 0 ? data : fallbackData;
+
+  // Normalize numeric values
+  const normalizedData = chartData.map((item) => {
+    const normalizedItem: ChartData = { name: item.name };
+    Object.keys(item).forEach((key) => {
+      if (key !== "name") {
+        const value = item[key];
+        normalizedItem[key] = typeof value === "string" ? Number(value) : value;
+      }
+    });
+    return normalizedItem;
+  });
+
+  const dataKeys =
+    normalizedData.length > 0
+      ? Object.keys(normalizedData[0]).filter(
+          (key) => key !== "name" && typeof normalizedData[0][key] === "number"
+        )
+      : [];
+
+  if (!normalizedData || normalizedData.length === 0 || dataKeys.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-sm text-gray-500">
+        No data available to display.
+      </div>
     );
-  };
+  }
 
-  const transformedData = data.map((entry) => ({
-    name: entry.name,
-    ...entry.data,
-  }));
-  const barKeys = Object.keys(data[0]?.data || {});
+  const colors = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff7f50",
+    "#ffb347",
+    "#91e3b1",
+    "#a28ad6",
+    "#c38ec7",
+    "#e06666",
+    "#6fa8dc",
+  ];
 
   return (
-    <div className="w-full h-full px-4 pt-8 pb-2">
+    <div className="w-full h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={transformedData}>
-          <CartesianGrid vertical={false} />
-          <XAxis dataKey="name" tickLine={false} tickMargin={10} />
-          <YAxis axisLine={false} tickLine={false} />
-          <Tooltip cursor={false} wrapperStyle={{ border: "2px solid #000" }} />
-          <Legend
-            iconType="circle"
-            wrapperStyle={{ cursor: "pointer" }}
-            onClick={(props) => handleLegendClick(props.dataKey)}
-          />
-          {barKeys.map((key, index) => (
+        <BarChart
+          data={normalizedData}
+          margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis allowDecimals={false} />
+          <Tooltip />
+          <Legend />
+          {dataKeys.map((key, index) => (
             <Bar
               key={key}
               dataKey={key}
-              fill={DEFAULT_COLORS[index % DEFAULT_COLORS.length]}
-              barSize={12}
-              radius={10}
-              hide={activeSeries.includes(key)}
+              fill={colors[index % colors.length]}
+              radius={[4, 4, 0, 0]}
+              barSize={30}
             />
           ))}
         </BarChart>

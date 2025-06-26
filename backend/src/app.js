@@ -31,6 +31,7 @@ connectDB();
 
 app.use(
   cors({
+    
     origin: process.env.CORS_ORIGINS.split(","), // Adjust to your frontend URL
     credentials: true, // Allow credentials (cookies) to be sent
   })

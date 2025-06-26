@@ -46,7 +46,7 @@ const Dropdown = ({
       control={form.control}
       name={fieldName}
       render={({ field }) => (
-        <FormItem className="flex flex-col gap-2 w-full">
+        <FormItem className="flex flex-col gap-2 w-max-600">
           {!hideTopLabel && <FormLabel required>{label}</FormLabel>}
           <Popover>
             <PopoverTrigger asChild>
