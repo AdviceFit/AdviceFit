@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data: Array.isArray(data) ? data : [],
-     // ✅ Safe fallback to avoid `.length` error
+    
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

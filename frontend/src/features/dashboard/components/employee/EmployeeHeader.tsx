@@ -12,7 +12,7 @@ interface Employee {
 }
 
 const EmployeeHeader = () => {
-  const router = useRouter(); // ✅ FIXED: Missing router initialization
+  const router = useRouter(); 
   const [modal, setModal] = useState(false);
 
   const handleExport = async () => {

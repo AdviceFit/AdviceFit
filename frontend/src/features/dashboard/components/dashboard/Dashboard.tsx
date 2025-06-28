@@ -72,6 +72,7 @@ type DashboardData = {
 };
 
 type CenterParams = {
+  _id: string;
   name: string;
 };
 
@@ -101,7 +102,7 @@ const Dashboard = ({ centers }: Props) => {
       { label: "All Centers", value: "all" },
       ...(centers ?? []).map((center) => ({
         label: center.name,
-        value: center.name,
+        value: center._id,
       })),
     ],
     [centers]
@@ -126,24 +127,22 @@ const Dashboard = ({ centers }: Props) => {
     },
   });
 
-  useEffect(() => {
-    form.trigger();
-  }, []);
+  const centerValue = form.watch("center");
+  const dateRangeValue = form.watch("dateRange");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        const values = form.getValues();
-        const fromDate = values.dateRange?.from?.toISOString().split("T")[0];
-        const toDate = values.dateRange?.to?.toISOString().split("T")[0];
+        const fromDate = dateRangeValue?.from?.toISOString().split("T")[0];
+        const toDate = dateRangeValue?.to?.toISOString().split("T")[0];
         const token = localStorage.getItem("token");
 
         const params: any = {
-          center: values.center,
+          centerId: centerValue, 
           dateFilter: selectedFilter.toLowerCase().replace(/\s/g, ""),
         };
-
+        console.log("Fetching dashboard data with params:", params);
         if (selectedFilter === "Custom") {
           params.startDate = fromDate;
           params.endDate = toDate;
@@ -156,17 +155,16 @@ const Dashboard = ({ centers }: Props) => {
           params,
         });
 
-        console.log("✅ Dashboard data fetched:", response.data);
         setDashboardData(response.data);
       } catch (error) {
-        console.error("❌ Dashboard fetch failed:", error);
+        console.error("Dashboard fetch failed:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, [selectedFilter, form.watch("center"), form.watch("dateRange")]);
+  }, [centerValue, dateRangeValue, selectedFilter]);
 
   const handleDateFilterClick = (label: string) => {
     const today = new Date();
@@ -212,19 +210,17 @@ const Dashboard = ({ centers }: Props) => {
   return (
     <Form {...form}>
       <form className="w-full h-full">
-        {/* Header */}
         <div className="bg-white dark:bg-gray-900 h-16 flex items-center justify-between p-4 gap-10">
           <h4 className="text-xl font-semibold text-gray-800 dark:text-white">Dashboard</h4>
           <Dropdown
             label="Center"
             hideTopLabel
-            fieldName={"center"}
+            fieldName="center"
             form={form}
             options={centerOptions}
           />
         </div>
 
-        {/* Filters */}
         <div className="bg-gray-100 p-4">
           <div className="h-12 flex items-center justify-end gap-2">
             {filterButtonLabels.map((label) => (
@@ -241,7 +237,6 @@ const Dashboard = ({ centers }: Props) => {
                 {label}
               </Button>
             ))}
-            {/* Custom Date Range Picker */}
             <FormField
               control={form.control}
               name="dateRange"
@@ -284,7 +279,7 @@ const Dashboard = ({ centers }: Props) => {
             />
           </div>
 
-          {/* Dashboard Cards */}
+          {/* Count Cards */}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 py-4">
             <DashboardCountCard title="New Members" newMembersCount={dashboardData?.newMembers || 0} label={`M: ${dashboardData?.newMembersMale || 0} / F: ${dashboardData?.newMembersFemale || 0}`} icon={Users} />
             <DashboardCountCard title="New Visitors" newMembersCount={dashboardData?.newVisitors || 0} label={`M: ${dashboardData?.newVisitorsMale || 0} / F: ${dashboardData?.newVisitorsFemale || 0}`} icon={UserRoundPlus} />

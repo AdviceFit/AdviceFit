@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { format, parseISO } from "date-fns";
 
 type ChartData = {
   name: string;
@@ -18,22 +19,38 @@ type ChartData = {
 };
 
 type Props = {
-  data?: ChartData[]; // Optional to test fallback
+  data?: ChartData[];
 };
 
 const DashboardCharts = ({ data }: Props) => {
-  // Fallback dummy data for testing
   const fallbackData: ChartData[] = [
-    { name: "Today", Members: 30, Visitors: 12 },
-    { name: "Yesterday", Members: 20, Visitors: 10 },
-    { name: "2 Days Ago", Members: 15, Visitors: 8 },
+    { name: "2024-06-23", Members: 30, Visitors: 12 },
+    { name: "2024-06-24", Members: 20, Visitors: 10 },
+    { name: "2024-06-25", Members: 15, Visitors: 8 },
+    { name: "2024-06-26", Members: 18, Visitors: 9 },
+    { name: "2024-06-27", Members: 25, Visitors: 13 },
   ];
 
   const chartData = data && data.length > 0 ? data : fallbackData;
 
-  // Normalize numeric values
+  // Infer label type from 'name' value (date/week/month)
+  const isDate = (str: string) => /^\d{4}-\d{2}-\d{2}$/.test(str);
+  const isWeek = (str: string) => str.includes("–");
+  const isMonth = (str: string) => /^[A-Za-z]{3,}$/.test(str);
+
+  // Format label
+  const formatLabel = (name: string) => {
+    if (isDate(name)) return format(parseISO(name), "MMM d"); // Daily
+    if (isWeek(name)) return name;                            // Weekly
+    if (isMonth(name)) return name;                           // Monthly
+    return name;
+  };
+
+  // Normalize and format data
   const normalizedData = chartData.map((item) => {
-    const normalizedItem: ChartData = { name: item.name };
+    const normalizedItem: ChartData = {
+      name: formatLabel(item.name),
+    };
     Object.keys(item).forEach((key) => {
       if (key !== "name") {
         const value = item[key];
@@ -43,33 +60,22 @@ const DashboardCharts = ({ data }: Props) => {
     return normalizedItem;
   });
 
-  const dataKeys =
-    normalizedData.length > 0
-      ? Object.keys(normalizedData[0]).filter(
-          (key) => key !== "name" && typeof normalizedData[0][key] === "number"
-        )
-      : [];
+  const dataKeys = normalizedData.length
+    ? Object.keys(normalizedData[0]).filter((key) => key !== "name")
+    : [];
 
-  if (!normalizedData || normalizedData.length === 0 || dataKeys.length === 0) {
+  const colors = [
+    "#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#ffb347",
+    "#91e3b1", "#a28ad6", "#c38ec7", "#e06666", "#6fa8dc",
+  ];
+
+  if (!normalizedData.length || !dataKeys.length) {
     return (
       <div className="w-full h-full flex items-center justify-center text-sm text-gray-500">
         No data available to display.
       </div>
     );
   }
-
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff7f50",
-    "#ffb347",
-    "#91e3b1",
-    "#a28ad6",
-    "#c38ec7",
-    "#e06666",
-    "#6fa8dc",
-  ];
 
   return (
     <div className="w-full h-[400px]">

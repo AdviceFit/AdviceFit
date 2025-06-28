@@ -28,7 +28,7 @@ const AttendanceActionDropdown =  ({ id }: { id: string }) => {
     
 
     const handleOpen = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent dropdown from closing
+        e.stopPropagation(); 
         setIsOpen(true);
     };
 

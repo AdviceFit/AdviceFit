@@ -20,7 +20,7 @@ interface Package {
 }
 
 const PackageHeader = () => {
-  const router = useRouter(); // ✅ Moved inside component
+  const router = useRouter(); 
   const [modal, setModal] = useState(false);
 
   const handleExport = async () => {

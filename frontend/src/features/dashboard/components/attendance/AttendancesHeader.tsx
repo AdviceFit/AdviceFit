@@ -13,8 +13,7 @@ import {
 import AddAndEditAttendance from "./AddAndEditAttendance";
 import { Download, Plus } from "lucide-react";
 
-// Optional Radix Toast imports if you want to enable toast notifications
-// import * as ToastPrimitive from "@radix-ui/react-toast";
+
 
 interface Attendance {
   [key: string]: any;
@@ -23,8 +22,7 @@ interface Attendance {
 const AttendanceHeader = () => {
   const [modal, setModal] = useState(false);
 
-  // For Radix Toast usage (optional)
-  // const [openToast, setOpenToast] = useState(false);
+
 
   const handleClose = () => {
     setModal(false);
@@ -39,12 +37,10 @@ const AttendanceHeader = () => {
       const attendanceData: Attendance[] = response.data.attendance;
 
       if (!attendanceData.length) {
-        // Using alert for simplicity
+     
         alert("No attendance data to export.");
 
-        // If using Radix Toast instead:
-        // setOpenToast(true);
-
+      
         return;
       }
 

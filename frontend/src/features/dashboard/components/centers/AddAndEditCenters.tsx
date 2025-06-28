@@ -27,7 +27,7 @@ import {
   updateCenter,
 } from "../../actions/centers.action";
 
-// ------------------------------
+
 // Zod Schema
 // ------------------------------
 const centerSchema = z.object({
@@ -62,9 +62,7 @@ const centerSchema = z.object({
 
 export type Center = z.infer<typeof centerSchema>;
 
-// ------------------------------
-// Component
-// ------------------------------
+
 export default function AddAndEditCenters({
   id,
   onClose,
@@ -77,7 +75,7 @@ export default function AddAndEditCenters({
 
   const paramId = searchParams.get("id");
   const finalId = id || paramId;
-  const action = searchParams.get("action"); // add/edit
+  const action = searchParams.get("action"); 
 
   const form = useForm<z.infer<typeof centerSchema>>({
     resolver: zodResolver(centerSchema),
@@ -102,9 +100,6 @@ export default function AddAndEditCenters({
     },
   });
 
-  // ------------------------------
-  // Format center data for form reset
-  // ------------------------------
   const formatCenterData = (data: any): z.infer<typeof centerSchema> => ({
     _id: data._id || "",
     name: data.name || "",
@@ -126,9 +121,7 @@ export default function AddAndEditCenters({
     termsAndConditions: data.termsAndConditions || "",
   });
 
-  // ------------------------------
-  // Fetch center details if in edit mode
-  // ------------------------------
+ 
   useEffect(() => {
     async function fetchCenterDetails() {
       if (!finalId) return;
@@ -148,13 +141,11 @@ export default function AddAndEditCenters({
     fetchCenterDetails();
   }, [finalId]);
 
-  // ------------------------------
-  // Submit Handler
-  // ------------------------------
   const onSubmit = async (values: z.infer<typeof centerSchema>) => {
     try {
       let response;
       if (finalId) {
+        //@ts-ignore
         response = await updateCenter(finalId, values);
         if (response.center) {
           toast.success("Center updated successfully!");
@@ -162,9 +153,11 @@ export default function AddAndEditCenters({
           toast.error("Failed to update center.");
         }
       } else {
+        console.log('Creating new center with values:');
+        console.log('values', values);
+        //@ts-ignore
         response = await createCenter(values);
-        if (response.center) {
-          toast.success("Center added successfully!");
+        if (response.data) {          toast.success("Center added successfully!");
         } else {
           toast.error("Failed to create center.");
         }
@@ -188,7 +181,7 @@ export default function AddAndEditCenters({
 <h3 className="text-lg font-semibold">
   {action === "edit" || id ? "Update Center" : "Add Center"}
 </h3>
-  {/* Spacer to align center title */}
+ 
 
         <Form {...form}> <div className="flex justify-between items-center">
 
@@ -197,7 +190,7 @@ export default function AddAndEditCenters({
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full mx-auto py-4">
                 <div className="grid grid-cols-2 gap-4">
-                    {/* Name */}
+                    {/* Name */} 
                     <FormField
                         control={form.control}
                         name="name"

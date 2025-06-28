@@ -6,15 +6,15 @@ import { buttonVariants } from "../ui/button";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // ✅ fixed typo
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const user = localStorage.getItem("user");
       if (user) {
-        setIsLoggedIn(true); // ✅ corrected setter
+        setIsLoggedIn(true); 
       } else {
-        setIsLoggedIn(false); // in case user logs out
+        setIsLoggedIn(false); 
       }
     }
   }, []);

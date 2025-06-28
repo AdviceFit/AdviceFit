@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Member = require("../models/memberModel");
 const Visitor = require("../models/visitorModel");
 const Expense = require("../models/expenseModel");
@@ -6,12 +7,11 @@ const Subscription = require("../models/subscriptionModel");
 
 exports.getDashboardData = async (req, res) => {
   try {
-    const { center = "all", dateFilter = "today", startDate, endDate } = req.query;
-
+    const { centerId = "all", dateFilter = "today", startDate, endDate } = req.query;
     const now = new Date();
     let dateQuery = {};
 
-    // Date Filter Logic
+    // 🗓 Date filter logic
     if (startDate && endDate) {
       dateQuery = {
         createdAt: {
@@ -21,7 +21,6 @@ exports.getDashboardData = async (req, res) => {
       };
     } else {
       let start, end;
-
       switch (dateFilter.toLowerCase()) {
         case "today":
           start = new Date();
@@ -29,7 +28,6 @@ exports.getDashboardData = async (req, res) => {
           end = new Date();
           end.setHours(23, 59, 59, 999);
           break;
-
         case "yesterday":
           start = new Date();
           start.setDate(start.getDate() - 1);
@@ -37,17 +35,14 @@ exports.getDashboardData = async (req, res) => {
           end = new Date(start);
           end.setHours(23, 59, 59, 999);
           break;
-
         case "thisweek":
           start = new Date();
-          const day = start.getDay();
-          const diffToMonday = day === 0 ? -6 : 1 - day;
+          const diffToMonday = start.getDay() === 0 ? -6 : 1 - start.getDay();
           start.setDate(start.getDate() + diffToMonday);
           start.setHours(0, 0, 0, 0);
           end = new Date();
           end.setHours(23, 59, 59, 999);
           break;
-
         case "lastweek":
           start = new Date();
           const lastDay = start.getDay();
@@ -58,17 +53,14 @@ exports.getDashboardData = async (req, res) => {
           end.setDate(end.getDate() + 6);
           end.setHours(23, 59, 59, 999);
           break;
-
         case "thismonth":
           start = new Date(now.getFullYear(), now.getMonth(), 1);
           end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
           break;
-
         case "lastmonth":
           start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
           break;
-
         default:
           start = null;
           end = null;
@@ -84,9 +76,13 @@ exports.getDashboardData = async (req, res) => {
       }
     }
 
-    const centerQuery = center !== "all" ? { centerName: center } : {};
+    // ✅ Center filter by centerId (ObjectId)
+    const centerQuery =
+      centerId !== "all"
+        ? { centerId: new mongoose.Types.ObjectId(centerId) }
+        : {};
 
-    // Parallel Queries
+    // 📊 Main counts
     const [
       totalMembers,
       maleMembers,
@@ -115,22 +111,68 @@ exports.getDashboardData = async (req, res) => {
       Subscription.countDocuments({ ...centerQuery, ...dateQuery }),
     ]);
 
+    // 📈 Chart Data Grouping
+    const from = startDate ? new Date(startDate) : now;
+    const to = endDate ? new Date(endDate) : now;
+    const diffInDays = Math.ceil((to - from) / (1000 * 60 * 60 * 24));
+    let groupBy;
+    if (diffInDays <= 1) groupBy = { $hour: "$createdAt" };
+    else if (diffInDays <= 7) groupBy = { $dayOfWeek: "$createdAt" };
+    else groupBy = { $dayOfMonth: "$createdAt" };
+
+    const collectionAgg = await Payment.aggregate([
+      { $match: { ...centerQuery, ...dateQuery } },
+      { $group: { _id: groupBy, total: { $sum: "$amount" } } },
+      { $project: { name: "$_id", Collection: "$total", _id: 0 } },
+    ]);
+
+    const expenseAggChart = await Expense.aggregate([
+      { $match: { ...centerQuery, ...dateQuery } },
+      { $group: { _id: groupBy, total: { $sum: "$amount" } } },
+      { $project: { name: "$_id", Expenses: "$total", _id: 0 } },
+    ]);
+
+    // Merge chart data
+    const chartMap = new Map();
+    collectionAgg.forEach((item) => {
+      chartMap.set(item.name, {
+        name: `Slot ${item.name}`,
+        Collection: item.Collection,
+        Expenses: 0,
+      });
+    });
+
+    expenseAggChart.forEach((item) => {
+      if (chartMap.has(item.name)) {
+        chartMap.get(item.name).Expenses = item.Expenses;
+      } else {
+        chartMap.set(item.name, {
+          name: `Slot ${item.name}`,
+          Collection: 0,
+          Expenses: item.Expenses,
+        });
+      }
+    });
+
+    const mergedChartData = Array.from(chartMap.values());
+
+    const chartData = {
+      Daily: {
+        "Collection vs Expenses": mergedChartData,
+      },
+    };
+
+    // ✅ Final response payload
     const response = {
       newMembers: totalMembers,
       newMembersMale: maleMembers,
       newMembersFemale: femaleMembers,
-      newMembersLabel: `M: ${maleMembers}, F: ${femaleMembers}`,
-
       newVisitors: visitorsCount,
       newVisitorsMale: maleVisitors,
       newVisitorsFemale: femaleVisitors,
-      newVisitorsLabel: `M: ${maleVisitors}, F: ${femaleVisitors}`,
-
       expenses: expenseAgg[0]?.total || 0,
       collected: paymentAgg[0]?.total || 0,
       renewedSubscription: subscriptionCount,
-
-      // Static values
       balanceDue: 0,
       balanceDueLabel: "₹0 due",
       expiredMembership: 0,
@@ -142,11 +184,15 @@ exports.getDashboardData = async (req, res) => {
       nonLiveFollowUp: 0,
       greeting: 0,
       sale: 0,
+      chartData,
     };
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Dashboard error:", error);
-    res.status(500).json({ message: "Internal Server Error", error: error.message });
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };

@@ -32,28 +32,28 @@ const SessionHeader = () => {
       );
 
       const data = response.data;
-      console.log("✅ Raw API response:", data);
+      console.log(" Raw API response:", data);
 
       let sessions: Session[] = [];
 
       if (Array.isArray(data.sessions)) {
         sessions = data.sessions;
-        console.log("📦 Found sessions in `data.sessions`:", sessions);
+        console.log(" Found sessions in `data.sessions`:", sessions);
       } else if (Array.isArray(data.session)) {
         sessions = data.session;
-        console.log("📦 Found sessions in `data.session`:", sessions);
+        console.log(" Found sessions in `data.session`:", sessions);
       } else if (Array.isArray(data)) {
         sessions = data;
-        console.log("📦 Found sessions directly in `data`:", sessions);
+        console.log(" Found sessions directly in `data`:", sessions);
       } else {
-        console.warn("⚠️ Unrecognized response format");
+        console.warn(" Unrecognized response format");
         toast.error("Unexpected response format from server.");
         setLoading(false);
         return;
       }
 
       if (!sessions.length) {
-        console.warn("⚠️ Sessions array is empty.");
+        console.warn(" Sessions array is empty.");
         toast.error("No sessions to export.");
         setLoading(false);
         return;
@@ -81,9 +81,9 @@ const SessionHeader = () => {
       link.click();
       document.body.removeChild(link);
 
-      toast.success("✅ Sessions exported successfully!");
+      toast.success(" Sessions exported successfully!");
     } catch (error) {
-      console.error("❌ Export failed:", error);
+      console.error(" Export failed:", error);
       toast.error("Failed to export sessions.");
     } finally {
       setLoading(false);
