@@ -97,16 +97,16 @@ const SidebarLinks = () => {
     <div className="relative flex h-[calc(100vh-64px)] flex-col rounded-tr-xl rounded-br-xl bg-clip-border text-gray-700  shadow-blue-gray-900/5 overflow-auto">
       <nav className="flex flex-col gap-1 p-2 font-sans text-sm font-medium text-blue-gray-700">
         {renderLink("Dashboard", "/dashboard", <LayoutDashboard />)}
-        {renderLink("Visitors", APP_ROUTES.dasboard.visitors, <UserSearch />)}
-        {renderLink("Members", APP_ROUTES.dasboard.members, <Users />)}
+        {renderLink("Visitors", APP_ROUTES.dashboard.visitors, <UserSearch />)}
+        {renderLink("Members", APP_ROUTES.dashboard.members, <Users />)}
         {renderLink(
           "Attendance",
-          APP_ROUTES.dasboard.attendance,
+          APP_ROUTES.dashboard.attendance,
           <CalendarDays />
         )}
         {renderLink(
           "Sessions",
-          APP_ROUTES.dasboard.sessions,
+          APP_ROUTES.dashboard.sessions,
           <TvMinimalPlay />
         )}
 
