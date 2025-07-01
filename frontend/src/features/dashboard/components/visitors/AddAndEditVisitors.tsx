@@ -167,34 +167,38 @@ export default function AddAndEditVisitors({ onClose }: { onClose?: () => void }
     fetchVisitorDetails();
   }, [id]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      let response;
-      if (id) {
-        response = await updateVisitor(id, values as VisitorParams);
-        if (response.visitor) {
-          toast.success("Visitor updated successfully!");
-        } else {
-          toast.error("Failed to update visitor.");
-        }
-      } else {
-        response = await createVisitor(values as VisitorParams);
-        if (response.visitor) {
-          console.log("response", response);
-          form.reset();
-          toast.success("Visitor added successfully!");
-        } else {
-          console.log("Response error:", response.error);
-          toast.error(response.error ?? "Failed to create visitor.");
-        }
-      }
+async function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    console.log("Submitting visitor:", values);
+    let response;
 
-      onClose?.();
-      router.replace("/dashboard/visitors");
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+    if (id) {
+      response = await updateVisitor(id, values as VisitorParams);
+      if (response.visitor) {
+        toast.success("Visitor updated successfully!");
+      } else {
+        toast.error("Failed to update visitor.");
+      }
+    } else {
+      response = await createVisitor(values as VisitorParams);
+      console.log("Create response:", response);
+      if (response.visitor) {
+        form.reset();
+        toast.success("Visitor added successfully!");
+      } else {
+       
+        toast.error(response.error ?? "Failed to create visitor.");
+      }
     }
+
+    onClose?.();
+    router.replace("/dashboard/visitors");
+  } catch (error) {
+    console.error("Submit error:", error);
+    toast.error("Something went wrong. Please try again.");
   }
+}
+
   return (
     <>
    <Button className="w-24" variant="outline" onClick={() => router.back()}>

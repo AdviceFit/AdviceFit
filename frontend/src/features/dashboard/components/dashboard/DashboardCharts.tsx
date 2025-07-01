@@ -33,20 +33,17 @@ const DashboardCharts = ({ data }: Props) => {
 
   const chartData = data && data.length > 0 ? data : fallbackData;
 
-  // Infer label type from 'name' value (date/week/month)
   const isDate = (str: string) => /^\d{4}-\d{2}-\d{2}$/.test(str);
-  const isWeek = (str: string) => str.includes("–");
+  const isWeek = (str: string) => str.includes("–") || str.includes("-");
   const isMonth = (str: string) => /^[A-Za-z]{3,}$/.test(str);
 
-  // Format label
   const formatLabel = (name: string) => {
-    if (isDate(name)) return format(parseISO(name), "MMM d"); // Daily
-    if (isWeek(name)) return name;                            // Weekly
-    if (isMonth(name)) return name;                           // Monthly
+    if (isDate(name)) return format(parseISO(name), "MMM d");
+    if (isWeek(name)) return name.replace("-", " to ");
+    if (isMonth(name)) return name;
     return name;
   };
 
-  // Normalize and format data
   const normalizedData = chartData.map((item) => {
     const normalizedItem: ChartData = {
       name: formatLabel(item.name),

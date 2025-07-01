@@ -7,12 +7,14 @@ const API_URL = `${BASE_URL}/visitors`;
 
 export const getVisitor = async (): Promise<VisitorsDataParams> => {
   const response = await apiClient.get(API_URL);
+  
   return response.data;
 };
 
 // Create a new visitor (POST request)
 export const createVisitor = async (data: VisitorParams) => {
   const response = await apiClient.post(API_URL, data);
+  
   return response.data;
 };
 

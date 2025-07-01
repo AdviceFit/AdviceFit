@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 const Member = require("../models/memberModel");
 const Visitor = require("../models/visitorModel");
 const Expense = require("../models/expenseModel");
@@ -78,11 +79,15 @@ exports.getDashboardData = async (req, res) => {
 
     // ✅ Center filter by centerId (ObjectId)
     const centerQuery =
-      centerId !== "all"
-        ? { centerId: new mongoose.Types.ObjectId(centerId) }
-        : {};
+  centerId !== "all"
+    ? {
+        $or: [
+          { center: new ObjectId(centerId) },
+          { visiting_center: new ObjectId(centerId) },
+        ]
+    }
+    : {};
 
-    // 📊 Main counts
     const [
       totalMembers,
       maleMembers,
@@ -111,7 +116,7 @@ exports.getDashboardData = async (req, res) => {
       Subscription.countDocuments({ ...centerQuery, ...dateQuery }),
     ]);
 
-    // 📈 Chart Data Grouping
+  
     const from = startDate ? new Date(startDate) : now;
     const to = endDate ? new Date(endDate) : now;
     const diffInDays = Math.ceil((to - from) / (1000 * 60 * 60 * 24));
@@ -186,7 +191,9 @@ exports.getDashboardData = async (req, res) => {
       sale: 0,
       chartData,
     };
+    
 
+    
     return res.status(200).json(response);
   } catch (error) {
     console.error("Dashboard error:", error);

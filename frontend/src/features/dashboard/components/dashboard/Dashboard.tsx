@@ -82,9 +82,9 @@ type Props = {
 
 const Dashboard = ({ centers }: Props) => {
   const [selectedFilter, setSelectedFilter] = useState("Today");
-  const [selectedChartFilter, setSelectedChartFilter] = useState("Daily");
   const [isLoading, setIsLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [chartFilters, setChartFilters] = useState<{ [title: string]: string }>({});
 
   const filterButtonLabels = [
     "Today",
@@ -134,15 +134,17 @@ const Dashboard = ({ centers }: Props) => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        const fromDate = dateRangeValue?.from?.toISOString().split("T")[0];
-        const toDate = dateRangeValue?.to?.toISOString().split("T")[0];
+        
+        
+        const fromDate = format(dateRangeValue.from, "yyyy-MM-dd");
+        const toDate = format(dateRangeValue.to, "yyyy-MM-dd");
         const token = localStorage.getItem("token");
 
         const params: any = {
-          centerId: centerValue, 
+          centerId: centerValue,
           dateFilter: selectedFilter.toLowerCase().replace(/\s/g, ""),
         };
-        console.log("Fetching dashboard data with params:", params);
+
         if (selectedFilter === "Custom") {
           params.startDate = fromDate;
           params.endDate = toDate;
@@ -155,7 +157,14 @@ const Dashboard = ({ centers }: Props) => {
           params,
         });
 
-        setDashboardData(response.data);
+        const responseData = response.data;
+        setDashboardData(responseData);
+
+        const initialChartFilters: { [key: string]: string } = {};
+        Object.keys(responseData.chartData?.["Daily"] || {}).forEach((title) => {
+          initialChartFilters[title] = "Daily";
+        });
+        setChartFilters(initialChartFilters);
       } catch (error) {
         console.error("Dashboard fetch failed:", error);
       } finally {
@@ -254,7 +263,10 @@ const Dashboard = ({ centers }: Props) => {
                           onClick={() => setSelectedFilter("Custom")}
                         >
                           {field.value?.from && field.value?.to ? (
-                            `${format(field.value.from, "PPP")} to ${format(field.value.to, "PPP")}`
+                            `${format(field.value.from, "PPP")} to ${format(
+                              field.value.to,
+                              "PPP"
+                            )}`
                           ) : (
                             <span>Select date range</span>
                           )}
@@ -281,9 +293,24 @@ const Dashboard = ({ centers }: Props) => {
 
           {/* Count Cards */}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 py-4">
-            <DashboardCountCard title="New Members" newMembersCount={dashboardData?.newMembers || 0} label={`M: ${dashboardData?.newMembersMale || 0} / F: ${dashboardData?.newMembersFemale || 0}`} icon={Users} />
-            <DashboardCountCard title="New Visitors" newMembersCount={dashboardData?.newVisitors || 0} label={`M: ${dashboardData?.newVisitorsMale || 0} / F: ${dashboardData?.newVisitorsFemale || 0}`} icon={UserRoundPlus} />
-            <DashboardCountCard title="Balance Due" newMembersCount={dashboardData?.balanceDue || 0} label={dashboardData?.balanceDueLabel} icon={Banknote} />
+            <DashboardCountCard
+              title="New Members"
+              newMembersCount={dashboardData?.newMembers || 0}
+              label={`M: ${dashboardData?.newMembersMale || 0} / F: ${dashboardData?.newMembersFemale || 0}`}
+              icon={Users}
+            />
+            <DashboardCountCard
+              title="New Visitors"
+              newMembersCount={dashboardData?.newVisitors || 0}
+              label={`M: ${dashboardData?.newVisitorsMale || 0} / F: ${dashboardData?.newVisitorsFemale || 0}`}
+              icon={UserRoundPlus}
+            />
+            <DashboardCountCard
+              title="Balance Due"
+              newMembersCount={dashboardData?.balanceDue || 0}
+              label={dashboardData?.balanceDueLabel}
+              icon={Banknote}
+            />
             <DashboardCountCard title="Expired Membership" newMembersCount={dashboardData?.expiredMembership || 0} icon={UserX} />
             <DashboardCountCard title="Expenses" newMembersCount={dashboardData?.expenses || 0} icon={Wallet} />
             <DashboardCountCard title="Collected" newMembersCount={dashboardData?.collected || 0} icon={HandCoins} />
@@ -305,32 +332,39 @@ const Dashboard = ({ centers }: Props) => {
               "Collection Mode",
               "Visitor vs Converted",
               "Business Source",
-            ].map((title) => (
-              <div className="w-full h-[450px]" key={title}>
-                <div className="flex items-center justify-between h-[10%] pb-4">
-                  <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
-                  <div className="flex items-center">
-                    {chartFilterButtonLabels.map((label) => (
-                      <Button
-                        key={label}
-                        type="button"
-                        className={`${
-                          selectedChartFilter === label
-                            ? "bg-white text-blue-600"
-                            : "bg-white text-gray-600"
-                        } text-xs rounded-none hover:bg-white p-2 h-7`}
-                        onClick={() => setSelectedChartFilter(label)}
-                      >
-                        {label}
-                      </Button>
-                    ))}
+            ].map((title) => {
+              const currentChartFilter = chartFilters[title] || "Daily";
+              const chartData = dashboardData?.chartData?.[currentChartFilter]?.[title] || [];
+
+              return (
+                <div className="w-full h-[450px]" key={title}>
+                  <div className="flex items-center justify-between h-[10%] pb-4">
+                    <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+                    <div className="flex items-center">
+                      {chartFilterButtonLabels.map((label) => (
+                        <Button
+                          key={label}
+                          type="button"
+                          className={`${
+                            currentChartFilter === label
+                              ? "bg-white text-blue-600"
+                              : "bg-white text-gray-600"
+                          } text-xs rounded-none hover:bg-white p-2 h-7`}
+                          onClick={() =>
+                            setChartFilters((prev) => ({ ...prev, [title]: label }))
+                          }
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-full h-[90%] bg-white flex items-center justify-center">
+                    <DashboardCharts data={chartData} />
                   </div>
                 </div>
-                <div className="w-full h-[90%] bg-white flex items-center justify-center">
-                  <DashboardCharts data={dashboardData?.chartData?.[selectedChartFilter]?.[title] || []} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </form>

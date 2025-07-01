@@ -7,7 +7,7 @@ exports.createVisitor = async (req, res) => {
         visitorData.createdBy = req.user._id; // Assign logged-in user
 
         const newVisitor = await VisitorService.createVisitor(visitorData);
-
+     
         res.status(201).json({ message: 'Visitor created successfully', visitor: newVisitor });
     } catch (error) {
         if (error.code === 11000) {
