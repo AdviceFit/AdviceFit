@@ -77,7 +77,7 @@ exports.getDashboardData = async (req, res) => {
       }
     }
 
-    // ✅ Center filter by centerId (ObjectId)
+    
     const centerQuery =
   centerId !== "all"
     ? {
@@ -137,7 +137,7 @@ exports.getDashboardData = async (req, res) => {
       { $project: { name: "$_id", Expenses: "$total", _id: 0 } },
     ]);
 
-    // Merge chart data
+  
     const chartMap = new Map();
     collectionAgg.forEach((item) => {
       chartMap.set(item.name, {
@@ -167,7 +167,7 @@ exports.getDashboardData = async (req, res) => {
       },
     };
 
-    // ✅ Final response payload
+    
     const response = {
       newMembers: totalMembers,
       newMembersMale: maleMembers,

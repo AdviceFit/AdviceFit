@@ -53,7 +53,7 @@ export default function LoginForm() {
       return;
     }
 
-    // ✅ 2. Save token in localStorage and print it
+    
     const tokenassess = localStorage.setItem("token", token);
     console.log("Login token saved to localStorage:", tokenassess);
 

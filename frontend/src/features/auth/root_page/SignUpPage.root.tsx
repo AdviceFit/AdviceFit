@@ -82,7 +82,7 @@ const SignUpPage = () => {
     city: values.city,
     pincode: values.pincode,
     state: values.state,
-    role: role, // ✅ explicitly set the role
+    role: role, 
   };
 
   try {

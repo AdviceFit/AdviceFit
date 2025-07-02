@@ -79,8 +79,8 @@ exports.login = async (req, res) => {
     const { accessToken } = await user.generateTokens(role);
     
 
-    // ✅ Print token to console
-    console.log("Generated access token:", accessToken);
+    
+    
 
     // Record login history
     const loginHistory = new LoginHistory({
