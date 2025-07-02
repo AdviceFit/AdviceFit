@@ -27,15 +27,28 @@ import { useEffect, useState } from "react";
 
 // Form schema
 const formSchema = z.object({
-  gym_name: z.string().min(2).max(50),
-  gym_owner_name: z.string().min(2).max(50),
+  gym_name: z.string().min(2, "Gym name must be at least 2 characters").max(50, "Gym name must not exceed 50 characters"),
+  gym_owner_name: z.string().min(2, "Owner name must be at least 2 characters").max(50, "Owner name must not exceed 50 characters"),
   email: z.string().email("Invalid email format"),
-  number: z.number(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  describe: z.string(),
+  number: z.string()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number must not exceed 15 digits")
+    .regex(/^\+?[0-9]+$/, "Invalid phone number format"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+  describe: z.string()
+    .min(20, "Description must be at least 20 characters")
+    .max(500, "Description must not exceed 500 characters"),
   country: z.string(),
   city: z.string().min(2).max(50),
-  pincode: z.string().min(6).max(8),
+  pincode: z.string()
+    .regex(/^[0-9]+$/, "Pincode must contain only numbers")
+    .min(6, "Pincode must be at least 6 digits")
+    .max(8, "Pincode must not exceed 8 digits"),
   state: z.string(),
 });
 
